@@ -29,6 +29,13 @@ they have solved a problem and I did not feel like reinventing the wheel.
 
 * [pypuppetdb](https://github.com/puppet-community/pypuppetdb)
 
+### Screenshots
+![Dashboard](screenshots/pano_dash.png)
+![Nodes View](screenshots/pano_nodes.png)
+![Reports View](screenshots/pano_reports.png)
+![Events View](screenshots/pano_events.png)
+![Facts View](screenshots/pano_facts.png)
+
 
 Requires python3
 install requirements listed in requirements.txt
