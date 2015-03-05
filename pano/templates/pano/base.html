@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PanoPuppet</title>
+    {% load staticfiles %}
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <!-- Latest compiled Bootstrap JavaScript -->
+    <script src="{% static 'pano/js/bootstrap.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'pano/css/bootstrap.min.css' %}">
+
+    {% block head %}
+    {% endblock %}
+
+    <link rel="shortcut icon" href="{% static 'pano/favicon.ico' %}" type="image/x-icon">
+</head>
+<body>
+{% load tz %}
+
+<div class="container-fluid">
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="/">PanoPuppet</a>
+            </div>
+            <div>
+                <ul class="nav navbar-nav">
+                    <li{% if "pano/dashboard" in request.path %} class="active"{% endif %}>
+                        <a href="{% url 'dashboard' %}">Dashboard</a>
+                    </li>
+                    <li{% if "pano/nodes" in request.path %} class="active"{% endif %}>
+                        <a href="{% url 'nodes' %}">Nodes</a>
+                    </li>
+                    {% if certname %}
+                        <li{% if "pano/reports" in request.path %} class="active"{% endif %}>
+                            <a href="{% url 'reports' certname %}">Reports</a>
+                        </li>
+                        <li{% if "pano/facts" in request.path %} class="active"{% endif %}>
+                            <a href="{% url 'facts' certname %}">Facts</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+</div>
+
+<div class="container-fluid">
+    {% block content %}
+    {% endblock %}
+</div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div align="right" class="col-md-12">
+            {{ requests }}
+            {% get_current_timezone as TIME_ZONE %}
+            <form action="{% url 'index' %}" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="url" value="{{ request.path|urlencode }}"/>
+                <span class="dropdown-header">
+                    <label for="timezone">
+                        <select class="span-12" name="timezone" onchange="this.form.submit()">
+                            {% for tz in timezones %}
+                                <option value="{{ tz }}"{% if tz == TIME_ZONE %}
+                                        selected="selected"{% endif %}>{{ tz }}</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                </span>
+            </form>
+        </div>
+    </div>
+    <div align="center" class="row">
+        <span class="small"><strong>Powered by Django, developed for speed. Swoosh...</strong></span>
+    </div>
+</div>
+</body>
+</html>

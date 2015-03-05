@@ -1,0 +1,98 @@
+{% extends "pano/base.html" %}
+
+{% load puppetdb_extras %}
+{% load common %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4" align="center">
+                <p><strong>Failed Nodes</strong></p>
+
+                <p>{{ failed_nodes }}</p>
+            </div>
+            <div class="col-md-4" align="center">
+                <p><strong>status changed</strong></p>
+
+                <p>{{ changed_nodes }}</p>
+            </div>
+            <div class="col-md-4" align="center">
+                <p><strong>Unreported nodes</strong></p>
+
+                <p>{{ unreported_nodes }}</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4" align="center">
+                <p><strong>Population</strong></p>
+
+                <p>{{ population }}</p>
+            </div>
+            <div class="col-md-4" align="center">
+                <p><strong>Resources managed</strong></p>
+
+                <p>{{ total_resource }}</p>
+            </div>
+            <div class="col-md-4" align="center">
+                <p><strong>Average resource per node</strong></p>
+
+                <p>{{ avg_resource }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <div class="row">
+            <ul class="nav nav-tabs">
+                <li{% if "pano/dashboard" in request.path %} class="active"{% endif %}><a href="{% url 'dashboard' %}">Recent</a></li>
+                <li{% if "pano/dashfails" in request.path %} class="active"{% endif %}><a href="{% url 'dashfailed' %}">Failed</a></li>
+                <li{% if "pano/dashunreported" in request.path %} class="active"{% endif %}>
+                    <a href="{% url 'dashunreported' %}">Unreported</a>
+                </li>
+                <li{% if "pano/dashchanged" in request.path %} class="active"{% endif %}>
+                    <a href="{% url 'dashchanged' %}">Changed</a>
+                </li>
+            </ul>
+        </div>
+        <div class="col-md-12">
+            <table class="table table-condensed table-striped">
+                <thead>
+                <tr>
+                    <th>Certname</th>
+                    <th>Latest Catalog</th>
+                    <th>Latest Report</th>
+                    <th>Latest Facts</th>
+                    <th>Success</th>
+                    <th>Noop</th>
+                    <th>Failure</th>
+                    <th>Skipped</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% if node_list %}
+                    {% for node in node_list %}
+                        <tr>
+                            <td><a href="{% url 'reports' certname=node.name %}">{{ node.name }}</a></td>
+                            <td>{{ node.catalog_timestamp|json_to_datetime }}</td>
+                            <td>{{ node.report_timestamp|json_to_datetime }}</td>
+                            <td>{{ node.facts_timestamp|json_to_datetime }}</td>
+                            <td class="success">
+                                <strong>{% get_status_summary runstatus node.name 'success' %}</strong>
+                            </td>
+                            <td class="info"><strong>{% get_status_summary runstatus node.name 'noop' %}</strong>
+                            </td>
+                            <td class="danger">
+                                <strong>{% get_status_summary runstatus node.name 'failure' %}</strong>
+                            </td>
+                            <td class="warning">
+                                <strong>{% get_status_summary runstatus node.name 'skipped' %}</strong>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    No nodes were found in puppetdb.
+                {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

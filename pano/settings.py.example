@@ -1,0 +1,6 @@
+########################
+####Pano Puppet Conf####
+########################
+
+# Must have a slash "/" at the end of the URL
+PUPPETDB_HOST = "http://puppetdb.your.domain.com:8080/"
