@@ -28,7 +28,7 @@
                     {% for report in reports %}
                         <tr>
                             <td>
-                              <a href="{% url 'events' certname=report.certname hashid=report.hash %}?report_timestamp={{ report|get_item:'start-time'|json_to_datetime }}">{{ report.hash }}</a>
+                                <a href="{% url 'events' certname=report.certname hashid=report.hash %}?report_timestamp={{ report|get_item:'start-time'|json_to_datetime }}">{{ report.hash }}</a>
                             </td>
                             <td>{{ report.environment }}</td>
                             <td>{{ report|get_item:'start-time'|json_to_datetime }}</td>
@@ -47,24 +47,21 @@
                     <p>No reports were found in puppetdb for <strong>{{ certname }}</strong></p>
                 {% endif %}
                 </tbody>
+                <tfoot>
+                <tr>
+                    <td>
+                        <ul class="pagination pagination-sm">
+                            {% for page in tot_pages|get_range %}
+                                {% if page != 0 %}
+                                    <li {% if curr_page == page %}class="active"{% endif %}><a
+                                            href="?page={{ page }}">{{ page }}</a></li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    </td>
+                </tr>
+                </tfoot>
             </table>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-4">
-            <div class="pagination">
-                <span class="step-links">
-                    {% if reports.has_previous %}
-                        <a href="?page={{ reports.previous_page_number }}">previous</a>
-                    {% endif %}
-                    <span class="current">
-                        Page {{ reports.number }} of {{ reports.paginator.num_pages }}.
-                    </span>
-                    {% if reports.has_next %}
-                        <a href="?page={{ reports.next_page_number }}">next</a>
-                    {% endif %}
-                </span>
-            </div>
         </div>
     </div>
 {% endblock %}

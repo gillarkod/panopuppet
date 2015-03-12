@@ -2,15 +2,28 @@
 {% load tz %}
 
 {% block content %}
-    <div class="container">
-        <div class="jumbotron">
-            <h1>PanoPuppet (.pp)</h1>
+    {% if username %}
+        <h3>Welcome {{ username }}</h3>
+    {% else %}
+        <div class="container">
+            <form action="{% url 'index' %}" class="form-signin" method="post">
+                {% csrf_token %}
+                <h2 class="form-signin-heading">Please sign in</h2>
+                <span class="alert-warning">{{ login_error }}</span>
+                <br>
+                <label for="username">Username: </label>
+                <input type="text" name="username" id="username" class="form-control" required>
+                <label for="password">Password: </label>
+                <input type="password" name="password" id="password" class="form-control" required>
 
-            <p>PanoPuppet is one of many Puppet Dashboards available today. This one was built with speed in mind...</p>
-
-            <p>It was developed for large enterprise environments spanning over multiple sites</p>
-
-            <p>Feel free to select a timezone...</p>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" value="remember-me"> Remember me
+                    </label>
+                </div>
+                <input type="text" name="nexturl" id="nexturl" class="hidden" value="{{ request.GET.next }}">
+                <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+            </form>
         </div>
-    </div>
+    {% endif %}
 {% endblock %}

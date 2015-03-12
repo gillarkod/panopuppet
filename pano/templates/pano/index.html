@@ -71,21 +71,14 @@
                 {% if node_list %}
                     {% for node in node_list %}
                         <tr>
-                            <td><a href="{% url 'reports' certname=node.name %}">{{ node.name }}</a></td>
-                            <td>{{ node.catalog_timestamp|json_to_datetime }}</td>
-                            <td>{{ node.report_timestamp|json_to_datetime }}</td>
-                            <td>{{ node.facts_timestamp|json_to_datetime }}</td>
-                            <td class="success">
-                                <strong>{% get_status_summary runstatus node.name 'success' %}</strong>
-                            </td>
-                            <td class="info"><strong>{% get_status_summary runstatus node.name 'noop' %}</strong>
-                            </td>
-                            <td class="danger">
-                                <strong>{% get_status_summary runstatus node.name 'failure' %}</strong>
-                            </td>
-                            <td class="warning">
-                                <strong>{% get_status_summary runstatus node.name 'skipped' %}</strong>
-                            </td>
+                            <td><a href="{% url 'reports' node.0 %}">{{ node.0 }}</a></td>
+                            <td>{{ node.1|json_to_datetime }}</td>
+                            <td>{{ node.2|json_to_datetime }}</td>
+                            <td>{{ node.3|json_to_datetime }}</td>
+                            <td class="success"><strong>{{ node.4 }}</strong></td>
+                            <td class="info"><strong>{{ node.5 }}</strong></td>
+                            <td class="danger"><strong>{{ node.6 }}</strong></td>
+                            <td class="warning"><strong>{{ node.7 }}</strong></td>
                         </tr>
                     {% endfor %}
                 {% else %}

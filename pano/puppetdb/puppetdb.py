@@ -16,8 +16,10 @@ api_get(path='/facts', params={'query': mk_puppetdb_query(test_params)}, verify=
 """
 
 import urllib.parse as urlparse
-import requests
 import json
+
+import requests
+
 from pano.settings import PUPPETDB_HOST
 
 
@@ -56,12 +58,14 @@ def api_get(api_url=PUPPETDB_HOST,
         path += '?{0}'.format(urlparse.urlencode(params))
 
     url = '{0}{1}'.format(api_url + api_version, path)
-
     resp = methods[method](url,
                            headers=headers,
                            verify=verify,
                            cert=cert)
-    return json.loads(resp.text)
+    if 'X-records' in resp.headers:
+        return json.loads(resp.text), resp.headers
+    else:
+        return json.loads(resp.text)
 
 
 def mk_puppetdb_query(params):
@@ -157,4 +161,5 @@ curl -X GET http://localhost:8080/v3/facts --data-urlencode 'order-by=[
         query_dict['include-total'] = params.get('include-total', 'true')
     if 'order-by' in params:
         query_dict['order-by'] = order_by_build(params['order-by'])
+
     return query_dict

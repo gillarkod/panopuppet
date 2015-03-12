@@ -10,6 +10,7 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 
@@ -17,12 +18,12 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = ''
+SECRET_KEY = 'this_is_so_secret_1_2_3_herp_derp'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-TEMPLATE_DEBUG = False
+TEMPLATE_DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1']
 
@@ -63,7 +64,6 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 
 ROOT_URLCONF = 'puppet.urls'
 
-
 WSGI_APPLICATION = 'puppet.wsgi.application'
 
 
@@ -71,11 +71,78 @@ WSGI_APPLICATION = 'puppet.wsgi.application'
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
 
 DATABASES = {
+
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
+
+# Authentication
+# Ldap authentication
+from pano.settings import AUTH_METHOD, LDAP_SERVER, LDAP_BIND_DN, LDAP_BIND_PW, LDAP_ALLOW_GRP, LDAP_USEARCH_PATH, \
+    LDAP_GSEARCH_PATH
+
+if AUTH_METHOD == "LDAP":
+    import ldap
+    from django_auth_ldap.config import LDAPSearch, ActiveDirectoryGroupType
+
+    AUTHENTICATION_BACKENDS = (
+        'django_auth_ldap.backend.LDAPBackend',
+        'django.contrib.auth.backends.ModelBackend',
+    )
+    AUTH_LDAP_SERVER_URI = LDAP_SERVER
+    AUTH_LDAP_BIND_DN = LDAP_BIND_DN
+    AUTH_LDAP_BIND_PASSWORD = LDAP_BIND_PW
+    AUTH_LDAP_USER_SEARCH = LDAPSearch(LDAP_USEARCH_PATH,
+                                       ldap.SCOPE_SUBTREE, "(name=%(user)s)")
+    AUTH_LDAP_GROUP_SEARCH = LDAPSearch(LDAP_GSEARCH_PATH,
+                                        ldap.SCOPE_SUBTREE, "(objectClass=Group)")
+    AUTH_LDAP_GROUP_TYPE = ActiveDirectoryGroupType()
+    AUTH_LDAP_CACHE_GROUPS = False
+    AUTH_LDAP_GROUP_CACHE_TIMEOUT = 300
+    AUTH_LDAP_REQUIRE_GROUP = LDAP_ALLOW_GRP
+    # The following OPT_REFERRALS option is CRUCIAL for getting this
+    # working with MS Active Directory it seems, unfortunately I have
+    # no idea why; it just hangs if you don't set it to 0 for us.
+    AUTH_LDAP_CONNECTION_OPTIONS = {
+        ldap.OPT_DEBUG_LEVEL: 0,
+        ldap.OPT_REFERRALS: 0,
+    }
+    AUTH_LDAP_USER_ATTR_MAP = {
+        "first_name": "givenName",
+        "last_name": "sn",
+        "email": "mail"
+    }
+    LOGIN_URL = '/pano/login/'
+    import logging
+
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'handlers': {
+            'mail_admins': {
+                'level': 'ERROR',
+                'class': 'django.utils.log.AdminEmailHandler'
+            },
+            'stream_to_console': {
+                'level': 'DEBUG',
+                'class': 'logging.StreamHandler'
+            },
+        },
+        'loggers': {
+            'django.request': {
+                'handlers': ['mail_admins'],
+                'level': 'ERROR',
+                'propagate': True,
+            },
+            'django_auth_ldap': {
+                'handlers': ['stream_to_console'],
+                'level': 'DEBUG',
+                'propagate': True,
+            },
+        }
+    }
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/

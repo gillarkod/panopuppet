@@ -4,3 +4,21 @@
 
 # Must have a slash "/" at the end of the URL
 PUPPETDB_HOST = "http://puppetdb.your.domain.com:8080/"
+
+# Authentication method
+# Available auth methods = ldap...
+# It will fallback to auth in django, so if you have created accounts in django admin page
+# they will be able to log in.
+AUTH_METHOD = "LDAP"
+LDAP_SERVER = "ldap://xxx:389"
+LDAP_BIND_DN = ""
+LDAP_BIND_PW = ""
+LDAP_USEARCH_PATH = ""
+LDAP_GSEARCH_PATH = ""
+LDAP_ALLOW_GRP = ""
+LDAP_DENY_GRP = None
+
+
+# Caching Time Settings
+# Set cache time to 0 to disable caching
+CACHE_TIME = 60  # 60 Seconds cache time

@@ -52,6 +52,7 @@ def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_st
         'failure': 6,
         'skipped': 7,
     }
+
     if sortby:
         # Sort by the field recieved, if valid field was not supplied, fallback
         # to report
