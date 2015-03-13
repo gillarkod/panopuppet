@@ -40,8 +40,7 @@ def splash(request):
                     if 'next' in request.POST:
                         return redirect(request.POST['next'])
                     else:
-                        context = {'timezones': pytz.common_timezones,}
-                        return render(request, 'pano/splash.html', context)
+                        return redirect('dashboard')
                 else:
                     context = {'timezones': pytz.common_timezones,
                                'login_error': "Account is disabled."}
