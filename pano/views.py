@@ -37,7 +37,7 @@ def splash(request):
             if user is not None:
                 if user.is_active:
                     login(request, user)
-                    return redirect(request.POSTet('next', 'dashboard'))
+                    return redirect(request.POST('next', 'dashboard'))
                 else:
                     context = {'timezones': pytz.common_timezones,
                                'login_error': "Account is disabled."}
