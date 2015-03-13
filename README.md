@@ -123,6 +123,13 @@ install requirements listed in requirements.txt
 Recommended to use virtualenv (+ virtualenvwrapper)
 
 
+#### Problems with python-ldap python 3 fork.
+I had some issues installing python-ldap using the python3 fork on a RHEL6 server
+Here are some of the issues I had...
+ * missing dependencies - yum install python-devel openldap-devel cyrus-sasl-devel
+ * GCC not compiling... Follow instructions here... http://bugs.python.org/issue21121
+
+
 ### Installation
 I have yet to write proper instructions for installing this mod_wsgi or mod_uwsgi.
 This is something that will come...
