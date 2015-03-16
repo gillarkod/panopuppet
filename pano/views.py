@@ -86,7 +86,7 @@ def index(request, certname=None):
             all_nodes_list, event_list, sort=True, get_status="changed")
 
         node_unreported = len(unreported_list)
-        node_fail_count = len([x for x in failed_list if x not in unreported_list)
+        node_fail_count = len([x for x in failed_list if x not in unreported_list])
         node_change_count = len([x for x in changed_list if x not in unreported_list and x not in failed_list])
 
         merged_nodes_list = dictstatus(
