@@ -110,6 +110,18 @@ def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_st
                         status['failures'],
                         status['skips'],
                     ))
+                elif get_status == "unreported":
+                    if pano.puppetdb.pdbutils.is_unreported(node['report_timestamp']):
+                        merged_list.append((
+                            node['name'],
+                            node['catalog_timestamp'] or '',
+                            node['report_timestamp'] or '',
+                            node['facts_timestamp'] or '',
+                            status['successes'],
+                            status['noops'],
+                            status['failures'],
+                            status['skips'],
+                            ))
                 break
 
         # We can assume that the node has not changed if its not found in the
@@ -125,7 +137,7 @@ def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_st
                 0,
                 0,
             ))
-        elif get_status == "unreported":
+        elif found_node is False and get_status == "unreported":
             if pano.puppetdb.pdbutils.is_unreported(node['report_timestamp']):
                 merged_list.append((
                     node['name'],
