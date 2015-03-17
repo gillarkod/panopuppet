@@ -53,6 +53,39 @@
             widgets: ["uitheme", "filter"]
         })
     });</script>
+    <script id="js">
+        $(function () {
+            // hide child rows
+            $('.tablesorter-childRow td').hide();
+
+            $(".tablesorter")
+                    .tablesorter({
+                        theme: 'blue',
+                        // this is the default setting
+                        cssChildRow: "tablesorter-childRow"
+                    })
+
+            // Toggle child row content (td), not hiding the row since we are using rowspan
+            // Using delegate because the pager plugin rebuilds the table after each page change
+            // "delegate" works in jQuery 1.4.2+; use "live" back to v1.3; for older jQuery - SOL
+        });
+    </script>
+    <script id="js">
+        $(document).ready(function () {
+
+            $('#eventsTable tr.parent').click(function () {
+                // use "nextUntil" to toggle multiple child rows
+                // toggle table cells instead of the row
+                $(this).closest('tr').nextUntil('tr:not(.tablesorter-childRow)').find('td').toggle();
+                // in v2.5.12, the parent row now has the class tablesorter-hasChildRow
+                // so you can use this code as well
+                // $(this).closest('tr').nextUntil('tr.tablesorter-hasChildRow').find('td').toggle();
+
+                return false;
+            });
+
+        });
+    </script>
 {% endblock %}
 
 {% block content %}
@@ -63,7 +96,7 @@
         </div>
         <div class="row">
         <div class="col-md-12">
-        <table id="eventsTable" class="table table-condensed">
+        <table id="eventsTable" class="table table-condensed tablesorter">
         <thead>
         <tr>
             <th>Class</th>
@@ -76,16 +109,19 @@
         </thead>
         <tbody>
         {% for event in events_list %}
-            <tr {% if event.status == 'success' %}class="bg-success"
-                {% elif event.status == 'failure' %}class="bg-danger"
-                {% elif event.status == 'noop' %}class="bg-info"
-                {% elif event.status == 'skipped' %}class="bg-warning"{% endif %}>
+            <tr {% if event.status == 'success' %}class="bg-success parent"
+                {% elif event.status == 'failure' %}class="bg-danger parent"
+                {% elif event.status == 'noop' %}class="bg-info parent"
+                {% elif event.status == 'skipped' %}class="bg-warning parent"{% endif %}>
                 <td>{{ event|get_item:'containing-class' }}</td>
                 <td>{{ event|get_item:'resource-title' }}</td>
                 <td>{{ event|get_item:'resource-type' }}</td>
                 <td>{{ event.property }}</td>
                 <td>{{ event|get_item:'old-value' }}</td>
                 <td>{{ event|get_item:'new-value' }}</td>
+            </tr>
+            <tr class="tablesorter-childRow">
+                <td colspan="6">{{ event|get_item:'message' }}</td>
             </tr>
         {% endfor %}
     {% else %}
