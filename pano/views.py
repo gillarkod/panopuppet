@@ -10,8 +10,6 @@ from pano.puppetdb import puppetdb
 
 from pano.methods.dictfuncs import dictstatus as dictstatus
 
-
-
 # Caching for certain views.
 from django.views.decorators.cache import cache_page
 from pano.settings import CACHE_TIME
@@ -458,7 +456,7 @@ def events(request, certname=None, hashid=None):
             'events_list': events_list,
         }
 
-        return render(request, 'pano/events.html', context)
+        return render(request, 'pano/detailed_events.html', context)
 
 
 @login_required
