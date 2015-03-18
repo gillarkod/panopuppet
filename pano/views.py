@@ -422,7 +422,7 @@ def reports(request, certname=None):
 
 @login_required
 @cache_page(CACHE_TIME)
-def events(request, certname=None, hashid=None):
+def detailed_events(request, certname=None, hashid=None):
     if request.method == 'POST':
         request.session['django_timezone'] = request.POST['timezone']
         return redirect(request.POST['return_url'])
