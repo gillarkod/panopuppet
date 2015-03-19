@@ -93,6 +93,7 @@
             <th>Class</th>
             <th>Title</th>
             <th>Type</th>
+            <th>Timestamp Started</th>
             <th>Property</th>
             <th>From</th>
             <th>To</th>
@@ -107,6 +108,7 @@
                 <td>{{ event|get_item:'containing-class' }}</td>
                 <td>{{ event|get_item:'resource-title' }}</td>
                 <td>{{ event|get_item:'resource-type' }}</td>
+                <td>{{ event|get_item:'timestamp'|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
                 <td>{{ event.property }}</td>
                 <td>{{ event|get_item:'old-value' }}</td>
                 <td>{{ event|get_item:'new-value' }}</td>
