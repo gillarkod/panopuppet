@@ -10,14 +10,14 @@
 {% endblock %}
 {% block content %}
     <div class="row">
-        <div class="col-md-12">
+        <div class="col-lg-12">
             <div class="panel panel-info">
                 <div align="center" class="panel-heading">Latest reports</div>
             </div>
         </div>
     </div>
     <div class="row">
-        <div class="col-md-4">
+        <div class="col-lg-4">
             <div class="panel panel-default">
                 <div class="panel-heading">Class Events</div>
                 <div class="panel-body">
@@ -25,7 +25,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-lg-4">
             <div class="panel panel-default">
                 <div class="panel-heading">Resource Events</div>
                 <div class="panel-body">
@@ -33,7 +33,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-lg-4">
             <div class="panel panel-default">
                 <div class="panel-heading">Staus Events</div>
                 <div class="panel-body">
@@ -58,10 +58,11 @@
                 onmouseout: function (d, i) {
                     console.log("onmouseout", d, i);
                 }
+            },
+            legend: {
+                position: 'right',
             }
         });
-        // Hide all legend.
-        chart_classes.legend.hide();
     </script>
     <script id="js">
         var chart_resources = c3.generate({
@@ -80,9 +81,11 @@
                 onmouseout: function (d, i) {
                     console.log("onmouseout", d, i);
                 }
+            },
+            legend: {
+                position: 'right',
             }
         });
-        chart_resources.legend.hide();
     </script>
     <script id="js">
         var chart_status = c3.generate({
@@ -100,6 +103,9 @@
                 onmouseout: function (d, i) {
                     console.log("onmouseout", d, i);
                 }
+            },
+            legend: {
+                position: 'right',
             }
         });
     </script>
