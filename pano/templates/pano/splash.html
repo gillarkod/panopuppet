@@ -21,7 +21,11 @@
                         <input type="checkbox" value="remember-me"> Remember me
                     </label>
                 </div>
-                <input type="text" name="nexturl" id="nexturl" class="hidden" value="{{ request.GET.next }}">
+                {% if nexturl %}
+                    <input type="text" name="nexturl" id="nexturl" class="hidden" value="{{ nexturl }}">
+                {% else %}
+                    <input type="text" name="nexturl" id="nexturl" class="hidden" value="{{ request.GET.next }}">
+                {% endif %}
                 <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
             </form>
         </div>

@@ -34,21 +34,25 @@ def splash(request):
             username = request.POST['username']
             password = request.POST['password']
             user = authenticate(username=username, password=password)
+            if 'nexturl' in request.POST:
+                next_url = request.POST['nexturl']
             if user is not None:
                 if user.is_active:
                     login(request, user)
-                    if 'next' in request.POST:
-                        return redirect(request.POST['next'])
+                    if next_url:
+                        return redirect(next_url)
                     else:
                         return redirect('dashboard')
                 else:
                     context = {'timezones': pytz.common_timezones,
-                               'login_error': "Account is disabled."}
+                               'login_error': "Account is disabled.",
+                               'nexturl': next_url}
                     return render(request, 'pano/splash.html', context)
             else:
                 # Return an 'invalid login' error message.
                 context = {'timezones': pytz.common_timezones,
-                           'login_error': "Invalid credentials"}
+                           'login_error': "Invalid credentials",
+                           'nexturl': next_url}
                 return render(request, 'pano/splash.html', context)
         return redirect('dashboard')
     else:
