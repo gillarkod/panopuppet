@@ -72,9 +72,9 @@
                     {% for node in node_list %}
                         <tr>
                             <td><a href="{% url 'reports' node.0 %}">{{ node.0 }}</a></td>
-                            <td>{{ node.1|json_to_datetime }}</td>
-                            <td>{{ node.2|json_to_datetime }}</td>
-                            <td>{{ node.3|json_to_datetime }}</td>
+                            <td>{{ node.1|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
+                            <td>{{ node.2|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
+                            <td>{{ node.3|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
                             <td class="success"><strong>{{ node.4 }}</strong></td>
                             <td class="info"><strong>{{ node.5 }}</strong></td>
                             <td class="danger"><strong>{{ node.6 }}</strong></td>
