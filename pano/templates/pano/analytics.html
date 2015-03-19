@@ -1,0 +1,107 @@
+{% extends "pano/base.html" %}
+
+{% load puppetdb_extras %}
+{% load common %}
+{% load staticfiles %}
+{% block head %}
+    <link href="{% static 'pano/css/c3.min.css' %}" rel="stylesheet" type="text/css">
+    <script src="{% static 'pano/js/c3.min.js' %}"></script>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+{% endblock %}
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-info">
+                <div align="center" class="panel-heading">Latest reports</div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">Class Events</div>
+                <div class="panel-body">
+                    <div id="class_events"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">Resource Events</div>
+                <div class="panel-body">
+                    <div id="resource_events"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">Staus Events</div>
+                <div class="panel-body">
+                    <div id="status_events"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script id="js">
+        var chart_classes = c3.generate({
+            bindto: '#class_events',
+            data: {
+                columns: [
+                    {% for event in class_events %}
+                        ['{{ event.0 }}', {{ event.1 }}],
+                    {% endfor %}
+                ],
+                type: 'pie',
+                onmouseover: function (d, i) {
+                    console.log("onmouseover", d, i);
+                },
+                onmouseout: function (d, i) {
+                    console.log("onmouseout", d, i);
+                }
+            }
+        });
+        // Hide all legend.
+        chart_classes.legend.hide();
+    </script>
+    <script id="js">
+        var chart_resources = c3.generate({
+            bindto: '#resource_events',
+            data: {
+                // iris data from R
+                columns: [
+                    {% for event in resource_events %}
+                        ['{{ event.0 }}', {{ event.1 }}],
+                    {% endfor %}
+                ],
+                type: 'pie',
+                onmouseover: function (d, i) {
+                    console.log("onmouseover", d, i);
+                },
+                onmouseout: function (d, i) {
+                    console.log("onmouseout", d, i);
+                }
+            }
+        });
+        chart_resources.legend.hide();
+    </script>
+    <script id="js">
+        var chart_status = c3.generate({
+            bindto: '#status_events',
+            data: {
+                columns: [
+                    {% for status in class_status %}
+                        ['{{ status.0 }}', {{ status.1 }}],
+                    {% endfor %}
+                ],
+                type: 'pie',
+                onmouseover: function (d, i) {
+                    console.log("onmouseover", d, i);
+                },
+                onmouseout: function (d, i) {
+                    console.log("onmouseout", d, i);
+                }
+            }
+        });
+    </script>
+
+{% endblock %}

@@ -33,6 +33,9 @@
                     <li{% if "pano/nodes" in request.path %} class="active"{% endif %}>
                         <a href="{% url 'nodes' %}">Nodes</a>
                     </li>
+                <li{% if "pano/analytics" in request.path %} class="active"{% endif %}>
+                        <a href="{% url 'analytics' %}">Analytics</a>
+                    </li>
                     {% if certname %}
                         <li{% if "pano/reports" in request.path %} class="active"{% endif %}>
                             <a href="{% url 'reports' certname %}">Reports</a>

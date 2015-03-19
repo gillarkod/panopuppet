@@ -1,5 +1,4 @@
 from django.shortcuts import redirect, render
-
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import HttpResponseBadRequest, HttpResponseRedirect
 import pytz
@@ -7,8 +6,11 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 
 from pano.puppetdb import puppetdb
-
 from pano.methods.dictfuncs import dictstatus as dictstatus
+
+
+
+
 
 # Caching for certain views.
 from django.views.decorators.cache import cache_page
@@ -101,7 +103,7 @@ def index(request, certname=None):
                    'failed_nodes': node_fail_count,
                    'changed_nodes': node_change_count,
                    'unreported_nodes': node_unreported,
-        }
+                   }
 
         return render(request, 'pano/index.html', context)
 
@@ -147,7 +149,7 @@ def indexfailed(request, certname=None):
                    'avg_resource': "{:.2f}".format(avg_resource_node['Value']),
                    'failed_nodes': node_fail_count,
                    'changed_nodes': node_change_count,
-        }
+                   }
         return render(request, 'pano/dashfailed.html', context)
 
 
@@ -192,7 +194,7 @@ def indexunreported(request, certname=None):
                    'avg_resource': "{:.2f}".format(avg_resource_node['Value']),
                    'failed_nodes': node_fail_count,
                    'changed_nodes': node_change_count,
-        }
+                   }
         return render(request, 'pano/dashunreported.html', context)
 
 
@@ -237,7 +239,7 @@ def indexchanged(request, certname=None):
                    'avg_resource': "{:.2f}".format(avg_resource_node['Value']),
                    'failed_nodes': node_fail_count,
                    'changed_nodes': node_change_count,
-        }
+                   }
         return render(request, 'pano/dashchanged.html', context)
 
 
@@ -418,6 +420,80 @@ def reports(request, certname=None):
         }
 
         return render(request, 'pano/reports.html', context)
+
+
+@login_required
+def analytics(request):
+    if request.method == 'POST':
+        request.session['django_timezone'] = request.POST['timezone']
+        return redirect(request.POST['return_url'])
+    else:
+        events_params = {
+            'query':
+                {
+                    1: '["=","latest-report?",true]'
+                },
+            'summarize-by': 'containing-class',
+        }
+        events_class_list = puppetdb.api_get(path='/event-counts',
+                                             params=puppetdb.mk_puppetdb_query(
+                                                 events_params),
+                                             verify=False)
+        event_resource_params = {
+            'query':
+                {
+                    1: '["=","latest-report?",true]'
+                },
+            'summarize-by': 'resource',
+        }
+        events_resource_list = puppetdb.api_get(path='/event-counts',
+                                                params=puppetdb.mk_puppetdb_query(
+                                                    event_resource_params),
+                                                verify=False)
+
+        events_class_list = puppetdb.api_get(path='/event-counts',
+                                             params=puppetdb.mk_puppetdb_query(
+                                                 events_params),
+                                             verify=False)
+        event_status_params = {
+            'query':
+                {
+                    1: '["=","latest-report?",true]'
+                },
+            'summarize-by': 'resource',
+        }
+        events_status_list = puppetdb.api_get(path='/aggregate-event-counts',
+                                                params=puppetdb.mk_puppetdb_query(
+                                                    event_status_params),
+                                                verify=False)
+
+        class_event_results = []
+        class_resource_results = []
+        class_status_results = []
+
+        for item in events_class_list:
+            class_name = item['subject']['title']
+            class_total = item['skips'] + item['failures'] + item['noops'] + item['successes']
+            class_event_results.append((class_name, class_total))
+
+        for item in events_resource_list:
+            class_name = item['subject']['type']
+            class_total = item['skips'] + item['failures'] + item['noops'] + item['successes']
+            class_resource_results.append((class_name, class_total))
+
+        for status, value in events_status_list.items():
+            if value is 0 or status == 'total':
+                continue
+            class_status_results.append((status, value))
+
+        context = {
+            'timezones': pytz.common_timezones,
+            'class_events': class_event_results,
+            'class_status': class_status_results,
+            'resource_events': class_resource_results,
+        }
+
+        return render(request, 'pano/analytics.html', context)
 
 
 @login_required
