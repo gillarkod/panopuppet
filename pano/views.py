@@ -246,6 +246,7 @@ def indexchanged(request, certname=None):
 
 
 @login_required
+@cache_page(CACHE_TIME)
 def nodes(request, certname=None):
     if request.method == 'POST':
         request.session['django_timezone'] = request.POST['timezone']
