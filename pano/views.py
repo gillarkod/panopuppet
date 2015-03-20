@@ -8,16 +8,12 @@ from django.contrib.auth.decorators import login_required
 from pano.puppetdb import puppetdb
 from pano.methods.dictfuncs import dictstatus as dictstatus
 
-
-
-
-
 # Caching for certain views.
 from django.views.decorators.cache import cache_page
 from pano.settings import CACHE_TIME
 
 # Dashboard functions
-from pano.puppetdb.pdbutils import run_dashboard_jobs
+from pano.puppetdb.pdbutils import run_dashboard_jobs, json_to_datetime
 
 
 def logout_view(request):
@@ -34,6 +30,7 @@ def splash(request):
             username = request.POST['username']
             password = request.POST['password']
             user = authenticate(username=username, password=password)
+            next_url = False
             if 'nexturl' in request.POST:
                 next_url = request.POST['nexturl']
             if user is not None:
@@ -467,9 +464,33 @@ def analytics(request):
             'summarize-by': 'resource',
         }
         events_status_list = puppetdb.api_get(path='/aggregate-event-counts',
-                                                params=puppetdb.mk_puppetdb_query(
-                                                    event_status_params),
-                                                verify=False)
+                                              params=puppetdb.mk_puppetdb_query(
+                                                  event_status_params),
+                                              verify=False)
+
+        report_runavg_params = {
+            'limit': 25,
+            'order-by': {
+                'order-field': {
+                    'field': 'receive-time',
+                    'order': 'desc',
+                },
+                'query-field': {'field': 'certname'},
+            },
+        }
+        reports_run_avg = puppetdb.api_get(path='/reports',
+                                           params=puppetdb.mk_puppetdb_query(
+                                               report_runavg_params),
+                                           verify=False)
+        num_runs_avg = len(reports_run_avg)
+        run_avg_times = []
+        avg_run_time = 0
+        for report in reports_run_avg:
+            run_time = "{0:.0f}".format(
+                (json_to_datetime(report['end-time']) - json_to_datetime(report['start-time'])).total_seconds())
+            avg_run_time += int(run_time)
+            run_avg_times.append(run_time)
+        avg_run_time = "{0:.0f}".format(avg_run_time / num_runs_avg)
 
         class_event_results = []
         class_resource_results = []
@@ -495,6 +516,9 @@ def analytics(request):
             'class_events': class_event_results,
             'class_status': class_status_results,
             'resource_events': class_resource_results,
+            'run_times': run_avg_times,
+            'run_num': num_runs_avg,
+            'run_avg': avg_run_time,
         }
 
         return render(request, 'pano/analytics.html', context)

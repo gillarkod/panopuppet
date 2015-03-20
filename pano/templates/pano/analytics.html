@@ -12,6 +12,23 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="panel panel-info">
+                <div align="center" class="panel-heading">Puppet Statistics</div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">Average Puppet Run Time ({{ run_num }} Last Runs)</div>
+                <div class="panel-body">
+                    <div id="run_times"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-info">
                 <div align="center" class="panel-heading">Latest reports</div>
             </div>
         </div>
@@ -42,7 +59,7 @@
             </div>
         </div>
     </div>
-    <script id="js">
+    <script id="js_class">
         var chart_classes = c3.generate({
             bindto: '#class_events',
             data: {
@@ -65,7 +82,7 @@
             }
         });
     </script>
-    <script id="js">
+    <script id="js_resource">
         var chart_resources = c3.generate({
             bindto: '#resource_events',
             data: {
@@ -89,7 +106,7 @@
             }
         });
     </script>
-    <script id="js">
+    <script id="js_status">
         var chart_status = c3.generate({
             bindto: '#status_events',
             data: {
@@ -99,6 +116,28 @@
                     {% endfor %}
                 ],
                 type: 'pie',
+                onmouseover: function (d, i) {
+                    console.log("onmouseover", d, i);
+                },
+                onmouseout: function (d, i) {
+                    console.log("onmouseout", d, i);
+                }
+            },
+            legend: {
+                position: 'bottom',
+            }
+        });
+    </script>
+    <script id="js_avg_run_time">
+        var chart_run_times = c3.generate({
+            bindto: '#run_times',
+            data: {
+                columns: [
+                        ['Run Times', {% for time in run_times %}{{ time }}, {% endfor %}],
+                        ['Baseline', {% for i in run_num|get_range %}{{ run_avg }}, {% endfor %}],
+
+                ],
+                type: 'line',
                 onmouseover: function (d, i) {
                     console.log("onmouseover", d, i);
                 },
