@@ -56,8 +56,11 @@ def is_unreported(node_report_timestamp, unreported=2):
     return False
 
 
-def run_dashboard_jobs(jobs):
-    num_threads = 6
+def run_puppetdb_jobs(jobs, threads=6):
+    if type(threads) != int:
+        threads = 6
+    if len(jobs) < threads:
+        threads = len(jobs)
     jobs_q = queue.Queue()
     out_q = queue.Queue()
 
@@ -77,7 +80,7 @@ def run_dashboard_jobs(jobs):
             out_q.put({t_job['id']: results})
             q.task_done()
 
-    for i in range(num_threads):
+    for i in range(threads):
         worker = Thread(target=db_threaded_requests, args=(i, jobs_q))
         worker.setDaemon(True)
         worker.start()

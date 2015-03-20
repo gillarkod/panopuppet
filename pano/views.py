@@ -8,16 +8,12 @@ from pano.puppetdb import puppetdb
 from pano.methods.dictfuncs import dictstatus as dictstatus
 
 
-
-
-
-
 # Caching for certain views.
 from django.views.decorators.cache import cache_page
 from pano.settings import CACHE_TIME
 
 # Dashboard functions
-from pano.puppetdb.pdbutils import run_dashboard_jobs, json_to_datetime
+from pano.puppetdb.pdbutils import run_puppetdb_jobs, json_to_datetime
 
 
 def logout_view(request):
@@ -123,7 +119,7 @@ def index(request, certname=None):
                 'verify': False,
             },
         }
-        results = run_dashboard_jobs(jobs)
+        results = run_puppetdb_jobs(jobs)
 
         # Dashboard to show nodes of "recent, failed, unreported or changed"
         dashboard_show = request.GET.get('show', 'recent')
@@ -384,41 +380,28 @@ def analytics(request):
         request.session['django_timezone'] = request.POST['timezone']
         return redirect(request.POST['return_url'])
     else:
-        events_params = {
+        events_class_params = {
             'query':
                 {
                     1: '["=","latest-report?",true]'
                 },
             'summarize-by': 'containing-class',
         }
-        events_class_list = puppetdb.api_get(path='/event-counts',
-                                             params=puppetdb.mk_puppetdb_query(
-                                                 events_params),
-                                             verify=False)
-        event_resource_params = {
+        events_resource_params = {
             'query':
                 {
                     1: '["=","latest-report?",true]'
                 },
             'summarize-by': 'resource',
         }
-        events_resource_list = puppetdb.api_get(path='/event-counts',
-                                                params=puppetdb.mk_puppetdb_query(
-                                                    event_resource_params),
-                                                verify=False)
-
-        event_status_params = {
+        events_status_params = {
             'query':
                 {
                     1: '["=","latest-report?",true]'
                 },
             'summarize-by': 'resource',
         }
-        events_status_list = puppetdb.api_get(path='/aggregate-event-counts',
-                                              params=puppetdb.mk_puppetdb_query(
-                                                  event_status_params),
-                                              verify=False)
-        report_runavg_params = {
+        reports_runavg_params = {
             'limit': 100,
             'order-by': {
                 'order-field': {
@@ -428,10 +411,40 @@ def analytics(request):
                 'query-field': {'field': 'certname'},
             },
         }
-        reports_run_avg = puppetdb.api_get(path='/reports',
-                                           params=puppetdb.mk_puppetdb_query(
-                                               report_runavg_params),
-                                           verify=False)
+        jobs = {
+            'events_class_list': {
+                'id': 'events_class_list',
+                'path': '/event-counts',
+                'params': events_class_params,
+                'verify': False,
+            },
+            'events_resource_list': {
+                'id': 'events_resource_list',
+                'path': '/event-counts',
+                'params': events_resource_params,
+                'verify': False,
+            },
+            'events_status_list': {
+                'id': 'events_status_list',
+                'path': '/aggregate-event-counts',
+                'params': events_status_params,
+                'verify': False,
+            },
+            'reports_run_avg': {
+                'id': 'reports_run_avg',
+                'path': '/reports',
+                'params': reports_runavg_params,
+                'verify': False,
+            },
+        }
+
+        job_results = run_puppetdb_jobs(jobs, 4)
+
+        reports_run_avg = job_results['reports_run_avg']
+        events_class_list = job_results['events_class_list']
+        events_resource_list = job_results['events_resource_list']
+        events_status_list = job_results['events_status_list']
+
         num_runs_avg = len(reports_run_avg)
         run_avg_times = []
         avg_run_time = 0
