@@ -133,8 +133,8 @@
             bindto: '#run_times',
             data: {
                 columns: [
-                        ['Run Times', {% for time in run_times %}{{ time }}, {% endfor %}],
-                        ['Baseline', {% for i in run_num|get_range %}{{ run_avg }}, {% endfor %}],
+                    ['Run Times', {% for time in run_times %}{{ time }}, {% endfor %}],
+                    ['Baseline', {% for i in run_num|get_range %}{{ run_avg }}, {% endfor %}],
 
                 ],
                 type: 'area-spline',
@@ -147,6 +147,9 @@
             },
             legend: {
                 position: 'bottom',
+            },
+            point: {
+                show: false
             }
         });
     </script>
