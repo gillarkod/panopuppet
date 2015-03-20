@@ -9,6 +9,8 @@ from pano.methods.dictfuncs import dictstatus as dictstatus
 
 
 
+
+
 # Caching for certain views.
 from django.views.decorators.cache import cache_page
 from pano.settings import CACHE_TIME
@@ -67,8 +69,65 @@ def index(request, certname=None):
         request.session['django_timezone'] = request.POST['timezone']
         return redirect(request.POST['url'])
     else:
-        results = run_dashboard_jobs()
 
+        events_params = {
+            'query':
+                {
+                    1: '["=","latest-report?",true]'
+                },
+            'summarize-by': 'certname',
+        }
+        nodes_params = {
+            'limit': 25,
+            'order-by': {
+                'order-field': {
+                    'field': 'report-timestamp',
+                    'order': 'desc',
+                },
+                'query-field': {'field': 'name'},
+            },
+        }
+
+        jobs = {
+            'population': {
+                'id': 'population',
+                'path': '/metrics/mbean/com.puppetlabs.puppetdb.query.population:type=default,name=num-nodes',
+                'verify': False,
+            },
+            'tot_resource': {
+                'id': 'tot_resource',
+                'path': '/metrics/mbean/com.puppetlabs.puppetdb.query.population:type=default,name=num-resources',
+                'verify': False,
+            },
+            'avg_resource': {
+                'id': 'avg_resource',
+                'path': '/metrics/mbean/com.puppetlabs.puppetdb.query.population:type=default,name=avg-resources-per-node',
+                'verify': False,
+            },
+            'all_nodes': {
+                'id': 'all_nodes',
+                'path': '/nodes',
+                'verify': False,
+            },
+            'events': {
+                'id': 'event-counts',
+                'path': 'event-counts',
+                'params': events_params,
+                'verify': False,
+            },
+            'nodes': {
+                'id': 'nodes',
+                'path': '/nodes',
+                'params': nodes_params,
+                'verify': False,
+            },
+        }
+        results = run_dashboard_jobs(jobs)
+
+        # Dashboard to show nodes of "recent, failed, unreported or changed"
+        dashboard_show = request.GET.get('show', 'recent')
+
+        # Assign vars from the completed jobs
         puppet_population = results['population']
         # Total resources managed by puppet metric
         total_resources = results['tot_resource']
@@ -89,160 +148,33 @@ def index(request, certname=None):
 
         changed_list = [x for x in changed_list if x not in unreported_list and x not in failed_list]
         failed_list = [x for x in failed_list if x not in unreported_list]
+        if dashboard_show == 'recent':
+            merged_nodes_list = dictstatus(
+                node_list, event_list, sort=False, get_status="all")
+        elif dashboard_show == 'failed':
+            merged_nodes_list = failed_list
+        elif dashboard_show == 'unreported':
+            merged_nodes_list = unreported_list
+        elif dashboard_show == 'changed':
+            merged_nodes_list = changed_list
 
-        node_unreported = len(unreported_list)
+        node_unreported_count = len(unreported_list)
         node_fail_count = len(failed_list)
         node_change_count = len(changed_list)
-        merged_nodes_list = dictstatus(
-            node_list, event_list, sort=False, get_status="all")
 
         context = {'node_list': merged_nodes_list,
                    'certname': certname,
+                   'show_nodes': dashboard_show,
                    'timezones': pytz.common_timezones,
                    'population': puppet_population['Value'],
                    'total_resource': total_resources['Value'],
                    'avg_resource': "{:.2f}".format(avg_resource_node['Value']),
                    'failed_nodes': node_fail_count,
                    'changed_nodes': node_change_count,
-                   'unreported_nodes': node_unreported,
+                   'unreported_nodes': node_unreported_count,
                    }
 
         return render(request, 'pano/index.html', context)
-
-
-@login_required
-@cache_page(CACHE_TIME)
-def indexfailed(request, certname=None):
-    if request.method == 'POST':
-        request.session['django_timezone'] = request.POST['timezone']
-        return redirect(request.POST['url'])
-    else:
-        results = run_dashboard_jobs()
-        puppet_population = results['population']
-        # Total resources managed by puppet metric
-        total_resources = results['tot_resource']
-        # Average resource per node metric
-        avg_resource_node = results['avg_resource']
-        # Information about all active nodes in puppet
-        all_nodes_list = results['all_nodes']
-        # All available events for the latest puppet reports
-        event_list = results['event-counts']
-
-        unreported_list = dictstatus(
-            all_nodes_list, event_list, sort=True, get_status="unreported")
-        failed_list = dictstatus(
-            all_nodes_list, event_list, sort=True, get_status="failed")
-        changed_list = dictstatus(
-            all_nodes_list, event_list, sort=True, get_status="changed")
-
-        changed_list = [x for x in changed_list if x not in unreported_list and x not in failed_list]
-        failed_list = [x for x in failed_list if x not in unreported_list]
-
-        node_unreported = len(unreported_list)
-        node_fail_count = len(failed_list)
-        node_change_count = len(changed_list)
-
-        context = {'node_list': failed_list,
-                   'certname': certname,
-                   'unreported_nodes': node_unreported,
-                   'timezones': pytz.common_timezones,
-                   'population': puppet_population['Value'],
-                   'total_resource': total_resources['Value'],
-                   'avg_resource': "{:.2f}".format(avg_resource_node['Value']),
-                   'failed_nodes': node_fail_count,
-                   'changed_nodes': node_change_count,
-                   }
-        return render(request, 'pano/dashfailed.html', context)
-
-
-@login_required
-@cache_page(CACHE_TIME)
-def indexunreported(request, certname=None):
-    if request.method == 'POST':
-        request.session['django_timezone'] = request.POST['timezone']
-        return redirect(request.POST['url'])
-    else:
-        results = run_dashboard_jobs()
-        puppet_population = results['population']
-        # Total resources managed by puppet metric
-        total_resources = results['tot_resource']
-        # Average resource per node metric
-        avg_resource_node = results['avg_resource']
-        # Information about all active nodes in puppet
-        all_nodes_list = results['all_nodes']
-        # All available events for the latest puppet reports
-        event_list = results['event-counts']
-
-        unreported_list = dictstatus(
-            all_nodes_list, event_list, sort=True, get_status="unreported")
-        failed_list = dictstatus(
-            all_nodes_list, event_list, sort=True, get_status="failed")
-        changed_list = dictstatus(
-            all_nodes_list, event_list, sort=True, get_status="changed")
-
-        changed_list = [x for x in changed_list if x not in unreported_list and x not in failed_list]
-        failed_list = [x for x in failed_list if x not in unreported_list]
-
-        node_unreported = len(unreported_list)
-        node_fail_count = len(failed_list)
-        node_change_count = len(changed_list)
-
-        context = {'node_list': unreported_list,
-                   'certname': certname,
-                   'unreported_nodes': node_unreported,
-                   'timezones': pytz.common_timezones,
-                   'population': puppet_population['Value'],
-                   'total_resource': total_resources['Value'],
-                   'avg_resource': "{:.2f}".format(avg_resource_node['Value']),
-                   'failed_nodes': node_fail_count,
-                   'changed_nodes': node_change_count,
-                   }
-        return render(request, 'pano/dashunreported.html', context)
-
-
-@login_required
-@cache_page(CACHE_TIME)
-def indexchanged(request, certname=None):
-    if request.method == 'POST':
-        request.session['django_timezone'] = request.POST['timezone']
-        return redirect(request.POST['url'])
-    else:
-        results = run_dashboard_jobs()
-        puppet_population = results['population']
-        # Total resources managed by puppet metric
-        total_resources = results['tot_resource']
-        # Average resource per node metric
-        avg_resource_node = results['avg_resource']
-        # Information about all active nodes in puppet
-        all_nodes_list = results['all_nodes']
-        # All available events for the latest puppet reports
-        event_list = results['event-counts']
-
-        unreported_list = dictstatus(
-            all_nodes_list, event_list, sort=True, get_status="unreported")
-        failed_list = dictstatus(
-            all_nodes_list, event_list, sort=True, get_status="failed")
-        changed_list = dictstatus(
-            all_nodes_list, event_list, sort=True, get_status="changed")
-
-        changed_list = [x for x in changed_list if x not in unreported_list and x not in failed_list]
-        failed_list = [x for x in failed_list if x not in unreported_list]
-
-        node_unreported = len(unreported_list)
-        node_fail_count = len(failed_list)
-        node_change_count = len(changed_list)
-
-        context = {'node_list': changed_list,
-                   'certname': certname,
-                   'unreported_nodes': node_unreported,
-                   'timezones': pytz.common_timezones,
-                   'population': puppet_population['Value'],
-                   'total_resource': total_resources['Value'],
-                   'avg_resource': "{:.2f}".format(avg_resource_node['Value']),
-                   'failed_nodes': node_fail_count,
-                   'changed_nodes': node_change_count,
-                   }
-        return render(request, 'pano/dashchanged.html', context)
 
 
 @login_required

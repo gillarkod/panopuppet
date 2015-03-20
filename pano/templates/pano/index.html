@@ -43,13 +43,13 @@
     <div class="container-fluid">
         <div class="row">
             <ul class="nav nav-tabs">
-                <li{% if "pano/dashboard" in request.path %} class="active"{% endif %}><a href="{% url 'dashboard' %}">Recent</a></li>
-                <li{% if "pano/dashfails" in request.path %} class="active"{% endif %}><a href="{% url 'dashfailed' %}">Failed</a></li>
-                <li{% if "pano/dashunreported" in request.path %} class="active"{% endif %}>
-                    <a href="{% url 'dashunreported' %}">Unreported</a>
+                <li{% if show_nodes == 'recent' %} class="active"{% endif %}><a href="{% url 'dashboard' %}">Recent</a></li>
+                <li{% if show_nodes == 'failed' %} class="active"{% endif %}><a href="?show=failed">Failed</a></li>
+                <li{% if show_nodes == 'unreported' %} class="active"{% endif %}>
+                    <a href="?show=unreported">Unreported</a>
                 </li>
-                <li{% if "pano/dashchanged" in request.path %} class="active"{% endif %}>
-                    <a href="{% url 'dashchanged' %}">Changed</a>
+                <li{% if show_nodes == 'changed' %} class="active"{% endif %}>
+                    <a href="?show=changed">Changed</a>
                 </li>
             </ul>
         </div>
