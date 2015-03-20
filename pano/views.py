@@ -452,10 +452,6 @@ def analytics(request):
                                                     event_resource_params),
                                                 verify=False)
 
-        events_class_list = puppetdb.api_get(path='/event-counts',
-                                             params=puppetdb.mk_puppetdb_query(
-                                                 events_params),
-                                             verify=False)
         event_status_params = {
             'query':
                 {
@@ -467,7 +463,6 @@ def analytics(request):
                                               params=puppetdb.mk_puppetdb_query(
                                                   event_status_params),
                                               verify=False)
-
         report_runavg_params = {
             'limit': 100,
             'order-by': {
