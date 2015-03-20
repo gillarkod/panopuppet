@@ -11,6 +11,7 @@ from pano.methods.dictfuncs import dictstatus as dictstatus
 
 
 
+
 # Caching for certain views.
 from django.views.decorators.cache import cache_page
 from pano.settings import CACHE_TIME
@@ -157,6 +158,9 @@ def index(request, certname=None):
             merged_nodes_list = unreported_list
         elif dashboard_show == 'changed':
             merged_nodes_list = changed_list
+        else:
+            merged_nodes_list = dictstatus(
+                node_list, event_list, sort=False, get_status="all")
 
         node_unreported_count = len(unreported_list)
         node_fail_count = len(failed_list)
