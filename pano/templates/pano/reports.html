@@ -52,10 +52,9 @@
                     <td>
                         <ul class="pagination pagination-sm">
                             {% for page in tot_pages|get_range %}
-                                {% if page != 0 %}
-                                    <li {% if curr_page == page %}class="active"{% endif %}><a
-                                            href="?page={{ page }}">{{ page }}</a></li>
-                                {% endif %}
+                                <li {% if curr_page == page %}class="active"{% endif %}><a
+                                        href="?limits={{ c_r_limit }}&?page={{ page }}">{{ page|add:'1' }}</a>
+                                </li>
                             {% endfor %}
                         </ul>
                     </td>

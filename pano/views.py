@@ -1,5 +1,4 @@
 from django.shortcuts import redirect, render
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import HttpResponseBadRequest, HttpResponseRedirect
 import pytz
 from django.contrib.auth import authenticate, login, logout
@@ -7,6 +6,8 @@ from django.contrib.auth.decorators import login_required
 
 from pano.puppetdb import puppetdb
 from pano.methods.dictfuncs import dictstatus as dictstatus
+
+
 
 # Caching for certain views.
 from django.views.decorators.cache import cache_page
@@ -245,7 +246,6 @@ def indexchanged(request, certname=None):
 
 
 @login_required
-@cache_page(CACHE_TIME)
 def nodes(request, certname=None):
     if request.method == 'POST':
         request.session['django_timezone'] = request.POST['timezone']
@@ -253,10 +253,16 @@ def nodes(request, certname=None):
     else:
         try:
             limits = int(request.GET.get('limits', 50))
-            if limits is 0:
+            if limits <= 0:
                 limits = 50
         except:
             return HttpResponseBadRequest('Oh no! Your filters were invalid.')
+
+        page_num = int(request.GET.get('page', 0))
+        if page_num <= 0:
+            offset = 0
+        else:
+            offset = "{:.0f}".format(page_num * limits)
         try:
             sort_field = str(request.GET.get('sortfield', 'latestReport'))
         except:
@@ -273,16 +279,24 @@ def nodes(request, certname=None):
                     {
                         1: '["~","name","' + search_node + '"]'
                     },
+                'limit': limits,
+                'include-total': 'true',
+                'offset': offset,
             }
         else:
             node_params = {
                 'query': {},
+                'limit': limits,
+                'include-total': 'true',
+                'offset': offset,
             }
 
-        node_list = puppetdb.api_get(path='/nodes',
-                                     params=puppetdb.mk_puppetdb_query(
-                                         node_params),
-                                     verify=False)
+        node_list, headers = puppetdb.api_get(path='/nodes',
+                                              params=puppetdb.mk_puppetdb_query(
+                                                  node_params),
+                                              verify=False)
+        xrecords = headers['X-Records']
+        num_pages = int(xrecords) / limits
 
         # return fields that you can sort by
         valid_sort_fields = (
@@ -318,17 +332,6 @@ def nodes(request, certname=None):
                 node_list, report_list, sortby=sort_field, asc=False)
             sort_field_order_opposite = 'desc'
 
-        paginator = Paginator(merged_list, limits)  # Show 25 contacts per page
-        page = request.GET.get('page')
-        try:
-            merged_list = paginator.page(page)
-        except PageNotAnInteger:
-            # If page is not an integer, deliver first page.
-            merged_list = paginator.page(1)
-        except EmptyPage:
-            # If page is out of range (e.g. 9999), deliver last page of
-            # results.
-            merged_list = paginator.page(paginator.num_pages)
         """
         c_r_s* = current request sort
         c_r_* = current req
@@ -344,6 +347,8 @@ def nodes(request, certname=None):
             'r_sfieldby': ['asc', 'desc'],
             'c_r_sfieldby': sort_field_order,
             'c_r_sfieldby_o': sort_field_order_opposite,
+            'curr_page': page_num,
+            'tot_pages': "{:.0f}".format(num_pages),
         }
         return render(request, 'pano/nodes.html', context)
 
@@ -355,8 +360,8 @@ def reports(request, certname=None):
         request.session['django_timezone'] = request.POST['timezone']
         return redirect(request.POST['return_url'])
     else:
-        page_num = int(request.GET.get('page', 1))
-        if page_num <= 1:
+        page_num = int(request.GET.get('page', 0))
+        if page_num <= 0:
             offset = 0
         else:
             offset = "{:.0f}".format(page_num * 25)

@@ -21,7 +21,9 @@
             <table class="table table-condensed table-striped">
                 <thead>
                 <tr>
-                    <th><a href="?sortfield=certname&sortfieldby={% if request.GET.sortfield == 'certname' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">
+                    <th><a href="?sortfield=certname&sortfieldby=
+
+                            {% if request.GET.sortfield == 'certname' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">
                         Certname
                             <span class="glyphicon
                             {% if c_r_sfieldby == 'asc' and c_r_sfield == 'certname' %}
@@ -31,7 +33,9 @@
                             {% endif %}">
                             </span></a>
                     </th>
-                    <th><a href="?sortfield=latestCatalog&sortfieldby={% if request.GET.sortfield == 'latestCatalog' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">
+                    <th><a href="?sortfield=latestCatalog&sortfieldby=
+
+                            {% if request.GET.sortfield == 'latestCatalog' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">
                         Latest Catalog
                             <span class="glyphicon
                             {% if c_r_sfieldby == 'asc' and c_r_sfield == 'latestCatalog' %}
@@ -41,7 +45,9 @@
                             {% endif %}">
                             </span></a>
                     </th>
-                    <th><a href="?sortfield=latestReport&sortfieldby={% if request.GET.sortfield == 'latestReport' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">
+                    <th><a href="?sortfield=latestReport&sortfieldby=
+
+                            {% if request.GET.sortfield == 'latestReport' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">
                         Latest Report
                             <span class="glyphicon
                             {% if c_r_sfieldby == 'asc' and c_r_sfield == 'latestReport' %}
@@ -51,7 +57,9 @@
                             {% endif %}">
                             </span></a>
                     </th>
-                    <th><a href="?sortfield=latestFacts&sortfieldby={% if request.GET.sortfield == 'latestFacts' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">
+                    <th><a href="?sortfield=latestFacts&sortfieldby=
+
+                            {% if request.GET.sortfield == 'latestFacts' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">
                         Latest Facts
                         <span class="glyphicon
                             {% if c_r_sfieldby == 'asc' and c_r_sfield == 'latestFacts' %}
@@ -61,7 +69,9 @@
                             {% endif %}">
                             </span></a>
                     </th>
-                    <th><a href="?sortfield=success&sortfieldby={% if request.GET.sortfield == 'success' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">
+                    <th><a href="?sortfield=success&sortfieldby=
+
+                            {% if request.GET.sortfield == 'success' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">
                         Success
                             <span class="glyphicon {% if c_r_sfieldby == 'asc' and c_r_sfield == 'success' %}
                             glyphicon-chevron-up
@@ -70,7 +80,9 @@
                             {% endif %}">
                             </span></a>
                     </th>
-                    <th><a href="?sortfield=noop&sortfieldby={% if request.GET.sortfield == 'noop' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">
+                    <th><a href="?sortfield=noop&sortfieldby=
+
+                            {% if request.GET.sortfield == 'noop' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">
                         Noop
                             <span class="glyphicon
                             {% if c_r_sfieldby == 'asc' and c_r_sfield == 'noop' %}
@@ -80,7 +92,9 @@
                             {% endif %}">
                             </span></a>
                     </th>
-                    <th><a href="?sortfield=failure&sortfieldby={% if request.GET.sortfield == 'failure' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">
+                    <th><a href="?sortfield=failure&sortfieldby=
+
+                            {% if request.GET.sortfield == 'failure' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">
                         Failure
                             <span class="glyphicon
                             {% if c_r_sfieldby == 'asc' and c_r_sfield == 'failure' %}
@@ -90,7 +104,9 @@
                             {% endif %}">
                             </span></a>
                     </th>
-                    <th><a href="?sortfield=skipped&sortfieldby={% if request.GET.sortfield == 'skipped' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">
+                    <th><a href="?sortfield=skipped&sortfieldby=
+
+                            {% if request.GET.sortfield == 'skipped' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">
                         Skipped
                             <span class="glyphicon
                             {% if c_r_sfieldby == 'asc' and c_r_sfield == 'skipped' %}
@@ -118,27 +134,28 @@
                         </tr>
                     {% endfor %}
                 {% else %}
-                    <p>No nodes were found in puppetdb.</p>
+                    <tr>
+                        <td colspan="8"> No nodes were found in puppetdb.</td>
+                    </tr>
                 {% endif %}
                 </tbody>
+                <tfoot>
+                <tr>
+                    <td>
+                        <ul class="pagination pagination-sm">
+                            {% for page in tot_pages|get_range %}
+                                    <li {% if curr_page == page %}class="active"{% endif %}><a
+                                            href="?limits={{ c_r_limit }}&page={{ page }}">{{ page|add:'1' }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </td>
+                </tr>
+                </tfoot>
             </table>
         </div>
     </div>
     <div class="row">
         <div class="col-md-4">
-            <div class="pagination">
-                <span class="step-links">
-                    {% if node_list.has_previous %}
-                        <a href="?page={{ node_list.previous_page_number }}&sortfield={{ c_r_sfield }}&sortfieldby={{ c_r_sfieldby }}&limits={{ c_r_limit }}">previous</a>
-                    {% endif %}
-                    <span class="current">
-                        Page {{ node_list.number }} of {{ node_list.paginator.num_pages }}.
-                    </span>
-                    {% if node_list.has_next %}
-                        <a href="?page={{ node_list.next_page_number }}&sortfield={{ c_r_sfield }}&sortfieldby={{ c_r_sfieldby }}&limits={{ c_r_limit }}">next</a>
-                    {% endif %}
-                </span>
-            </div>
         </div>
         <div class="col-md-8" align="right">
             <form action="{% url 'nodes' %}" method="GET">
