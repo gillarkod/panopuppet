@@ -295,8 +295,14 @@ def nodes(request, certname=None):
                                               params=puppetdb.mk_puppetdb_query(
                                                   node_params),
                                               verify=False)
+        # Work out the number of pages from the xrecords response
         xrecords = headers['X-Records']
-        num_pages = int(xrecords) / limits
+        num_pages_wdec = int(xrecords) / 25
+        num_pages_wodec = "{:.0f}".format(num_pages_float)
+        if num_pages_wdec > num_pages_wodec:
+            num_pages = num_pages_wodec + 1
+        else:
+            num_pages = num_pages_wodec
 
         # return fields that you can sort by
         valid_sort_fields = (
@@ -392,7 +398,12 @@ def reports(request, certname=None):
 
         # Work out the number of pages from the xrecords response
         xrecords = headers['X-Records']
-        num_pages = int(xrecords) / 25
+        num_pages_wdec = int(xrecords) / 25
+        num_pages_wodec = "{:.0f}".format(num_pages_float)
+        if num_pages_wdec > num_pages_wodec:
+            num_pages = num_pages_wodec + 1
+        else:
+            num_pages = num_pages_wodec
 
         report_status = {}
         for report in reports_list:
