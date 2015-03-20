@@ -78,7 +78,7 @@
             },
             legend: {
                 position: 'bottom',
-                hide: true,
+                hide: true
             }
         });
     </script>
@@ -124,7 +124,7 @@
                 }
             },
             legend: {
-                position: 'bottom',
+                position: 'bottom'
             }
         });
     </script>
@@ -134,7 +134,7 @@
             data: {
                 columns: [
                     ['Run Times', {% for time in run_times %}{{ time }}, {% endfor %}],
-                    ['Baseline', {% for i in run_num|get_range %}{{ run_avg }}, {% endfor %}],
+                    ['Baseline', {% for i in run_num|get_range %}{{ run_avg }}, {% endfor %}]
 
                 ],
                 type: 'area-spline',
@@ -146,7 +146,7 @@
                 }
             },
             legend: {
-                position: 'bottom',
+                position: 'bottom'
             },
             point: {
                 show: false
