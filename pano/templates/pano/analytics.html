@@ -137,7 +137,7 @@
                         ['Baseline', {% for i in run_num|get_range %}{{ run_avg }}, {% endfor %}],
 
                 ],
-                type: 'line',
+                type: 'area-spline',
                 onmouseover: function (d, i) {
                     console.log("onmouseover", d, i);
                 },
