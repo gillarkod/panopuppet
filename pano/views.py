@@ -469,7 +469,7 @@ def analytics(request):
                                               verify=False)
 
         report_runavg_params = {
-            'limit': 250,
+            'limit': 100,
             'order-by': {
                 'order-field': {
                     'field': 'receive-time',
