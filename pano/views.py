@@ -297,8 +297,8 @@ def nodes(request, certname=None):
                                               verify=False)
         # Work out the number of pages from the xrecords response
         xrecords = headers['X-Records']
-        num_pages_wdec = int(xrecords) / 25
-        num_pages_wodec = "{:.0f}".format(num_pages_wdec)
+        num_pages_wdec = float(xrecords) / 25
+        num_pages_wodec = float("{:.0f}".format(num_pages_wdec))
         if num_pages_wdec > num_pages_wodec:
             num_pages = num_pages_wodec + 1
         else:
@@ -398,8 +398,8 @@ def reports(request, certname=None):
 
         # Work out the number of pages from the xrecords response
         xrecords = headers['X-Records']
-        num_pages_wdec = int(xrecords) / 25
-        num_pages_wodec = "{:.0f}".format(num_pages_wdec)
+        num_pages_wdec = float(xrecords) / 25
+        num_pages_wodec = float("{:.0f}".format(num_pages_wdec))
         if num_pages_wdec > num_pages_wodec:
             num_pages = num_pages_wodec + 1
         else:
