@@ -109,7 +109,7 @@
                         <tr>
                             <td><a href="{% url 'reports' node.0 %}">{{ node.0 }}</a></td>
                             <td>{{ node.1|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
-                            <td>{{ node.2|json_to_datetime|date:'Y-m-d H:i:s' }} <a href="{% url 'reports' node.0 %}?latest=true&report_timestamp={{ node.2 }}">[Show Report]</a></td>
+                            <td>{{ node.2|json_to_datetime|date:'Y-m-d H:i:s' }} {% if node.4 or node.5 or node.6 or node.7 %}<a href="{% url 'reports' node.0 %}?latest=true&report_timestamp={{ node.2 }}"> [Show Report]</a>{% endif %}</td>
                             <td>{{ node.3|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
                             <td class="success"><strong>{{ node.4 }}</strong></td>
                             <td class="info"><strong>{{ node.5 }}</strong></td>
