@@ -21,9 +21,7 @@
             <table class="table table-condensed table-striped">
                 <thead>
                 <tr>
-                    <th><a href="?sortfield=certname&sortfieldby=
-
-                            {% if request.GET.sortfield == 'certname' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">
+                    <th><a href="?sortfield=certname&sortfieldby={% if request.GET.sortfield == 'certname' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">
                         Certname
                             <span class="glyphicon
                             {% if c_r_sfieldby == 'asc' and c_r_sfield == 'certname' %}
@@ -33,9 +31,7 @@
                             {% endif %}">
                             </span></a>
                     </th>
-                    <th><a href="?sortfield=latestCatalog&sortfieldby=
-
-                            {% if request.GET.sortfield == 'latestCatalog' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">
+                    <th><a href="?sortfield=latestCatalog&sortfieldby={% if request.GET.sortfield == 'latestCatalog' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">
                         Latest Catalog
                             <span class="glyphicon
                             {% if c_r_sfieldby == 'asc' and c_r_sfield == 'latestCatalog' %}
@@ -45,9 +41,7 @@
                             {% endif %}">
                             </span></a>
                     </th>
-                    <th><a href="?sortfield=latestReport&sortfieldby=
-
-                            {% if request.GET.sortfield == 'latestReport' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">
+                    <th><a href="?sortfield=latestReport&sortfieldby={% if request.GET.sortfield == 'latestReport' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">
                         Latest Report
                             <span class="glyphicon
                             {% if c_r_sfieldby == 'asc' and c_r_sfield == 'latestReport' %}
@@ -57,9 +51,7 @@
                             {% endif %}">
                             </span></a>
                     </th>
-                    <th><a href="?sortfield=latestFacts&sortfieldby=
-
-                            {% if request.GET.sortfield == 'latestFacts' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">
+                    <th><a href="?sortfield=latestFacts&sortfieldby={% if request.GET.sortfield == 'latestFacts' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">
                         Latest Facts
                         <span class="glyphicon
                             {% if c_r_sfieldby == 'asc' and c_r_sfield == 'latestFacts' %}
@@ -69,9 +61,7 @@
                             {% endif %}">
                             </span></a>
                     </th>
-                    <th><a href="?sortfield=success&sortfieldby=
-
-                            {% if request.GET.sortfield == 'success' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">
+                    <th><a href="?sortfield=success&sortfieldby={% if request.GET.sortfield == 'success' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">
                         Success
                             <span class="glyphicon {% if c_r_sfieldby == 'asc' and c_r_sfield == 'success' %}
                             glyphicon-chevron-up
@@ -80,9 +70,7 @@
                             {% endif %}">
                             </span></a>
                     </th>
-                    <th><a href="?sortfield=noop&sortfieldby=
-
-                            {% if request.GET.sortfield == 'noop' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">
+                    <th><a href="?sortfield=noop&sortfieldby={% if request.GET.sortfield == 'noop' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">
                         Noop
                             <span class="glyphicon
                             {% if c_r_sfieldby == 'asc' and c_r_sfield == 'noop' %}
@@ -92,9 +80,7 @@
                             {% endif %}">
                             </span></a>
                     </th>
-                    <th><a href="?sortfield=failure&sortfieldby=
-
-                            {% if request.GET.sortfield == 'failure' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">
+                    <th><a href="?sortfield=failure&sortfieldby={% if request.GET.sortfield == 'failure' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">
                         Failure
                             <span class="glyphicon
                             {% if c_r_sfieldby == 'asc' and c_r_sfield == 'failure' %}
@@ -104,9 +90,7 @@
                             {% endif %}">
                             </span></a>
                     </th>
-                    <th><a href="?sortfield=skipped&sortfieldby=
-
-                            {% if request.GET.sortfield == 'skipped' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">
+                    <th><a href="?sortfield=skipped&sortfieldby={% if request.GET.sortfield == 'skipped' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">
                         Skipped
                             <span class="glyphicon
                             {% if c_r_sfieldby == 'asc' and c_r_sfield == 'skipped' %}
