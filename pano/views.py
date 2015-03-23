@@ -232,8 +232,6 @@ def nodes(request, certname=None):
         xrecords = headers['X-Records']
         num_pages_wdec = float(xrecords) / limits
         num_pages_wodec = float("{:.0f}".format(num_pages_wdec))
-        print(num_pages_wdec)
-        print(num_pages_wodec)
         if num_pages_wdec > num_pages_wodec:
             num_pages = num_pages_wodec + 1
         else:
@@ -300,78 +298,106 @@ def reports(request, certname=None):
     if request.method == 'POST':
         request.session['django_timezone'] = request.POST['timezone']
         return redirect(request.POST['return_url'])
-    else:
-        page_num = int(request.GET.get('page', 0))
-        if page_num <= 0:
-            offset = 0
-        else:
-            offset = "{:.0f}".format(page_num * 25)
 
-        reports_params = {
-            'query':
-                {
-                    1: '["=","certname","' + certname + '"]'
-                },
-            'order-by':
-                {
-                    'order-field':
-                        {
-                            'field': 'start-time',
-                            'order': 'desc',
-                        },
-                    'query-field': {'field': 'certname'},
-                },
-            'limit': 25,
-            'include-total': 'true',
-            'offset': offset,
-        }
-        reports_list, headers = puppetdb.api_get(path='/reports',
-                                                 api_version='v4',
-                                                 params=puppetdb.mk_puppetdb_query(
-                                                     reports_params),
-                                                 verify=False)
-
-        # Work out the number of pages from the xrecords response
-        xrecords = headers['X-Records']
-        num_pages_wdec = float(xrecords) / 25
-        num_pages_wodec = float("{:.0f}".format(num_pages_wdec))
-        if num_pages_wdec > num_pages_wodec:
-            num_pages = num_pages_wodec + 1
-        else:
-            num_pages = num_pages_wodec
-
-        report_status = {}
-        for report in reports_list:
-            events_params = {
+    if request.GET.get('latest', False):
+        if request.GET.get('latest') == "true":
+            latest_report_params = {
                 'query':
                     {
-                        1: '["=","report","' + report['hash'] + '"]'
+                        1: '["=","certname","' + certname + '"]'
                     },
-                'summarize-by': 'certname',
+                'order-by':
+                    {
+                        'order-field':
+                            {
+                                'field': 'start-time',
+                                'order': 'desc',
+                            },
+                        'query-field': {'field': 'certname'},
+                    },
+                'limit': 1,
             }
-            eventcount_list = puppetdb.api_get(path='event-counts',
-                                               params=puppetdb.mk_puppetdb_query(
-                                                   events_params),
-                                               verify=False)
-            for event in eventcount_list:
-                if event['subject']['title'] == report['certname']:
-                    report_status[report['hash']] = {
-                        'failure': event['failures'],
-                        'success': event['successes'],
-                        'noop': event['noops'],
-                        'skipped': event['skips'],
-                    }
+            latest_report = puppetdb.api_get(path='/reports',
+                                             api_version='v4',
+                                             params=puppetdb.mk_puppetdb_query(
+                                                 latest_report_params),
+                                             verify=False)
+            report_hash = ""
+            for report in latest_report:
+                report_hash = report['hash']
+            return redirect('/pano/events/' + certname + '/' + report_hash + '?report_timestamp=' + request.GET.get('report_timestamp'))
 
-        context = {
-            'timezones': pytz.common_timezones,
-            'certname': certname,
-            'reports': reports_list,
-            'report_status': report_status,
-            'curr_page': page_num,
-            'tot_pages': "{:.0f}".format(num_pages),
+    page_num = int(request.GET.get('page', 0))
+    if page_num <= 0:
+        offset = 0
+    else:
+        offset = "{:.0f}".format(page_num * 25)
+
+    reports_params = {
+        'query':
+            {
+                1: '["=","certname","' + certname + '"]'
+            },
+        'order-by':
+            {
+                'order-field':
+                    {
+                        'field': 'start-time',
+                        'order': 'desc',
+                    },
+                'query-field': {'field': 'certname'},
+            },
+        'limit': 25,
+        'include-total': 'true',
+        'offset': offset,
+    }
+    reports_list, headers = puppetdb.api_get(path='/reports',
+                                             api_version='v4',
+                                             params=puppetdb.mk_puppetdb_query(
+                                                 reports_params),
+                                             verify=False)
+
+    # Work out the number of pages from the xrecords response
+    xrecords = headers['X-Records']
+    num_pages_wdec = float(xrecords) / 25
+    num_pages_wodec = float("{:.0f}".format(num_pages_wdec))
+    if num_pages_wdec > num_pages_wodec:
+        num_pages = num_pages_wodec + 1
+    else:
+        num_pages = num_pages_wodec
+
+    report_status = {}
+    for report in reports_list:
+        events_params = {
+            'query':
+                {
+                    1: '["=","report","' + report['hash'] + '"]'
+                },
+            'summarize-by': 'certname',
         }
+        eventcount_list = puppetdb.api_get(path='event-counts',
+                                           params=puppetdb.mk_puppetdb_query(
+                                               events_params),
+                                           verify=False)
+        for event in eventcount_list:
+            if event['subject']['title'] == report['certname']:
+                report_status[report['hash']] = {
+                    'failure': event['failures'],
+                    'success': event['successes'],
+                    'noop': event['noops'],
+                    'skipped': event['skips'],
+                }
 
-        return render(request, 'pano/reports.html', context)
+    context = {
+        'timezones': pytz.common_timezones,
+        'certname': certname,
+        'reports': reports_list,
+        'report_status': report_status,
+        'curr_page': page_num,
+        'tot_pages': "{:.0f}".format(num_pages),
+    }
+
+    return render(request, 'pano/reports.html', context)
 
 
 @login_required

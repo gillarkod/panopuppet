@@ -83,7 +83,7 @@
     {% if events_list %}
         <div class="row">
             <h3>Events for {{ certname }}</h3>
-            <h4>Report ID: {{ hashid }} @ {{ report_timestamp }}</h4>
+            <h4>Report ID: {{ hashid }} @ {{ report_timestamp|json_to_datetime|date:'Y-m-d H:i:s'}}</h4>
         </div>
         <div class="row">
         <div class="col-md-12">
