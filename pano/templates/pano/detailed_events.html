@@ -10,6 +10,10 @@
           href="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.20.1/css/theme.bootstrap.css">
     <script src="{% static 'pano/tablesorter/jquery.tablesorter.js' %}"></script>
     <script src="{% static 'pano/tablesorter/jquery.tablesorter.widgets.js' %}"></script>
+    <link href="{% static 'pano/css/c3.min.css' %}" rel="stylesheet" type="text/css">
+    <script src="{% static 'pano/js/c3.min.js' %}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js" charset="utf-8"></script>
+    <!-- Table sorter config options -->
     <script id="js">$(function () {
 
         // NOTE: $.tablesorter.theme.bootstrap is ALREADY INCLUDED in the jquery.tablesorter.widgets.js
@@ -53,6 +57,7 @@
             widgets: ["uitheme", "filter"]
         })
     });</script>
+    <!-- Hide rows -->
     <script id="js">
         $(function () {
             // hide child rows
@@ -66,6 +71,7 @@
                     })
         });
     </script>
+    <!-- open events -->
     <script id="js">
         $(document).ready(function () {
             $('#eventsTable').find('tr.parent').click(function () {
@@ -83,11 +89,80 @@
     {% if events_list %}
         <div class="row">
             <h3>Events for {{ certname }}</h3>
-            <h4>Report ID: {{ hashid }} @ {{ report_timestamp|json_to_datetime|date:'Y-m-d H:i:s'}}</h4>
+            <h4>Report ID: {{ hashid }} @ {{ report_timestamp|json_to_datetime|date:'Y-m-d H:i:s' }}</h4>
         </div>
         <div class="row">
+            <div class="col-md-12">
+                <div class="panel-group" id="events_accordion" role="tablist" aria-multiselectable="true">
+                    <div class="panel panel-primary">
+                        <div role="tab" class="panel-heading" id="headingGraph">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#events_accordion" href="#collapseGraph"
+                                   aria-expanded="false" aria-controls="collapseGraph">
+                                    Execution Times (10 Highest)
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="collapseGraph" class="panel-collapse collapse" role="tabpanel"
+                             aria-labelledby="headingGraph">
+                            <div class="panel-body">
+                                <div align="center" id="exec_times"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script id="js_exec_times">
+            var chart = c3.generate({
+                        bindto: '#exec_times',
+                        data: {
+                            columns: [
+                                {% for event in event_durations %}
+                                    {% if event.1|rmDecimal != "0" %}
+                                        ['{{ event.0 }}', {{ event.1|rmDecimal }}],
+                                    {% endif %}
+                                {% endfor    %}
+                            ],
+                            type: 'bar'
+                        },
+                        grid: {
+                            y: {
+                                show: true
+                            }
+                        },
+                        tooltip: {
+                            grouped: false
+                        },
+                        axis: {
+                            x: {
+                                tick: {
+                                    values: ["Events"]
+                                }
+                            },
+                            y: {
+                                label: 'Seconds'
+                            }
+                        },
+                        bar: {
+                            width: {
+                                ratio: 0.5 // this makes bar width 50% of length between ticks
+                            }
+                            // or
+                            //width: 100 // this makes bar width 100px
+                        }
+                        ,
+                        size: {
+                            width: 500
+                        }
+                    })
+                    ;
+        </script>
+        <div class="row">
         <div class="col-md-12">
-        <table id="eventsTable" class="table table-condensed tablesorter">
+        <div class="panel panel-primary">
+        <div class="panel-heading"><h4 class="panel-title">Event Details</h4></div>
+        <table id="eventsTable" class="table-responsive table-condensed tablesorter">
         <thead>
         <tr>
             <th>Class</th>
@@ -135,6 +210,7 @@
     {% endif %}
 </tbody>
 </table>
+</div>
 </div>
 </div>
 {% endblock %}

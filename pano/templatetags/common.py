@@ -79,6 +79,13 @@ def get_range(value):
     """
     return range(int(value))
 
+@register.filter
+def rmDecimal(float_num):
+    return "{0:.0f}".format(float_num)
+
+@register.filter
+def decimal_to_comma(float_num):
+    return str(float_num).replace('.', ',')
 
 @register.tag
 def mkrange(parser, token):

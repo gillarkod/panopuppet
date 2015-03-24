@@ -561,10 +561,9 @@ def detailed_events(request, certname=None, hashid=None):
                 last_event_time = event_start_time
                 last_event_title = event_title
         event_exec_time = (last_event_time - run_end_time).total_seconds()
-        add_event = (last_event_title, event_exec_time)
+        add_event = [last_event_title, event_exec_time]
         event_execution_times.append(add_event)
-        sorted_events = sorted(event_execution_times, reverse=False, key=lambda field: field[1])
-
+        sorted_events = sorted(event_execution_times, reverse=True, key=lambda field: field[1])
 
         context = {
             'timezones': pytz.common_timezones,
@@ -572,7 +571,7 @@ def detailed_events(request, certname=None, hashid=None):
             'report_timestamp': report_timestamp,
             'hashid': hashid,
             'events_list': events_list,
-            'event_durations': sorted_events,
+            'event_durations': sorted_events[:10],
         }
 
         return render(request, 'pano/detailed_events.html', context)
