@@ -179,7 +179,7 @@ def index(request, certname=None):
 
 
 @login_required
-@cache_page(CACHE_TIME)
+#@cache_page(CACHE_TIME)
 def nodes(request, certname=None):
     if request.method == 'POST':
         request.session['django_timezone'] = request.POST['timezone']
@@ -254,8 +254,8 @@ def nodes(request, certname=None):
             merged_list = dictstatus(
                 node_list, report_list, sortby=sort_field, asc=False)
             sort_field_order_opposite = 'desc'
-
         paginator = Paginator(merged_list, limits)
+
         try:
             merged_list=paginator.page(page_num)
         except PageNotAnInteger:
@@ -264,6 +264,7 @@ def nodes(request, certname=None):
         except EmptyPage:
             # If page is out of range, deliver last page
             merged_list = paginator.page(paginator.num_pages)
+
         """
         c_r_s* = current request sort
         c_r_* = current req
@@ -279,6 +280,7 @@ def nodes(request, certname=None):
             'r_sfieldby': ['asc', 'desc'],
             'c_r_sfieldby': sort_field_order,
             'c_r_sfieldby_o': sort_field_order_opposite,
+            'tot_pages': paginator.page_range,
         }
         return render(request, 'pano/nodes.html', context)
 
