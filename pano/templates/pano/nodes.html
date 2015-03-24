@@ -23,6 +23,7 @@
                 <tr>
                     <th><a href="?sortfield=certname&sortfieldby=
 
+
                             {% if request.GET.sortfield == 'certname' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">
                         Certname
                             <span class="glyphicon
@@ -34,6 +35,7 @@
                             </span></a>
                     </th>
                     <th><a href="?sortfield=latestCatalog&sortfieldby=
+
 
                             {% if request.GET.sortfield == 'latestCatalog' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">
                         Latest Catalog
@@ -47,6 +49,7 @@
                     </th>
                     <th><a href="?sortfield=latestReport&sortfieldby=
 
+
                             {% if request.GET.sortfield == 'latestReport' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">
                         Latest Report
                             <span class="glyphicon
@@ -58,6 +61,7 @@
                             </span></a>
                     </th>
                     <th><a href="?sortfield=latestFacts&sortfieldby=
+
 
                             {% if request.GET.sortfield == 'latestFacts' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">
                         Latest Facts
@@ -71,6 +75,7 @@
                     </th>
                     <th><a href="?sortfield=success&sortfieldby=
 
+
                             {% if request.GET.sortfield == 'success' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">
                         Success
                             <span class="glyphicon {% if c_r_sfieldby == 'asc' and c_r_sfield == 'success' %}
@@ -81,6 +86,7 @@
                             </span></a>
                     </th>
                     <th><a href="?sortfield=noop&sortfieldby=
+
 
                             {% if request.GET.sortfield == 'noop' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">
                         Noop
@@ -94,6 +100,7 @@
                     </th>
                     <th><a href="?sortfield=failure&sortfieldby=
 
+
                             {% if request.GET.sortfield == 'failure' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">
                         Failure
                             <span class="glyphicon
@@ -105,6 +112,7 @@
                             </span></a>
                     </th>
                     <th><a href="?sortfield=skipped&sortfieldby=
+
 
                             {% if request.GET.sortfield == 'skipped' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">
                         Skipped
@@ -125,10 +133,14 @@
                         <tr>
                             <td><a href="{% url 'reports' node.0 %}">{{ node.0 }}</a></td>
                             <td>{{ node.1|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
-                            <td>{{ node.2|json_to_datetime|date:'Y-m-d H:i:s' }}
-                                {% if node.4 or node.5 or node.6 or node.7 %}
-                                    <a href="{% url 'reports' node.0 %}?latest=true&report_timestamp={{ node.2 }}">
-                                        [Show Report]</a>{% endif %}</td>
+                            <td>{% if node.4 or node.5 or node.6 or node.7 %}
+                                <a href="{% url 'reports' node.0 %}?latest=true&report_timestamp={{ node.2 }}">
+                                    {{ node.2|json_to_datetime|date:'Y-m-d H:i:s' }}
+                                </a>
+                            {% else %}
+                                {{ node.2|json_to_datetime|date:'Y-m-d H:i:s' }}
+                            {% endif %}
+                            </td>
                             <td>{{ node.3|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
                             <td class="success"><strong>{{ node.4 }}</strong></td>
                             <td class="info"><strong>{{ node.5 }}</strong></td>
@@ -144,13 +156,15 @@
                 </tbody>
                 <tfoot>
                 <tr>
-                   <td colspan="8">
-                       <ul class="pagination pagination-sm">
-                           {% for page in tot_pages %}
-                           <li {% if node_list.number == page %}class="active"{% endif %}><a href="?page={{ page }}&sortfield={{ c_r_sfield }}&sortfieldby={{ c_r_sfieldby }}&limits={{ c_r_limit }}">{{ page }}</a></li>
-                           {% endfor %}
-                       </ul>
-                   </td>
+                    <td colspan="8">
+                        <ul class="pagination pagination-sm">
+                            {% for page in tot_pages %}
+                                <li {% if node_list.number == page %}class="active"{% endif %}><a
+                                        href="?page={{ page }}&sortfield={{ c_r_sfield }}&sortfieldby={{ c_r_sfieldby }}&limits={{ c_r_limit }}">{{ page }}</a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </td>
                 </tr>
                 </tfoot>
             </table>
