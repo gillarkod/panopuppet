@@ -515,7 +515,7 @@ def analytics(request):
 
 
 @login_required
-@cache_page(CACHE_TIME)
+@cache_page(CACHE_TIME * 60)  # Cache for cache_time times 60 because the report will never change...
 def detailed_events(request, certname=None, hashid=None):
     if request.method == 'POST':
         request.session['django_timezone'] = request.POST['timezone']
