@@ -119,9 +119,7 @@
                         data: {
                             columns: [
                                 {% for event in event_durations %}
-                                    {% if event.1|rmDecimal != "0" %}
-                                        ['{{ event.0 }}', {{ event.1|rmDecimal }}],
-                                    {% endif %}
+                                    ['{{ event.0 }}', {{ event.1|decimal_to_point }}],
                                 {% endfor    %}
                             ],
                             type: 'bar'

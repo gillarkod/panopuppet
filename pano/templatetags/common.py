@@ -84,8 +84,8 @@ def rmDecimal(float_num):
     return "{0:.0f}".format(float_num)
 
 @register.filter
-def decimal_to_comma(float_num):
-    return str(float_num).replace('.', ',')
+def decimal_to_point(float_num):
+    return str(float_num).replace(',', '.')
 
 @register.tag
 def mkrange(parser, token):
