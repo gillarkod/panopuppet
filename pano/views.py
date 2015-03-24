@@ -3,6 +3,7 @@ from django.http import HttpResponseBadRequest, HttpResponseRedirect
 import pytz
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from pano.puppetdb import puppetdb
 from pano.methods.dictfuncs import dictstatus as dictstatus
@@ -191,11 +192,8 @@ def nodes(request, certname=None):
         except:
             return HttpResponseBadRequest('Oh no! Your filters were invalid.')
 
-        page_num = int(request.GET.get('page', 0))
-        if page_num <= 0:
-            offset = 0
-        else:
-            offset = "{:.0f}".format(page_num * limits)
+        page_num = int(request.GET.get('page', 1))
+
         try:
             sort_field = str(request.GET.get('sortfield', 'latestReport'))
         except:
@@ -212,31 +210,17 @@ def nodes(request, certname=None):
                     {
                         1: '["~","name","' + search_node + '"]'
                     },
-                'limit': limits,
-                'include-total': 'true',
-                'offset': offset,
             }
         else:
             node_params = {
                 'query': {},
-                'limit': limits,
-                'include-total': 'true',
-                'offset': offset,
             }
 
-        node_list, headers = puppetdb.api_get(path='/nodes',
+        node_list = puppetdb.api_get(path='/nodes',
                                               params=puppetdb.mk_puppetdb_query(
                                                   node_params),
                                               verify=False)
         # Work out the number of pages from the xrecords response
-        xrecords = headers['X-Records']
-        num_pages_wdec = float(xrecords) / limits
-        num_pages_wodec = float("{:.0f}".format(num_pages_wdec))
-        if num_pages_wdec > num_pages_wodec:
-            num_pages = num_pages_wodec + 1
-        else:
-            num_pages = num_pages_wodec
-
         # return fields that you can sort by
         valid_sort_fields = (
             'certname',
@@ -271,6 +255,15 @@ def nodes(request, certname=None):
                 node_list, report_list, sortby=sort_field, asc=False)
             sort_field_order_opposite = 'desc'
 
+        paginator = Paginator(merged_list, limits)
+        try:
+            merged_list=paginator.page(page_num)
+        except PageNotAnInteger:
+            # If page is not an integer, deliver first page.
+            merged_list = paginator.page(1)
+        except EmptyPage:
+            # If page is out of range, deliver last page
+            merged_list = paginator.page(paginator.num_pages)
         """
         c_r_s* = current request sort
         c_r_* = current req
@@ -286,8 +279,6 @@ def nodes(request, certname=None):
             'r_sfieldby': ['asc', 'desc'],
             'c_r_sfieldby': sort_field_order,
             'c_r_sfieldby_o': sort_field_order_opposite,
-            'curr_page': page_num,
-            'tot_pages': "{:.0f}".format(num_pages),
         }
         return render(request, 'pano/nodes.html', context)
 
