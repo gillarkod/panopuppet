@@ -325,7 +325,8 @@ def reports(request, certname=None):
             report_hash = ""
             for report in latest_report:
                 report_hash = report['hash']
-            return redirect('/pano/events/' + certname + '/' + report_hash + '?report_timestamp=' + request.GET.get('report_timestamp'))
+            return redirect('/pano/events/' + certname + '/' + report_hash + '?report_timestamp=' + request.GET.get(
+                'report_timestamp'))
 
     page_num = int(request.GET.get('page', 0))
     if page_num <= 0:
@@ -530,7 +531,7 @@ def detailed_events(request, certname=None, hashid=None):
                 {
                     'order-field':
                         {
-                            'field': 'containing-class',
+                            'field': 'timestamp',
                             'order': 'asc',
                         },
                     'query-field': {'field': 'certname'},
@@ -541,12 +542,37 @@ def detailed_events(request, certname=None, hashid=None):
                                            events_params),
                                        verify=False)
 
+        event_execution_times = []
+        last_event_time = None
+        last_event_title = None
+        run_end_time = None
+        for event in events_list:
+            event_title = event['resource-title']
+            event_start_time = json_to_datetime(event['timestamp'])
+            if last_event_time is None and last_event_title is None:
+                last_event_time = event_start_time
+                last_event_title = event_title
+                run_end_time = json_to_datetime(event['run-end-time'])
+                continue
+            else:
+                event_exec_time = (event_start_time - last_event_time).total_seconds()
+                add_event = (last_event_title, event_exec_time)
+                event_execution_times.append(add_event)
+                last_event_time = event_start_time
+                last_event_title = event_title
+        event_exec_time = (last_event_time - run_end_time).total_seconds()
+        add_event = (last_event_title, event_exec_time)
+        event_execution_times.append(add_event)
+        sorted_events = sorted(event_execution_times, reverse=False, key=lambda field: field[1])
+
+
         context = {
             'timezones': pytz.common_timezones,
             'certname': certname,
             'report_timestamp': report_timestamp,
             'hashid': hashid,
             'events_list': events_list,
+            'event_durations': sorted_events,
         }
 
         return render(request, 'pano/detailed_events.html', context)
