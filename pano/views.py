@@ -217,9 +217,9 @@ def nodes(request, certname=None):
             }
 
         node_list = puppetdb.api_get(path='/nodes',
-                                              params=puppetdb.mk_puppetdb_query(
-                                                  node_params),
-                                              verify=False)
+                                     params=puppetdb.mk_puppetdb_query(
+                                         node_params),
+                                     verify=False)
         # Work out the number of pages from the xrecords response
         # return fields that you can sort by
         valid_sort_fields = (
@@ -257,7 +257,7 @@ def nodes(request, certname=None):
         paginator = Paginator(merged_list, limits)
 
         try:
-            merged_list=paginator.page(page_num)
+            merged_list = paginator.page(page_num)
         except PageNotAnInteger:
             # If page is not an integer, deliver first page.
             merged_list = paginator.page(1)
@@ -536,29 +536,31 @@ def detailed_events(request, certname=None, hashid=None):
                                        verify=False)
 
         event_execution_times = []
+        sorted_events = None
         last_event_time = None
         last_event_title = None
         run_end_time = None
-        for event in events_list:
-            event_title = event['resource-title']
-            event_start_time = json_to_datetime(event['timestamp'])
-            if last_event_time is None and last_event_title is None:
-                last_event_time = event_start_time
-                last_event_title = event_title
-                run_end_time = json_to_datetime(event['run-end-time'])
-                continue
-            else:
-                event_exec_time = (event_start_time - last_event_time).total_seconds()
-                add_event = (last_event_title, event_exec_time)
-                event_execution_times.append(add_event)
-                last_event_time = event_start_time
-                last_event_title = event_title
-        event_exec_time = (last_event_time - run_end_time).total_seconds()
-        add_event = [last_event_title, event_exec_time]
-        event_execution_times.append(add_event)
-        sorted_events = sorted(event_execution_times, reverse=True, key=lambda field: field[1])
-        if len(sorted_events) > 10:
-            sorted_events = sorted_events[:10]
+        if len(events_list) != 0:
+            for event in events_list:
+                event_title = event['resource-title']
+                event_start_time = json_to_datetime(event['timestamp'])
+                if last_event_time is None and last_event_title is None:
+                    last_event_time = event_start_time
+                    last_event_title = event_title
+                    run_end_time = json_to_datetime(event['run-end-time'])
+                    continue
+                else:
+                    event_exec_time = (event_start_time - last_event_time).total_seconds()
+                    add_event = (last_event_title, event_exec_time)
+                    event_execution_times.append(add_event)
+                    last_event_time = event_start_time
+                    last_event_title = event_title
+            event_exec_time = (last_event_time - run_end_time).total_seconds()
+            add_event = [last_event_title, event_exec_time]
+            event_execution_times.append(add_event)
+            sorted_events = sorted(event_execution_times, reverse=True, key=lambda field: field[1])
+            if len(sorted_events) > 10:
+                sorted_events = sorted_events[:10]
 
         context = {
             'timezones': pytz.common_timezones,
