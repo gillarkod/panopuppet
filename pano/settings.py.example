@@ -5,6 +5,9 @@
 # Must have a slash "/" at the end of the URL
 PUPPETDB_HOST = "http://puppetdb.your.domain.com:8080/"
 
+# Puppet Agent Run Interval
+PUPPET_RUN_INTERVAL = 30  # Specify in minutes
+
 # Authentication method
 # Available auth methods = ldap...
 # It will fallback to auth in django, so if you have created accounts in django admin page
