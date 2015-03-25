@@ -143,12 +143,12 @@ def index(request, certname=None):
             all_nodes_list, event_list, sort=True, get_status="failed")
         changed_list = dictstatus(
             all_nodes_list, event_list, sort=True, get_status="changed")
-        failed_compiles_list = dictstatus(
+        off_timestamps_list = dictstatus(
             all_nodes_list, event_list, sort=True, get_status="failed_catalogs")
 
-    changed_list = [x for x in changed_list if x not in unreported_list and x not in failed_list and x not in failed_compiles_list]
+    changed_list = [x for x in changed_list if x not in unreported_list and x not in failed_list and x not in off_timestamps_list]
     failed_list = [x for x in failed_list if x not in unreported_list]
-    unreported_list = [x for x in unreported_list if x not in failed_list and x not in failed_compiles_list]
+    unreported_list = [x for x in unreported_list if x not in failed_list and x not in off_timestamps_list]
 
     if dashboard_show == 'recent':
         merged_nodes_list = dictstatus(
@@ -160,7 +160,7 @@ def index(request, certname=None):
     elif dashboard_show == 'changed':
         merged_nodes_list = changed_list
     elif dashboard_show == 'failed_catalogs':
-        merged_nodes_list = failed_compiles_list
+        merged_nodes_list = off_timestamps_list
     else:
         merged_nodes_list = dictstatus(
             node_list, event_list, sort=False, get_status="all")
@@ -168,6 +168,7 @@ def index(request, certname=None):
     node_unreported_count = len(unreported_list)
     node_fail_count = len(failed_list)
     node_change_count = len(changed_list)
+    node_off_timestamps_count = len(off_timestamps_list)
 
     context = {'node_list': merged_nodes_list,
                'certname': certname,
@@ -179,6 +180,7 @@ def index(request, certname=None):
                'failed_nodes': node_fail_count,
                'changed_nodes': node_change_count,
                'unreported_nodes': node_unreported_count,
+               'weird_timestamps': node_off_timestamps_count,
     }
 
     return render(request, 'pano/index.html', context)
