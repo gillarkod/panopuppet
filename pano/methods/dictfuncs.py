@@ -1,9 +1,6 @@
 __author__ = 'etaklar'
 
-from datetime import timedelta
-
-from pano.puppetdb.pdbutils import json_to_datetime, is_unreported
-from pano.settings import PUPPET_RUN_INTERVAL
+import pano.puppetdb.pdbutils
 
 
 def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_status="all"):
@@ -63,39 +60,6 @@ def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_st
     else:
         sortbycol = 2
 
-    def check_failed_compile(report_timestamp, fact_timestamp, catalog_timestamp):
-        """
-        :param report_timestamp: str
-        :param fact_timestamp: str
-        :param catalog_timestamp: str
-        :return: Bool
-
-        Returns False if the compiled run has not failed
-        Returns True if the compiled run has failed
-        """
-        if (report_timestamp is None or catalog_timestamp is None) and fact_timestamp is not None:
-            return True
-        # check if the fact report is older than puppet_run_time by double the run time
-        report_time = json_to_datetime(report_timestamp)
-        fact_time = json_to_datetime(fact_timestamp)
-        catalog_time = json_to_datetime(catalog_timestamp)
-
-        # Report time, fact time and catalog time should all be run within (PUPPET_RUN_INTERVAL / 2)
-        # minuites of each other
-
-        # Time elapsed between fact time and catalog time
-        elapsed_catalog = fact_time - catalog_time
-        # Time elapsed between fact time and report time
-        elapsed_report = fact_time - report_time
-
-        if elapsed_catalog > timedelta(minutes=PUPPET_RUN_INTERVAL / 2):
-            return True
-        elif elapsed_report > timedelta(minutes=PUPPET_RUN_INTERVAL / 2):
-            return True
-        else:
-            return False
-
-
     merged_list = []
     for node in node_dict:
         found_node = False
@@ -124,9 +88,7 @@ def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_st
                         status['failures'],
                         status['skips'],
                     ))
-                elif (get_status == "failed" and status['failures'] > 0) or check_failed_compile(
-                        node.get('report_timestamp', None), node.get('facts_timestamp', None),
-                        node.get('catalog_timestamp', None)):
+                elif get_status == "failed" and status['failures'] > 0:
                     merged_list.append((
                         node['name'],
                         node['catalog_timestamp'] or '',
@@ -148,10 +110,8 @@ def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_st
                         status['failures'],
                         status['skips'],
                     ))
-                elif get_status == "unreported" or not check_failed_compile(
-                        node.get('report_timestamp', None), node.get('facts_timestamp', None),
-                        node.get('catalog_timestamp', None)):
-                    if is_unreported(node['report_timestamp']):
+                elif get_status == "unreported":
+                    if pano.puppetdb.pdbutils.is_unreported(node['report_timestamp']):
                         merged_list.append((
                             node['name'],
                             node['catalog_timestamp'] or '',
@@ -161,7 +121,7 @@ def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_st
                             status['noops'],
                             status['failures'],
                             status['skips'],
-                        ))
+                            ))
                 break
 
         # We can assume that the node has not changed if its not found in the
@@ -177,10 +137,8 @@ def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_st
                 0,
                 0,
             ))
-        elif found_node is False and get_status == "unreported" and not check_failed_compile(
-                node.get('report_timestamp', None), node.get('facts_timestamp', None),
-                node.get('catalog_timestamp', None)):
-            if is_unreported(node['report_timestamp']):
+        elif found_node is False and get_status == "unreported":
+            if pano.puppetdb.pdbutils.is_unreported(node['report_timestamp']):
                 merged_list.append((
                     node['name'],
                     node['catalog_timestamp'] or '',
