@@ -14,7 +14,7 @@ from django.views.decorators.cache import cache_page
 from pano.settings import CACHE_TIME
 
 # Dashboard functions
-from pano.puppetdb.pdbutils import run_puppetdb_jobs, json_to_datetime
+from pano.puppetdb.pdbutils import run_puppetdb_jobs, json_to_datetime, get_dashboard_items
 
 
 def logout_view(request):
@@ -120,33 +120,62 @@ def index(request, certname=None):
                 'verify': False,
             },
         }
-        results = run_puppetdb_jobs(jobs)
+
+        puppetdb_results = run_puppetdb_jobs(jobs)
 
         # Dashboard to show nodes of "recent, failed, unreported or changed"
         dashboard_show = request.GET.get('show', 'recent')
 
         # Assign vars from the completed jobs
-        puppet_population = results['population']
+        puppet_population = puppetdb_results['population']
         # Total resources managed by puppet metric
-        total_resources = results['tot_resource']
+        total_resources = puppetdb_results['tot_resource']
         # Average resource per node metric
-        avg_resource_node = results['avg_resource']
+        avg_resource_node = puppetdb_results['avg_resource']
         # Information about all active nodes in puppet
-        all_nodes_list = results['all_nodes']
+        all_nodes_list = puppetdb_results['all_nodes']
         # All available events for the latest puppet reports
-        event_list = results['event-counts']
-        node_list = results['nodes']
+        event_list = puppetdb_results['event-counts']
+        node_list = puppetdb_results['nodes']
 
-        unreported_list = dictstatus(
-            all_nodes_list, event_list, sort=True, get_status="unreported")
-        failed_list = dictstatus(
-            all_nodes_list, event_list, sort=True, get_status="failed")
-        changed_list = dictstatus(
-            all_nodes_list, event_list, sort=True, get_status="changed")
-        off_timestamps_list = dictstatus(
-            all_nodes_list, event_list, sort=True, get_status="failed_catalogs")
+        sort_jobs = {
+            'unreported': {
+                'id': 'unreported',
+                'status': 'unreported',
+                'all_nodes': all_nodes_list,
+                'events': event_list,
+                'sort': True,
+            },
+            'changed': {
+                'id': 'changed',
+                'status': 'changed',
+                'all_nodes': all_nodes_list,
+                'events': event_list,
+                'sort': True,
+            },
+            'failed': {
+                'id': 'failed',
+                'status': 'failed',
+                'all_nodes': all_nodes_list,
+                'events': event_list,
+                'sort': True,
+            },
+            'failed_catalogs': {
+                'id': 'failed_catalogs',
+                'status': 'failed_catalogs',
+                'all_nodes': all_nodes_list,
+                'events': event_list,
+                'sort': True,
+            },
+        }
+        sort_job_results = get_dashboard_items(sort_jobs)
+        unreported_list = sort_job_results['unreported']
+        failed_list = sort_job_results['failed']
+        changed_list = sort_job_results['changed']
+        off_timestamps_list = sort_job_results['failed_catalogs']
 
-    changed_list = [x for x in changed_list if x not in unreported_list and x not in failed_list and x not in off_timestamps_list]
+    changed_list = [x for x in changed_list if
+                    x not in unreported_list and x not in failed_list and x not in off_timestamps_list]
     failed_list = [x for x in failed_list if x not in unreported_list]
     unreported_list = [x for x in unreported_list if x not in failed_list and x not in off_timestamps_list]
 
@@ -182,7 +211,6 @@ def index(request, certname=None):
                'unreported_nodes': node_unreported_count,
                'weird_timestamps': node_off_timestamps_count,
     }
-
     return render(request, 'pano/index.html', context)
 
 

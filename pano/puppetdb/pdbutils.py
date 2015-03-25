@@ -3,6 +3,7 @@ import queue
 from threading import Thread
 
 from pano.puppetdb import puppetdb
+import pano.methods.dictfuncs
 
 
 class UTC(datetime.tzinfo):
@@ -78,6 +79,44 @@ def run_puppetdb_jobs(jobs, threads=6):
                 verify=t_verify,
             )
             out_q.put({t_job['id']: results})
+            q.task_done()
+
+    for i in range(threads):
+        worker = Thread(target=db_threaded_requests, args=(i, jobs_q))
+        worker.setDaemon(True)
+        worker.start()
+
+    for job in jobs:
+        jobs_q.put(jobs[job])
+    jobs_q.join()
+    job_results = {}
+    while True:
+        try:
+            msg = (out_q.get_nowait())
+            job_results = dict(
+                list(job_results.items()) + list(msg.items()))
+        except queue.Empty:
+            break
+
+    return job_results
+
+
+def get_dashboard_items(jobs):
+    jobs_q = queue.Queue()
+    out_q = queue.Queue()
+    threads = 4
+
+    def db_threaded_requests(i, q):
+        while True:
+            t_job = q.get()
+            t_id = t_job['id']
+            t_status = t_job['status']
+            t_nodes = t_job['all_nodes']
+            t_events = t_job['events']
+            t_sort = t_job['sort']
+            results = pano.methods.dictfuncs.dictstatus(
+                t_nodes, t_events, sort=t_sort, get_status=t_status)
+            out_q.put({t_id: results})
             q.task_done()
 
     for i in range(threads):
