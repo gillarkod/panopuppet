@@ -106,7 +106,7 @@
                         <div id="collapseGraph" class="panel-collapse collapse" role="tabpanel"
                              aria-labelledby="headingGraph">
                             <div class="panel-body">
-                                <div align="center" id="exec_times"></div>
+                                <div class="row" id="exec_times"></div>
                             </div>
                         </div>
                     </div>
@@ -123,6 +123,9 @@
                                 {% endfor    %}
                             ],
                             type: 'bar'
+                        },
+                        padding: {
+                            right: 20
                         },
                         grid: {
                             y: {
@@ -154,7 +157,7 @@
         <div class="col-md-12">
         <div class="panel panel-primary">
         <div class="panel-heading"><h4 class="panel-title">Event Details</h4></div>
-        <table id="eventsTable" class="table-responsive table-condensed tablesorter">
+        <table style="border-collapse: separate" id="eventsTable" class="table-responsive table-condensed tablesorter">
         <thead>
         <tr>
             <th>Class</th>
@@ -184,7 +187,7 @@
                 {% if mess != None %}
                     <tr class="tablesorter-childRow">
                         <td colspan="1"><strong>Message</strong></td>
-                        <td colspan="5">{{ event|get_item:'message' }}</td>
+                        <td colspan="6">{{ event|get_item:'message' }}</td>
                     </tr>
                 {% endif %}
             {% endwith %}
@@ -192,7 +195,7 @@
                 {% if file != None %}
                     <tr class="tablesorter-childRow">
                         <td colspan="1"><strong>File</strong></td>
-                        <td colspan="5">{{ event|get_item:'file' }}:{{ event|get_item:'line' }}</td>
+                        <td colspan="6">{{ event|get_item:'file' }}:{{ event|get_item:'line' }}</td>
                     </tr>
                 {% endif %}
             {% endwith %}
