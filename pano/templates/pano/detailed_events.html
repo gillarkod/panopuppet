@@ -106,7 +106,7 @@
                         <div id="collapseGraph" class="panel-collapse collapse" role="tabpanel"
                              aria-labelledby="headingGraph">
                             <div class="panel-body">
-                                <div align="center" id="exec_times"></div>
+                                <div class="row" id="exec_times"></div>
                             </div>
                         </div>
                     </div>
@@ -123,6 +123,9 @@
                                 {% endfor    %}
                             ],
                             type: 'bar'
+                        },
+                        padding: {
+                            right: 20
                         },
                         grid: {
                             y: {
