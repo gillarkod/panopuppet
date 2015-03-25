@@ -197,7 +197,7 @@ def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_st
                     0,
                     0,
                 ))
-        elif get_status == "failed_catalogs":
+        elif found_node is False and get_status == "failed_catalogs":
             if check_failed_compile(report_timestamp=node.get('report_timestamp', None),
                                     fact_timestamp=node.get('facts_timestamp', None),
                                     catalog_timestamp=node.get('catalog_timestamp', None)):
