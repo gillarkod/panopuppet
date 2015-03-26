@@ -202,21 +202,21 @@
             {% with event|get_item:'old-value' as oldval %}
                 {% with event|get_item:'new-value' as newval %}
                     {% if '{md5}' in oldval or '{md5}' in newval %}
-                        <tr class="tablesorter-childRow">
-                            <td colspan="1"><strong>Filebucket</strong></td>
-                            {% if oldval|get_filebucket:environment or newval|get_filebucket:environment %}
+                        {% if oldval|get_filebucket:environment or newval|get_filebucket:environment %}
+                            <tr class="tablesorter-childRow">
+                                <td colspan="1"><strong>Filebucket</strong></td>
                                 <td colspan="6">
-                                {% if oldval|get_filebucket:environment %}
-                                    <strong>From: </strong><a href="#" data-toggle="modal"
-                                                              data-target="#{{ event|get_item:'resource-title' }}-from">{{ oldval }}</a>
-                                {% endif %}
-                                {% if newval|get_filebucket:environment %}
-                                    <strong> To: </strong><a href="#" data-toggle="modal"
-                                                             data-target="#{{ event|get_item:'resource-title' }}-to">{{ newval }}</a>
-                                {% endif %}
+                                    {% if oldval|get_filebucket:environment %}
+                                        <strong>From: </strong><a href="#" data-toggle="modal"
+                                                                  data-target="#{{ event|get_item:'resource-title' }}-from">{{ oldval }}</a>
+                                    {% endif %}
+                                    {% if newval|get_filebucket:environment %}
+                                        <strong> To: </strong><a href="#" data-toggle="modal"
+                                                                 data-target="#{{ event|get_item:'resource-title' }}-to">{{ newval }}</a>
+                                    {% endif %}
                                 </td>
-                            {% endif %}
-                        </tr>
+                            </tr>
+                        {% endif %}
                     {% endif %}
                 {% endwith %}
             {% endwith %}
