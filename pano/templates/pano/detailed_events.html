@@ -88,7 +88,7 @@
 {% block content %}
     {% if events_list %}
         <div class="row">
-            <h3>Events for {{ certname }}</h3>
+            <h3>Events for {{ certname }} in {{ environment }} environment</h3>
             <h4>Report ID: {{ hashid }} @ {{ report_timestamp|json_to_datetime|date:'Y-m-d H:i:s' }}</h4>
         </div>
         <div class="row">
@@ -199,6 +199,27 @@
                     </tr>
                 {% endif %}
             {% endwith %}
+            {% with event|get_item:'old-value' as oldval %}
+                {% with event|get_item:'new-value' as newval %}
+                    {% if '{md5}' in oldval or '{md5}' in newval %}
+                        <tr class="tablesorter-childRow">
+                            <td colspan="1"><strong>Filebucket</strong></td>
+                            {% if oldval|get_filebucket:environment or newval|get_filebucket:environment %}
+                                <td colspan="6">
+                                {% if oldval|get_filebucket:environment %}
+                                    <strong>From: </strong><a href="#" data-toggle="modal"
+                                                              data-target="#{{ event|get_item:'resource-title' }}-from">{{ oldval }}</a>
+                                {% endif %}
+                                {% if newval|get_filebucket:environment %}
+                                    <strong> To: </strong><a href="#" data-toggle="modal"
+                                                             data-target="#{{ event|get_item:'resource-title' }}-to">{{ newval }}</a>
+                                {% endif %}
+                                </td>
+                            {% endif %}
+                        </tr>
+                    {% endif %}
+                {% endwith %}
+            {% endwith %}
         {% endfor %}
     {% else %}
         <p>No events were found in puppetdb for <strong>{{ certname }}</strong> report id: {{ hashid }}</p>
@@ -208,4 +229,40 @@
 </div>
 </div>
 </div>
+    {% for event in events_list %}
+        {% with event|get_item:'old-value' as oldval %}
+            {% if '{md5}' in oldval %}
+                {% if oldval|get_filebucket:environment %}
+                    <div class="modal fade {{ event|get_item:'resource-title' }}-from" tabindex="-1"
+                         role="dialog"
+                         aria-labelledby="{{ event|get_item:'resource-title' }}-from"
+                         aria-hidden="true"
+                         id="{{ event|get_item:'resource-title' }}-from">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                {{ oldval|get_filebucket:environment }}
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endif %}
+        {% endwith %}
+        {% with event|get_item:'new-value' as newval %}
+            {% if '{md5}' in newval %}
+                {% if newval|get_filebucket:environment %}
+                    <div class="modal fade {{ event|get_item:'resource-title' }}-to" tabindex="-1"
+                         role="dialog"
+                         aria-labelledby="{{ event|get_item:'resource-title' }}-to"
+                         aria-hidden="true"
+                         id="{{ event|get_item:'resource-title' }}-to">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                {{ oldval|get_filebucket:environment }}
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endif %}
+        {% endwith %}
+    {% endfor %}
 {% endblock %}

@@ -50,7 +50,6 @@ def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_st
         :param fact_timestamp: str
         :param catalog_timestamp: str
         :return: Bool
-
         Returns False if the compiled run has not failed
         Returns True if the compiled run has failed
         """
@@ -95,6 +94,11 @@ def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_st
         sortbycol = 2
 
     merged_list = []
+    failed_list = []
+    unreported_list = []
+    changed_list = []
+    mismatch_list = []
+
     for node in node_dict:
         found_node = False
         for status in status_dict:
@@ -111,42 +115,10 @@ def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_st
                         status['failures'],
                         status['skips'],
                     ))
-                elif get_status == "noop" and status['noops'] > 0:
-                    merged_list.append((
-                        node['name'],
-                        node['catalog_timestamp'] or '',
-                        node['report_timestamp'] or '',
-                        node['facts_timestamp'] or '',
-                        status['successes'],
-                        status['noops'],
-                        status['failures'],
-                        status['skips'],
-                    ))
-                elif get_status == "failed" and status['failures'] > 0:
-                    merged_list.append((
-                        node['name'],
-                        node['catalog_timestamp'] or '',
-                        node['report_timestamp'] or '',
-                        node['facts_timestamp'] or '',
-                        status['successes'],
-                        status['noops'],
-                        status['failures'],
-                        status['skips'],
-                    ))
-                elif get_status == "changed":
-                    merged_list.append((
-                        node['name'],
-                        node['catalog_timestamp'] or '',
-                        node['report_timestamp'] or '',
-                        node['facts_timestamp'] or '',
-                        status['successes'],
-                        status['noops'],
-                        status['failures'],
-                        status['skips'],
-                    ))
-                elif get_status == "unreported":
-                    if is_unreported(node['report_timestamp']):
-                        merged_list.append((
+                else:
+                    # If the node has failures
+                    if status['failures'] > 0:
+                        failed_list.append((
                             node['name'],
                             node['catalog_timestamp'] or '',
                             node['report_timestamp'] or '',
@@ -156,11 +128,10 @@ def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_st
                             status['failures'],
                             status['skips'],
                         ))
-                elif get_status == "failed_catalogs":
                     if check_failed_compile(report_timestamp=node.get('report_timestamp', None),
                                             fact_timestamp=node.get('facts_timestamp', None),
                                             catalog_timestamp=node.get('catalog_timestamp', None)):
-                        merged_list.append((
+                        mismatch_list.append((
                             node['name'],
                             node['catalog_timestamp'] or '',
                             node['report_timestamp'] or '',
@@ -170,47 +141,80 @@ def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_st
                             status['failures'],
                             status['skips'],
                         ))
+                    # If the node is unreported
+                    if is_unreported(node['report_timestamp']):
+                        unreported_list.append((
+                            node['name'],
+                            node['catalog_timestamp'] or '',
+                            node['report_timestamp'] or '',
+                            node['facts_timestamp'] or '',
+                            status['successes'],
+                            status['noops'],
+                            status['failures'],
+                            status['skips'],
+                        ))
+                    # The node was found in the events list so it has to have changed
+                    changed_list.append((
+                        node['name'],
+                        node['catalog_timestamp'] or '',
+                        node['report_timestamp'] or '',
+                        node['facts_timestamp'] or '',
+                        status['successes'],
+                        status['noops'],
+                        status['failures'],
+                        status['skips'],
+                    ))
+                # Found the node in events list so we can break this loop
                 break
+        if found_node is False:
+            if get_status == "all":
+                merged_list.append((
+                    node['name'],
+                    node['catalog_timestamp'] or '',
+                    node['report_timestamp'] or '',
+                    node['facts_timestamp'] or '',
+                    0,
+                    0,
+                    0,
+                    0,
+                ))
+            else:
+                # If the node is unreported
+                if is_unreported(node['report_timestamp']):
+                    unreported_list.append((
+                        node['name'],
+                        node['catalog_timestamp'] or '',
+                        node['report_timestamp'] or '',
+                        node['facts_timestamp'] or '',
+                        0,
+                        0,
+                        0,
+                        0,
+                    ))
+                if check_failed_compile(report_timestamp=node.get('report_timestamp', None),
+                                        fact_timestamp=node.get('facts_timestamp', None),
+                                        catalog_timestamp=node.get('catalog_timestamp', None)):
+                    mismatch_list.append((
+                        node['name'],
+                        node['catalog_timestamp'] or '',
+                        node['report_timestamp'] or '',
+                        node['facts_timestamp'] or '',
+                        0,
+                        0,
+                        0,
+                        0,
+                    ))
 
-        # We can assume that the node has not changed if its not found in the
-        # event-counts output.
-        if found_node is False and get_status == "all":
-            merged_list.append((
-                node['name'],
-                node['catalog_timestamp'] or '',
-                node['report_timestamp'] or '',
-                node['facts_timestamp'] or '',
-                0,
-                0,
-                0,
-                0,
-            ))
-        elif found_node is False and get_status == "unreported":
-            if is_unreported(node['report_timestamp']):
-                merged_list.append((
-                    node['name'],
-                    node['catalog_timestamp'] or '',
-                    node['report_timestamp'] or '',
-                    node['facts_timestamp'] or '',
-                    0,
-                    0,
-                    0,
-                    0,
-                ))
-        elif found_node is False and get_status == "failed_catalogs":
-            if check_failed_compile(report_timestamp=node.get('report_timestamp', None),
-                                    fact_timestamp=node.get('facts_timestamp', None),
-                                    catalog_timestamp=node.get('catalog_timestamp', None)):
-                merged_list.append((
-                    node['name'],
-                    node['catalog_timestamp'] or '',
-                    node['report_timestamp'] or '',
-                    node['facts_timestamp'] or '',
-                    0,
-                    0,
-                    0,
-                    0,
-                ))
-    if sort:
+    if sort and get_status == 'all':
         return sort_table(merged_list, order=asc, col=sortbycol)
-    return merged_list
+    elif sort and get_status != 'all':
+        sorted_unreported_list = sort_table(unreported_list, order=asc, col=sortbycol)
+        sorted_changed_list = sort_table(changed_list, order=asc, col=sortbycol)
+        sorted_failed_list = sort_table(failed_list, order=asc, col=sortbycol)
+        sorted_mismatch_list = sort_table(mismatch_list, order=asc, col=sortbycol)
+        return sorted_failed_list, sorted_changed_list, sorted_unreported_list, sorted_mismatch_list
+
+    if get_status == 'all':
+        return merged_list
+    else:
+        return failed_list, changed_list, unreported_list, mismatch_list

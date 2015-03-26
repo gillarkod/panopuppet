@@ -1,5 +1,5 @@
 from django.shortcuts import redirect, render
-from django.http import HttpResponseBadRequest, HttpResponseRedirect
+from django.http import HttpResponseBadRequest, HttpResponseRedirect, HttpResponse
 import pytz
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -8,13 +8,17 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from pano.puppetdb import puppetdb
 from pano.methods.dictfuncs import dictstatus as dictstatus
 
+# Settings for puppetdb
+from pano.settings import PUPPETDB_CERTIFICATES, PUPPETDB_VERIFY_SSL, PUPPETDB_HOST
 
 # Caching for certain views.
 from django.views.decorators.cache import cache_page
 from pano.settings import CACHE_TIME
 
 # Dashboard functions
-from pano.puppetdb.pdbutils import run_puppetdb_jobs, json_to_datetime, get_dashboard_items
+from pano.puppetdb.pdbutils import run_puppetdb_jobs, json_to_datetime
+
+import datetime
 
 
 def logout_view(request):
@@ -120,9 +124,7 @@ def index(request, certname=None):
                 'verify': False,
             },
         }
-
         puppetdb_results = run_puppetdb_jobs(jobs)
-
         # Dashboard to show nodes of "recent, failed, unreported or changed"
         dashboard_show = request.GET.get('show', 'recent')
 
@@ -138,80 +140,49 @@ def index(request, certname=None):
         event_list = puppetdb_results['event-counts']
         node_list = puppetdb_results['nodes']
 
-        sort_jobs = {
-            'unreported': {
-                'id': 'unreported',
-                'status': 'unreported',
-                'all_nodes': all_nodes_list,
-                'events': event_list,
-                'sort': True,
-            },
-            'changed': {
-                'id': 'changed',
-                'status': 'changed',
-                'all_nodes': all_nodes_list,
-                'events': event_list,
-                'sort': True,
-            },
-            'failed': {
-                'id': 'failed',
-                'status': 'failed',
-                'all_nodes': all_nodes_list,
-                'events': event_list,
-                'sort': True,
-            },
-            'failed_catalogs': {
-                'id': 'failed_catalogs',
-                'status': 'failed_catalogs',
-                'all_nodes': all_nodes_list,
-                'events': event_list,
-                'sort': True,
-            },
+        failed_list, changed_list, unreported_list, mismatch_list = dictstatus(all_nodes_list,
+                                                                               event_list,
+                                                                               sort=True,
+                                                                               sortby='latestReport',
+                                                                               get_status='notall')
+        changed_list = [x for x in changed_list if
+                        x not in unreported_list and x not in failed_list]
+        failed_list = [x for x in failed_list if x not in unreported_list]
+        unreported_list = [x for x in unreported_list if x not in failed_list]
+
+        if dashboard_show == 'recent':
+            merged_nodes_list = dictstatus(
+                node_list, event_list, sort=False, get_status="all")
+        elif dashboard_show == 'failed':
+            merged_nodes_list = failed_list
+        elif dashboard_show == 'unreported':
+            merged_nodes_list = unreported_list
+        elif dashboard_show == 'changed':
+            merged_nodes_list = changed_list
+        elif dashboard_show == 'failed_catalogs':
+            merged_nodes_list = mismatch_list
+        else:
+            merged_nodes_list = dictstatus(
+                node_list, event_list, sort=False, get_status="all")
+
+        node_unreported_count = len(unreported_list)
+        node_fail_count = len(failed_list)
+        node_change_count = len(changed_list)
+        node_off_timestamps_count = len(mismatch_list)
+
+        context = {'node_list': merged_nodes_list,
+                   'certname': certname,
+                   'show_nodes': dashboard_show,
+                   'timezones': pytz.common_timezones,
+                   'population': puppet_population['Value'],
+                   'total_resource': total_resources['Value'],
+                   'avg_resource': "{:.2f}".format(avg_resource_node['Value']),
+                   'failed_nodes': node_fail_count,
+                   'changed_nodes': node_change_count,
+                   'unreported_nodes': node_unreported_count,
+                   'weird_timestamps': node_off_timestamps_count,
         }
-        sort_job_results = get_dashboard_items(sort_jobs)
-        unreported_list = sort_job_results['unreported']
-        failed_list = sort_job_results['failed']
-        changed_list = sort_job_results['changed']
-        off_timestamps_list = sort_job_results['failed_catalogs']
-
-    changed_list = [x for x in changed_list if
-                    x not in unreported_list and x not in failed_list and x not in off_timestamps_list]
-    failed_list = [x for x in failed_list if x not in unreported_list]
-    unreported_list = [x for x in unreported_list if x not in failed_list and x not in off_timestamps_list]
-
-    if dashboard_show == 'recent':
-        merged_nodes_list = dictstatus(
-            node_list, event_list, sort=False, get_status="all")
-    elif dashboard_show == 'failed':
-        merged_nodes_list = failed_list
-    elif dashboard_show == 'unreported':
-        merged_nodes_list = unreported_list
-    elif dashboard_show == 'changed':
-        merged_nodes_list = changed_list
-    elif dashboard_show == 'failed_catalogs':
-        merged_nodes_list = off_timestamps_list
-    else:
-        merged_nodes_list = dictstatus(
-            node_list, event_list, sort=False, get_status="all")
-
-    node_unreported_count = len(unreported_list)
-    node_fail_count = len(failed_list)
-    node_change_count = len(changed_list)
-    node_off_timestamps_count = len(off_timestamps_list)
-
-    context = {'node_list': merged_nodes_list,
-               'certname': certname,
-               'show_nodes': dashboard_show,
-               'timezones': pytz.common_timezones,
-               'population': puppet_population['Value'],
-               'total_resource': total_resources['Value'],
-               'avg_resource': "{:.2f}".format(avg_resource_node['Value']),
-               'failed_nodes': node_fail_count,
-               'changed_nodes': node_change_count,
-               'unreported_nodes': node_unreported_count,
-               'weird_timestamps': node_off_timestamps_count,
-    }
-    return render(request, 'pano/index.html', context)
+        return render(request, 'pano/index.html', context)
 
 
 @login_required
@@ -544,7 +515,7 @@ def analytics(request):
 
 
 @login_required
-@cache_page(CACHE_TIME * 60)  # Cache for cache_time times 60 because the report will never change...
+@cache_page(CACHE_TIME * 60)  # Cache for cache_time multiplied 60 because the report will never change...
 def detailed_events(request, certname=None, hashid=None):
     if request.method == 'POST':
         request.session['django_timezone'] = request.POST['timezone']
@@ -567,15 +538,19 @@ def detailed_events(request, certname=None, hashid=None):
                 },
         }
         events_list = puppetdb.api_get(path='/events',
+                                       api_version='v4',
                                        params=puppetdb.mk_puppetdb_query(
                                            events_params),
                                        verify=False)
+        single_event = events_list[0]
+        environment = single_event['environment']
 
         event_execution_times = []
         sorted_events = None
         last_event_time = None
         last_event_title = None
         run_end_time = None
+
         if len(events_list) != 0:
             for event in events_list:
                 event_title = event['resource-title']
@@ -605,6 +580,7 @@ def detailed_events(request, certname=None, hashid=None):
             'hashid': hashid,
             'events_list': events_list,
             'event_durations': sorted_events,
+            'environment': environment,
         }
 
         return render(request, 'pano/detailed_events.html', context)

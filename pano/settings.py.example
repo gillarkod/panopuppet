@@ -3,7 +3,18 @@
 ########################
 
 # Must have a slash "/" at the end of the URL
-PUPPETDB_HOST = "http://puppetdb.your.domain.com:8080/"
+PUPPETDB_HOST = "http://puppetdb.example.com/"
+PUPPETDB_CERTIFICATES = ""
+PUPPETDB_VERIFY_SSL = False
+
+# Clientbucket Settings
+PUPPETMASTER_CLIENTBUCKET_SHOW = False
+PUPPETMASTER_CLIENTBUCKET_HOST = "https://puppetmaster.example.com/"
+PUPPETMASTER_CERTIFICATES = ""
+PUPPETMASTER_VERIFY_SSL = False
+
+# Puppet Agent Run Interval
+PUPPET_RUN_INTERVAL = 30
 
 # Authentication method
 # Available auth methods = ldap...

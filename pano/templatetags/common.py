@@ -1,5 +1,9 @@
 __author__ = 'etaklar'
 
+# Settings for clientbucket
+from pano.settings import PUPPETMASTER_CLIENTBUCKET_SHOW, PUPPETMASTER_CLIENTBUCKET_HOST, PUPPETMASTER_CERTIFICATES, PUPPETMASTER_VERIFY_SSL
+import requests
+
 from django import template
 register = template.Library()
 
@@ -136,3 +140,28 @@ def mkrange(parser, token):
     context_name = tokens.pop()
 
     return RangeNode(range_args, context_name)
+
+@register.filter
+def get_filebucket(md5_sum, env):
+    if not PUPPETMASTER_CLIENTBUCKET_SHOW:
+        return False
+
+    if not md5_sum.startswith('{md5}'):
+        return False
+
+    if md5_sum and env:
+        md5_sum = md5_sum.strip('{md5}')
+        cert = list()
+        headers = {
+            'Accept': 's',
+        }
+        url = PUPPETMASTER_CLIENTBUCKET_HOST + env + '/file_bucket_file/md5/' + md5_sum
+        print(url)
+        resp = requests.get(url=url,
+                            headers=headers,
+                            verify=PUPPETMASTER_VERIFY_SSL,
+                            cert=cert)
+        if resp.status_code != 200:
+            return False
+        else:
+            return resp.text
