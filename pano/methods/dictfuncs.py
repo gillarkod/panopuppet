@@ -206,10 +206,10 @@ def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_st
                     node['catalog_timestamp'] or '',
                     node['report_timestamp'] or '',
                     node['facts_timestamp'] or '',
-                    status['successes'],
-                    status['noops'],
-                    status['failures'],
-                    status['skips'],
+                    0,
+                    0,
+                    0,
+                    0,
                 ))
     if sort:
         return sort_table(merged_list, order=asc, col=sortbycol)
