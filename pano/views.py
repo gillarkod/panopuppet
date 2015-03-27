@@ -18,6 +18,9 @@ from pano.settings import CACHE_TIME
 # Dashboard functions
 from pano.puppetdb.pdbutils import run_puppetdb_jobs, json_to_datetime
 
+# Filebucket function
+from pano.methods.filebucket import get_file as get_filebucket
+
 import datetime
 
 
@@ -610,3 +613,47 @@ def facts(request, certname=None):
         }
 
         return render(request, 'pano/facts.html', context)
+
+
+def filebucket(request):
+    certname = request.GET.get('certname', False)
+    rtype = request.GET.get('rtype', False)
+    rtitle = request.GET.get('rtitle', False)
+    md5_sum_from = request.GET.get('md5_from', False)
+    env = request.GET.get('environment', False)
+    file_status = request.GET.get('file_status', 'from')
+
+    md5_sum_to = request.GET.get('md5_to', False)
+    diff_files = request.GET.get('diff', False)
+
+    # If got md5_sum_from
+    if certname and md5_sum_from and env and rtitle and rtype and file_status == 'from':
+        filebucket_file = get_filebucket(certname=certname, environment=env, rtitle=rtitle, rtype=rtype,
+                                         file_status=file_status,
+                                         md5sum_from=md5_sum_from)
+        if filebucket_file:
+            context = {
+                'timezones': pytz.common_timezones,
+                'certname': certname,
+                'content': filebucket_file,
+            }
+            return render(request, 'pano/filebucket.html', context)
+        else:
+            return HttpResponse('Could not find file with MD5 Hash: %s in filebucket.' % (md5_sum_from))
+    # If got md5_sum_to
+    elif certname and md5_sum_to and env and rtitle and rtype and file_status == 'to':
+        filebucket_file = get_filebucket(certname=certname, environment=env, rtitle=rtitle, rtype=rtype,
+                                         file_status=file_status,
+                                         md5sum_to=md5_sum_to)
+        if filebucket_file:
+            context = {
+                'timezones': pytz.common_timezones,
+                'certname': certname,
+                'content': filebucket_file,
+            }
+            return render(request, 'pano/filebucket.html', context)
+        else:
+            return HttpResponse('Could not find file with MD5 Hash: %s in filebucket.' % (md5_sum_from))
+
+    else:
+        return HttpResponse('No valid GET params was sent.')

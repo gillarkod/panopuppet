@@ -199,27 +199,15 @@
                     </tr>
                 {% endif %}
             {% endwith %}
-            {% with event|get_item:'old-value' as oldval %}
-                {% with event|get_item:'new-value' as newval %}
-                    {% if '{md5}' in oldval or '{md5}' in newval %}
-                        {% if oldval|get_filebucket:environment or newval|get_filebucket:environment %}
-                            <tr class="tablesorter-childRow">
-                                <td colspan="1"><strong>Filebucket</strong></td>
-                                <td colspan="6">
-                                    {% if oldval|get_filebucket:environment %}
-                                        <strong>From: </strong><a href="#" data-toggle="modal"
-                                                                  data-target="#{{ event|get_item:'resource-title' }}-from">{{ oldval }}</a>
-                                    {% endif %}
-                                    {% if newval|get_filebucket:environment %}
-                                        <strong> To: </strong><a href="#" data-toggle="modal"
-                                                                 data-target="#{{ event|get_item:'resource-title' }}-to">{{ newval }}</a>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                        {% endif %}
-                    {% endif %}
-                {% endwith %}
-            {% endwith %}
+            <tr class="tablesorter-childRow">
+                <td colspan="1"><strong>Filebucket</strong></td>
+                <td colspan="6">
+                    <strong>From: </strong><a href="#" data-toggle="modal"
+                                              data-target="#{{ event|get_item:'resource-title' }}-from">{{ event|get_item:'old-value' }}</a>
+                    <strong> To: </strong><a href="#" data-toggle="modal"
+                                             data-target="#{{ event|get_item:'resource-title' }}-to">{{ event|get_item:'new-value' }}</a>
+                </td>
+            </tr>
         {% endfor %}
     {% else %}
         <p>No events were found in puppetdb for <strong>{{ certname }}</strong> report id: {{ hashid }}</p>
@@ -232,36 +220,42 @@
     {% for event in events_list %}
         {% with event|get_item:'old-value' as oldval %}
             {% if '{md5}' in oldval %}
-                {% if oldval|get_filebucket:environment %}
-                    <div class="modal fade {{ event|get_item:'resource-title' }}-from" tabindex="-1"
-                         role="dialog"
-                         aria-labelledby="{{ event|get_item:'resource-title' }}-from"
-                         aria-hidden="true"
-                         id="{{ event|get_item:'resource-title' }}-from">
-                        <div class="modal-dialog modal-lg">
-                            <div class="modal-content">
-                                <pre>{{ oldval|get_filebucket:environment }}</pre>
-                            </div>
+                <div class="modal fade {{ event|get_item:'resource-title' }}-from" tabindex="-1"
+                     role="dialog"
+                     aria-labelledby="{{ event|get_item:'resource-title' }}-from"
+                     aria-hidden="true"
+                     id="{{ event|get_item:'resource-title' }}-from">
+                    <div class="modal-dialog modal-lg" style="height: 75%">
+                        <div class="modal-content">
+                            {% with event|get_item:'resource-type' as rtype %}
+                                {% with event|get_item:'resource-title' as rtitle %}
+                                    <iframe frameborder="0" width="100%" height="600"
+                                            src="{% url 'filebucket' %}?certname={{ certname }}&rtype={{ rtype }}&rtitle={{ rtitle }}&environment={{ environment }}&file_status=from&md5_from={{ oldval }}"></iframe>
+                                {% endwith %}
+                            {% endwith %}
                         </div>
                     </div>
-                {% endif %}
+                </div>
             {% endif %}
         {% endwith %}
         {% with event|get_item:'new-value' as newval %}
             {% if '{md5}' in newval %}
-                {% if newval|get_filebucket:environment %}
-                    <div class="modal fade {{ event|get_item:'resource-title' }}-to" tabindex="-1"
-                         role="dialog"
-                         aria-labelledby="{{ event|get_item:'resource-title' }}-to"
-                         aria-hidden="true"
-                         id="{{ event|get_item:'resource-title' }}-to">
-                        <div class="modal-dialog modal-lg">
-                            <div class="modal-content">
-                                <pre>{{ oldval|get_filebucket:environment }}</pre>
-                            </div>
+                <div class="modal fade {{ event|get_item:'resource-title' }}-to" tabindex="-1"
+                     role="dialog"
+                     aria-labelledby="{{ event|get_item:'resource-title' }}-to"
+                     aria-hidden="true"
+                     id="{{ event|get_item:'resource-title' }}-to">
+                    <div class="modal-dialog modal-lg" style="height: 75%">
+                        <div class="modal-content">
+                            {% with event|get_item:'resource-type' as rtype %}
+                                {% with event|get_item:'resource-title' as rtitle %}
+                                    <iframe frameborder="0" width="100%" height="600"
+                                            src="{% url 'filebucket' %}?certname={{ certname }}&rtype={{ rtype }}&rtitle={{ rtitle }}&environment={{ environment }}&file_status=to&md5_to={{ newval }}"></iframe>
+                                {% endwith %}
+                            {% endwith %}
                         </div>
                     </div>
-                {% endif %}
+                </div>
             {% endif %}
         {% endwith %}
     {% endfor %}

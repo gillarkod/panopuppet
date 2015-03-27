@@ -20,7 +20,7 @@ import json
 
 import requests
 
-from pano.settings import PUPPETDB_HOST
+from pano.settings import PUPPETDB_HOST, PUPPETDB_VERIFY_SSL, PUPPETDB_CERTIFICATES
 
 
 def api_get(api_url=PUPPETDB_HOST,
@@ -28,8 +28,8 @@ def api_get(api_url=PUPPETDB_HOST,
             path='',
             method='get',
             params=None,
-            verify=True,
-            cert=list()):
+            verify=PUPPETDB_VERIFY_SSL,
+            cert=PUPPETDB_CERTIFICATES):
     """
     Wrapper function for requests
     :param api_url: Base URL for requests
