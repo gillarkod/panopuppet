@@ -225,7 +225,7 @@
                      aria-labelledby="{{ event|get_item:'resource-title' }}-from"
                      aria-hidden="true"
                      id="{{ event|get_item:'resource-title' }}-from">
-                    <div class="modal-dialog modal-lg" style="height: 75%">
+                    <div class="modal-dialog modal-lg">
                         <div class="modal-content">
                             {% with event|get_item:'resource-type' as rtype %}
                                 {% with event|get_item:'resource-title' as rtitle %}
@@ -245,7 +245,7 @@
                      aria-labelledby="{{ event|get_item:'resource-title' }}-to"
                      aria-hidden="true"
                      id="{{ event|get_item:'resource-title' }}-to">
-                    <div class="modal-dialog modal-lg" style="height: 75%">
+                    <div class="modal-dialog modal-lg">
                         <div class="modal-content">
                             {% with event|get_item:'resource-type' as rtype %}
                                 {% with event|get_item:'resource-title' as rtitle %}
