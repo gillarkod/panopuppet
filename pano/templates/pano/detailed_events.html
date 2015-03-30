@@ -207,6 +207,8 @@
                                                   data-target="#{{ event|get_item:'resource-title' }}-from">{{ event|get_item:'old-value' }}</a>
                         <strong> To: </strong><a href="#" data-toggle="modal"
                                                  data-target="#{{ event|get_item:'resource-title' }}-to">{{ event|get_item:'new-value' }}</a>
+                        <strong>    |    </strong><a href="#" data-toggle="modal"
+                                                 data-target="#{{ event|get_item:'resource-title' }}-diff"><strong>Diff</strong></a>
                     </td>
                 </tr>
             {% endif %}
@@ -259,6 +261,30 @@
                     </div>
                 </div>
             {% endif %}
+        {% endwith %}
+        {% with event|get_item:'old-value' as oldval %}
+            {% with event|get_item:'new-value' as newval %}
+                {% if '{md5}' in oldval %}
+                    {% if '{md5}' in newval %}
+                        <div class="modal fade {{ event|get_item:'resource-title' }}-diff" tabindex="-1"
+                             role="dialog"
+                             aria-labelledby="{{ event|get_item:'resource-title' }}-diff"
+                             aria-hidden="true"
+                             id="{{ event|get_item:'resource-title' }}-diff">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    {% with event|get_item:'resource-type' as rtype %}
+                                        {% with event|get_item:'resource-title' as rtitle %}
+                                            <iframe frameborder="0" width="100%" height="600"
+                                                    src="{% url 'filebucket' %}?certname={{ certname }}&rtype={{ rtype }}&rtitle={{ rtitle }}&environment={{ environment }}&file_status=both&md5_from={{ oldval }}&md5_to={{ newval }}&diff=True"></iframe>
+                                        {% endwith %}
+                                    {% endwith %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endif %}
+            {% endwith %}
         {% endwith %}
     {% endfor %}
 {% endblock %}

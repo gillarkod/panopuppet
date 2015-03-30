@@ -625,6 +625,8 @@ def filebucket(request):
 
     md5_sum_to = request.GET.get('md5_to', False)
     diff_files = request.GET.get('diff', False)
+    if diff_files is not False:
+        diff_files = True
 
     # If got md5_sum_from
     if certname and md5_sum_from and env and rtitle and rtype and file_status == 'from':
@@ -654,6 +656,20 @@ def filebucket(request):
             return render(request, 'pano/filebucket.html', context)
         else:
             return HttpResponse('Could not find file with MD5 Hash: %s in filebucket.' % (md5_sum_from))
+    elif certname and md5_sum_to and md5_sum_from and env and rtitle and rtype and file_status == 'both' and diff_files:
+        filebucket_file = get_filebucket(certname=certname, environment=env, rtitle=rtitle, rtype=rtype,
+                                         file_status=file_status,
+                                         md5sum_to=md5_sum_to,
+                                         md5sum_from=md5_sum_from,
+                                         diff=diff_files)
+        if filebucket_file:
+            context = {
+                'timezones': pytz.common_timezones,
+                'certname': certname,
+                'content': filebucket_file,
+            }
+        return render(request, 'pano/filebucket.html', context)
+
 
     else:
         return HttpResponse('No valid GET params was sent.')
