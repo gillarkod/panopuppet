@@ -62,9 +62,7 @@ def get_file(certname, environment, rtitle, rtype, md5sum_from=None, md5sum_to=N
                 md5sum_to = md5sum_to.replace('{md5}', '')
 
                 from_url = PUPPETMASTER_CLIENTBUCKET_HOST + environment + '/file_bucket_file/md5/' + md5sum_from
-                print(from_url)
                 to_url = PUPPETMASTER_CLIENTBUCKET_HOST + environment + '/file_bucket_file/md5/' + md5sum_to
-                print(to_url)
                 if fetch_filebucket(from_url, 'head') is not False:
                     resource_from = fetch_filebucket(from_url, 'get')
                 else:
@@ -77,7 +75,6 @@ def get_file(certname, environment, rtitle, rtype, md5sum_from=None, md5sum_to=N
                     if resource_to is False:
                         return "Could not find new MD5 %s in Filebucket or as a PuppetDB Resource." % (md5sum_to)
                     else:
-                        print("found new file")
                         resource_to = resource_to[0]
                     if 'content' in resource_to['parameters']:
                         resource_to = resource_to['parameters']['content']
@@ -87,10 +84,13 @@ def get_file(certname, environment, rtitle, rtype, md5sum_from=None, md5sum_to=N
                             hash_matches = True
                 # now that we have come this far, we have both files.
                 # Lets differentiate the shit out of these files.
+
                 from_split_lines = resource_from.split('\n')
                 to_split_lines = resource_to.split('\n')
                 diff = difflib.unified_diff(from_split_lines, to_split_lines)
-                return '\n'.join(list(diff))
+                diff = ('\n'.join(list(diff))).split('\n')
+                return diff
+
             else:
                 return False
         else:

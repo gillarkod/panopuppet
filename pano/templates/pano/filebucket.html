@@ -3,8 +3,9 @@
 <head lang="en">
     <meta charset="UTF-8">
     <title></title>
+    {% load common %}
 </head>
 <body>
-<pre>{{ content }}</pre>
+<pre>{{ content|colorizediff|safe }}</pre>
 </body>
 </html>

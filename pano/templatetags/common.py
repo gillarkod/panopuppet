@@ -68,6 +68,24 @@ class RangeNode(template.Node):
 
 
 @register.filter
+def colorizediff(content):
+    color_diff = []
+
+    for line in content:
+        if line.startswith(' '):
+            # Nothing has changed
+            color_diff.append('<br>' + line.rstrip('\n'))
+        elif line.startswith('-'):
+            # Line has been removed
+            color_diff.append('<br>' + '<span style="color:red">' + line.rstrip('\n') + '</span>')
+        elif line.startswith('+'):
+            # Line has been added
+            color_diff.append('<br>' + '<span style="color:green">' + line.rstrip('\n') + '</span>')
+        else:
+            color_diff.append('<br>' + line.rstrip('\n'))
+    return ''.join(color_diff)
+
+@register.filter
 def get_range(value):
     """
       Filter - returns a list containing range made from given value
