@@ -1,5 +1,17 @@
 # PanoPuppet
 
+## Features
+* Fast and easy to use
+* Uses PuppetDB API to retrieve information
+* Filebucket support
+* Fully featured Dashboard for use with PuppetDB
+* Analytics Page providing insight into your puppet environment
+* LDAP Authentication
+
+## Future plans
+* Docker image to quickly install a panopuppet dashboard
+* Search nodes by facts and subqueries
+
 
 ### Introduction
 
@@ -19,94 +31,15 @@ This was written for a multi-tenant site across several datacenters.
 
 ### About the code
 
-I am not a developer, most of my code could look like it came out of a
+I am not a developer really so most of my code could look like it came out of a
 rats den. I have followed the PEP8 standards for coding. The comments might be sparse,
 sorry for that.
-I may also have taken bits of code from other PuppetDB dashboards. Mostly because
-they have solved a problem and I did not feel like reinventing the wheel.
 
-This code is quite slow, but this is largely due to the amount of data that
-needs to be processed. I was considering using celery to distribute queries
-and queries to one or more workers but realized that the main issue here is
-the amount of time it takes to poll puppetdb of certain things.
-
-You can see here with this profiling output:
-
-<pre>
-request start
-2015-03-10 10:36:39.796807
-
-jobs start
-2015-03-10 10:36:39.801722
-
-population:
-time: (0.0, 0.080793)
-
-nodes:
-time: (0.0, 0.087991)
-
-event-counts:
-time: (0.0, 0.107203)
-
-all_nodes:
-time: (0.0, 0.293851)
-
-tot_resource:
-time: (0.0, 0.373909)
-
-avg_resource:
-time: (0.0, 0.381993)
-
-end jobs
-2015-03-10 10:36:40.184869
-
-node statistics start
-2015-03-10 10:36:40.184949
-2015-03-10 10:36:40.185408
-end node statistics
-
-node unreported start
-2015-03-10 10:36:40.185437
-2015-03-10 10:36:40.308031
-end node unreported
-
-generate new dict
-2015-03-10 10:36:40.308095
-2015-03-10 10:36:40.309542
-end generate new dict
-
-end requests
-2015-03-10 10:36:40.309616
-</pre>
-
-The longest amount of time was actually retrieving information from puppetdb about the 
-nodes,average/tot resouces etc.
-This part took between 600-900 ms depending on the current load on postgresqldb.
-
-I decided therefore to do some old school caching.
-Each request is cached for 60 seconds. This should work quite well with cronjob scheduled puppet
-runs since they run at even intervals.
-
-
-<pre>
-Panopuppet without caching:
-1000 Clients
-1.3 requests/second
-64 seconds average response time
-</pre>
-<pre>
-Panopuppet with Caching:
-1000 Clients
-282.2 requests/second
-1.6 seconds average response time
-</pre>
-
-Another way to go is by doing a ton of client side calls to puppetdb API.
-Talking directly to the puppetdb postgresql server
+Code has been relatively fixed and optimized even though i'm sure there is much more I can do.
 
 #### Thanks go to...
 
-* [pypuppetdb](https://github.com/puppet-community/pypuppetdb)
+* [pypuppetdb](https://github.com/puppet-community/pypuppetdb) - Solved some issues which I got stuck at
 
 ### Screenshots
 ![Dashboard](screenshots/pano_dash.png)
