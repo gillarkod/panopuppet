@@ -203,12 +203,18 @@
                 <tr class="tablesorter-childRow">
                     <td colspan="1"><strong>Filebucket</strong></td>
                     <td colspan="6">
-                        <strong>From: </strong><a href="#" data-toggle="modal"
-                                                  data-target="#{{ event|get_item:'resource-title' }}-from">{{ event|get_item:'old-value' }}</a>
-                        <strong> To: </strong><a href="#" data-toggle="modal"
-                                                 data-target="#{{ event|get_item:'resource-title' }}-to">{{ event|get_item:'new-value' }}</a>
-                        <strong>    |    </strong><a href="#" data-toggle="modal"
-                                                 data-target="#{{ event|get_item:'resource-title' }}-diff"><strong>Diff</strong></a>
+                        <strong>From: </strong><a id="filebucketURL"
+                                                  data-toggle="modal"
+                                                  href="{% url 'filebucket' %}?certname={{ certname }}&rtype={{ event|get_item:'resource-type' }}&rtitle={{ event|get_item:'resource-title' }}&environment={{ environment }}&file_status=from&md5_from={{ event|get_item:'old-value' }}"
+                                                  data-target="#filebucketModal">{{ event|get_item:'old-value' }}</a>
+                        <strong> To: </strong><a id="filebucketURL"
+                                                 data-toggle="modal"
+                                                 href="{% url 'filebucket' %}?certname={{ certname }}&rtype={{ event|get_item:'resource-type' }}&rtitle={{ event|get_item:'resource-title' }}&environment={{ environment }}&file_status=to&md5_to={{ event|get_item:'new-value' }}"
+                                                 data-target="#filebucketModal">{{ event|get_item:'new-value' }}</a>
+                        <strong> | </strong><a id="filebucketURL"
+                                               data-toggle="modal"
+                                               href="{% url 'filebucket' %}?certname={{ certname }}&rtype={{ event|get_item:'resource-type' }}&rtitle={{ event|get_item:'resource-title' }}&environment={{ environment }}&file_status=both&md5_from={{ event|get_item:'old-value' }}&md5_to={{ event|get_item:'new-value' }}&diff=True"
+                                               data-target="#filebucketModal"><strong>Diff</strong></a>
                     </td>
                 </tr>
             {% endif %}
@@ -221,70 +227,22 @@
 </div>
 </div>
 </div>
-    {% for event in events_list %}
-        {% with event|get_item:'old-value' as oldval %}
-            {% if '{md5}' in oldval %}
-                <div class="modal fade {{ event|get_item:'resource-title' }}-from" tabindex="-1"
-                     role="dialog"
-                     aria-labelledby="{{ event|get_item:'resource-title' }}-from"
-                     aria-hidden="true"
-                     id="{{ event|get_item:'resource-title' }}-from">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            {% with event|get_item:'resource-type' as rtype %}
-                                {% with event|get_item:'resource-title' as rtitle %}
-                                    <iframe frameborder="0" width="100%" height="600"
-                                            src="{% url 'filebucket' %}?certname={{ certname }}&rtype={{ rtype }}&rtitle={{ rtitle }}&environment={{ environment }}&file_status=from&md5_from={{ oldval }}"></iframe>
-                                {% endwith %}
-                            {% endwith %}
-                        </div>
-                    </div>
-                </div>
-            {% endif %}
-        {% endwith %}
-        {% with event|get_item:'new-value' as newval %}
-            {% if '{md5}' in newval %}
-                <div class="modal fade {{ event|get_item:'resource-title' }}-to" tabindex="-1"
-                     role="dialog"
-                     aria-labelledby="{{ event|get_item:'resource-title' }}-to"
-                     aria-hidden="true"
-                     id="{{ event|get_item:'resource-title' }}-to">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            {% with event|get_item:'resource-type' as rtype %}
-                                {% with event|get_item:'resource-title' as rtitle %}
-                                    <iframe frameborder="0" width="100%" height="600"
-                                            src="{% url 'filebucket' %}?certname={{ certname }}&rtype={{ rtype }}&rtitle={{ rtitle }}&environment={{ environment }}&file_status=to&md5_to={{ newval }}"></iframe>
-                                {% endwith %}
-                            {% endwith %}
-                        </div>
-                    </div>
-                </div>
-            {% endif %}
-        {% endwith %}
-        {% with event|get_item:'old-value' as oldval %}
-            {% with event|get_item:'new-value' as newval %}
-                {% if '{md5}' in oldval %}
-                    {% if '{md5}' in newval %}
-                        <div class="modal fade {{ event|get_item:'resource-title' }}-diff" tabindex="-1"
-                             role="dialog"
-                             aria-labelledby="{{ event|get_item:'resource-title' }}-diff"
-                             aria-hidden="true"
-                             id="{{ event|get_item:'resource-title' }}-diff">
-                            <div class="modal-dialog modal-lg">
-                                <div class="modal-content">
-                                    {% with event|get_item:'resource-type' as rtype %}
-                                        {% with event|get_item:'resource-title' as rtitle %}
-                                            <iframe frameborder="0" width="100%" height="600"
-                                                    src="{% url 'filebucket' %}?certname={{ certname }}&rtype={{ rtype }}&rtitle={{ rtitle }}&environment={{ environment }}&file_status=both&md5_from={{ oldval }}&md5_to={{ newval }}&diff=True"></iframe>
-                                        {% endwith %}
-                                    {% endwith %}
-                                </div>
-                            </div>
-                        </div>
-                    {% endif %}
-                {% endif %}
-            {% endwith %}
-        {% endwith %}
-    {% endfor %}
+
+    <div class="modal fade filebucketModal" tabindex="-1"
+         role="dialog"
+         aria-labelledby="filebucketModal"
+         aria-hidden="true"
+         id="filebucketModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+            </div>
+        </div>
+    </div>
+    <script>
+    $('#filebucketModal').on('hidden.bs.modal', function (e) {
+        $(this).removeData('bs.modal');
+    })
+    </script>
+
+
 {% endblock %}
