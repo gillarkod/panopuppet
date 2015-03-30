@@ -638,6 +638,7 @@ def filebucket(request):
                 'timezones': pytz.common_timezones,
                 'certname': certname,
                 'content': filebucket_file,
+                'isdiff': diff_files,
             }
             return render(request, 'pano/filebucket.html', context)
         else:
@@ -652,6 +653,7 @@ def filebucket(request):
                 'timezones': pytz.common_timezones,
                 'certname': certname,
                 'content': filebucket_file,
+                'isdiff': diff_files,
             }
             return render(request, 'pano/filebucket.html', context)
         else:
@@ -667,6 +669,7 @@ def filebucket(request):
                 'timezones': pytz.common_timezones,
                 'certname': certname,
                 'content': filebucket_file,
+                'isdiff': diff_files
             }
         return render(request, 'pano/filebucket.html', context)
 

@@ -6,6 +6,10 @@
     {% load common %}
 </head>
 <body>
-<pre>{{ content|colorizediff|safe }}</pre>
+{% if isdiff == False%}
+    <pre>{{ content }}</pre>
+{% else %}
+    <pre>{{ content|colorizediff|safe }}</pre>
+{% endif %}
 </body>
 </html>
