@@ -3,7 +3,6 @@ import queue
 from threading import Thread
 
 from pano.puppetdb import puppetdb
-import pano.methods.dictfuncs
 
 
 class UTC(datetime.tzinfo):
@@ -70,13 +69,11 @@ def run_puppetdb_jobs(jobs, threads=6):
             t_job = q.get()
             t_path = t_job['path']
             t_params = t_job.get('params', {})
-            t_verify = t_job.get('verify', False)
             t_api_v = t_job.get('api', 'v3')
             results = puppetdb.api_get(
                 path=t_path,
                 params=puppetdb.mk_puppetdb_query(t_params),
                 api_version=t_api_v,
-                verify=t_verify,
             )
             out_q.put({t_job['id']: results})
             q.task_done()

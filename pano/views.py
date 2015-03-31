@@ -21,8 +21,6 @@ from pano.puppetdb.pdbutils import run_puppetdb_jobs, json_to_datetime
 # Filebucket function
 from pano.methods.filebucket import get_file as get_filebucket
 
-import datetime
-
 
 def logout_view(request):
     logout(request)
@@ -97,34 +95,28 @@ def index(request, certname=None):
             'population': {
                 'id': 'population',
                 'path': '/metrics/mbean/com.puppetlabs.puppetdb.query.population:type=default,name=num-nodes',
-                'verify': False,
             },
             'tot_resource': {
                 'id': 'tot_resource',
                 'path': '/metrics/mbean/com.puppetlabs.puppetdb.query.population:type=default,name=num-resources',
-                'verify': False,
             },
             'avg_resource': {
                 'id': 'avg_resource',
                 'path': '/metrics/mbean/com.puppetlabs.puppetdb.query.population:type=default,name=avg-resources-per-node',
-                'verify': False,
             },
             'all_nodes': {
                 'id': 'all_nodes',
                 'path': '/nodes',
-                'verify': False,
             },
             'events': {
                 'id': 'event-counts',
                 'path': 'event-counts',
                 'params': events_params,
-                'verify': False,
             },
             'nodes': {
                 'id': 'nodes',
                 'path': '/nodes',
                 'params': nodes_params,
-                'verify': False,
             },
         }
         puppetdb_results = run_puppetdb_jobs(jobs)
@@ -229,7 +221,7 @@ def nodes(request, certname=None):
         node_list = puppetdb.api_get(path='/nodes',
                                      params=puppetdb.mk_puppetdb_query(
                                          node_params),
-                                     verify=False)
+        )
         # Work out the number of pages from the xrecords response
         # return fields that you can sort by
         valid_sort_fields = (
@@ -255,7 +247,7 @@ def nodes(request, certname=None):
         report_list = puppetdb.api_get(path='event-counts',
                                        params=puppetdb.mk_puppetdb_query(
                                            report_params),
-                                       verify=False)
+        )
         if sort_field_order == 'desc':
             merged_list = dictstatus(
                 node_list, report_list, sortby=sort_field, asc=True)
@@ -324,7 +316,7 @@ def reports(request, certname=None):
                                              api_version='v4',
                                              params=puppetdb.mk_puppetdb_query(
                                                  latest_report_params),
-                                             verify=False)
+            )
             report_hash = ""
             for report in latest_report:
                 report_hash = report['hash']
@@ -359,7 +351,7 @@ def reports(request, certname=None):
                                              api_version='v4',
                                              params=puppetdb.mk_puppetdb_query(
                                                  reports_params),
-                                             verify=False)
+    )
 
     # Work out the number of pages from the xrecords response
     xrecords = headers['X-Records']
@@ -382,7 +374,7 @@ def reports(request, certname=None):
         eventcount_list = puppetdb.api_get(path='event-counts',
                                            params=puppetdb.mk_puppetdb_query(
                                                events_params),
-                                           verify=False)
+        )
         for event in eventcount_list:
             if event['subject']['title'] == report['certname']:
                 report_status[report['hash']] = {
@@ -446,25 +438,21 @@ def analytics(request):
                 'id': 'events_class_list',
                 'path': '/event-counts',
                 'params': events_class_params,
-                'verify': False,
             },
             'events_resource_list': {
                 'id': 'events_resource_list',
                 'path': '/event-counts',
                 'params': events_resource_params,
-                'verify': False,
             },
             'events_status_list': {
                 'id': 'events_status_list',
                 'path': '/aggregate-event-counts',
                 'params': events_status_params,
-                'verify': False,
             },
             'reports_run_avg': {
                 'id': 'reports_run_avg',
                 'path': '/reports',
                 'params': reports_runavg_params,
-                'verify': False,
             },
         }
 
@@ -544,7 +532,7 @@ def detailed_events(request, certname=None, hashid=None):
                                        api_version='v4',
                                        params=puppetdb.mk_puppetdb_query(
                                            events_params),
-                                       verify=False)
+        )
         single_event = events_list[0]
         environment = single_event['environment']
 
@@ -605,7 +593,7 @@ def facts(request, certname=None):
         facts_list = puppetdb.api_get(path='/facts/',
                                       params=puppetdb.mk_puppetdb_query(
                                           facts_params),
-                                      verify=False)
+        )
         context = {
             'timezones': pytz.common_timezones,
             'certname': certname,
