@@ -7,40 +7,46 @@
     <div class="container">
         <div class="row">
             <div class="col-md-3" align="center">
-                <p><strong>Failed Nodes</strong></p>
+                <p class="bg-danger img-rounded"><strong>Failed Nodes</strong></p>
 
                 <p>{{ failed_nodes }}</p>
             </div>
             <div class="col-md-3" align="center">
-                <p><strong>status changed</strong></p>
+                <p class="bg-success img-rounded"><strong>Status Changed</strong></p>
 
                 <p>{{ changed_nodes }}</p>
             </div>
             <div class="col-md-3" align="center">
-                <p><strong>Unreported nodes</strong></p>
+                <p class="bg-info img-rounded"><strong>Pending Nodes</strong></p>
+
+                <p>{{ pending_nodes }}</p>
+            </div>
+            <div class="col-md-3" align="center">
+                <p class="bg-warning img-rounded"><strong>Unreported Nodes</strong></p>
 
                 <p>{{ unreported_nodes }}</p>
             </div>
-            <div class="col-md-3" align="center">
-                <p><strong>Missmatching Timestamps</strong></p>
-                <p>{{ weird_timestamps }}</p>
-            </div>
         </div>
         <div class="row">
-            <div class="col-md-3" align="center">
-                <p><strong>Population</strong></p>
+            <div class="col-md-3 respon" align="center">
+                <p class="bg-info img-rounded"><strong>Population</strong></p>
 
                 <p>{{ population }}</p>
             </div>
             <div class="col-md-3" align="center">
-                <p><strong>Resources managed</strong></p>
+                <p class="bg-info img-rounded"><strong>Resources Managed</strong></p>
 
                 <p>{{ total_resource }}</p>
             </div>
             <div class="col-md-3" align="center">
-                <p><strong>Average resource per node</strong></p>
+                <p class="bg-info img-rounded"><strong>Average Resource per Node</strong></p>
 
                 <p>{{ avg_resource }}</p>
+            </div>
+            <div class="col-md-3" align="center">
+                <p class="bg-info img-rounded"><strong>Missmatching Timestamps</strong></p>
+
+                <p>{{ weird_timestamps }}</p>
             </div>
         </div>
     </div>
@@ -49,47 +55,51 @@
             <ul class="nav nav-tabs">
                 <li{% if show_nodes == 'recent' %} class="active"{% endif %}><a href="{% url 'dashboard' %}">Recent</a>
                 </li>
+                <li{% if show_nodes == 'changed' %} class="active"{% endif %}><a href="?show=changed">Changed</a></li>
+                <li{% if show_nodes == 'pending' %} class="active"{% endif %}><a href="?show=pending">Pending</a></li>
                 <li{% if show_nodes == 'failed' %} class="active"{% endif %}><a href="?show=failed">Failed</a></li>
                 <li{% if show_nodes == 'unreported' %} class="active"{% endif %}><a
                         href="?show=unreported">Unreported</a></li>
-                <li{% if show_nodes == 'changed' %} class="active"{% endif %}><a href="?show=changed">Changed</a></li>
                 <li{% if show_nodes == 'failed_catalogs' %} class="active"{% endif %}><a href="?show=failed_catalogs">Missmatching
                     Timestamps</a></li>
+
             </ul>
         </div>
-        <div class="col-md-12">
-            <table class="table table-condensed table-striped">
-                <thead>
-                <tr>
-                    <th>Certname</th>
-                    <th>Latest Catalog</th>
-                    <th>Latest Report</th>
-                    <th>Latest Facts</th>
-                    <th>Success</th>
-                    <th>Noop</th>
-                    <th>Failure</th>
-                    <th>Skipped</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% if node_list %}
-                    {% for node in node_list %}
-                        <tr>
-                            <td><a href="{% url 'reports' node.0 %}">{{ node.0 }}</a></td>
-                            <td>{{ node.1|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
-                            <td>{{ node.2|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
-                            <td>{{ node.3|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
-                            <td class="success"><strong>{{ node.4 }}</strong></td>
-                            <td class="info"><strong>{{ node.5 }}</strong></td>
-                            <td class="danger"><strong>{{ node.6 }}</strong></td>
-                            <td class="warning"><strong>{{ node.7 }}</strong></td>
-                        </tr>
-                    {% endfor %}
-                {% else %}
-                    No nodes were found in puppetdb.
-                {% endif %}
-                </tbody>
-            </table>
+        <div class="row">
+            <div class="col-md-12">
+                <table class="table table-condensed table-striped">
+                    <thead>
+                    <tr>
+                        <th>Certname</th>
+                        <th>Latest Catalog</th>
+                        <th>Latest Report</th>
+                        <th>Latest Facts</th>
+                        <th>Success</th>
+                        <th>Noop</th>
+                        <th>Failure</th>
+                        <th>Skipped</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% if node_list %}
+                        {% for node in node_list %}
+                            <tr>
+                                <td><a href="{% url 'reports' node.0 %}">{{ node.0 }}</a></td>
+                                <td>{{ node.1|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
+                                <td>{{ node.2|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
+                                <td>{{ node.3|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
+                                <td class="success"><strong>{{ node.4 }}</strong></td>
+                                <td class="info"><strong>{{ node.5 }}</strong></td>
+                                <td class="danger"><strong>{{ node.6 }}</strong></td>
+                                <td class="warning"><strong>{{ node.7 }}</strong></td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        No nodes were found in puppetdb.
+                    {% endif %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 {% endblock %}

@@ -97,6 +97,7 @@ def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_st
     failed_list = []
     unreported_list = []
     changed_list = []
+    pending_list = []
     mismatch_list = []
 
     for node in node_dict:
@@ -144,6 +145,18 @@ def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_st
                     # If the node is unreported
                     if is_unreported(node['report_timestamp']):
                         unreported_list.append((
+                            node['name'],
+                            node['catalog_timestamp'] or '',
+                            node['report_timestamp'] or '',
+                            node['facts_timestamp'] or '',
+                            status['successes'],
+                            status['noops'],
+                            status['failures'],
+                            status['skips'],
+                        ))
+                    # If the node has noops
+                    if status['noops'] > 0 and status['successes'] == 0 and status['failures'] == 0 and status['skips'] == 0:
+                        pending_list.append((
                             node['name'],
                             node['catalog_timestamp'] or '',
                             node['report_timestamp'] or '',
@@ -212,9 +225,10 @@ def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_st
         sorted_changed_list = sort_table(changed_list, order=asc, col=sortbycol)
         sorted_failed_list = sort_table(failed_list, order=asc, col=sortbycol)
         sorted_mismatch_list = sort_table(mismatch_list, order=asc, col=sortbycol)
-        return sorted_failed_list, sorted_changed_list, sorted_unreported_list, sorted_mismatch_list
+        sorted_pending_list = sort_table(pending_list, order=asc, col=sortbycol)
+        return sorted_failed_list, sorted_changed_list, sorted_unreported_list, sorted_mismatch_list, sorted_pending_list
 
     if get_status == 'all':
         return merged_list
     else:
-        return failed_list, changed_list, unreported_list, mismatch_list
+        return failed_list, changed_list, unreported_list, mismatch_list, pending_list

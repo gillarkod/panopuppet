@@ -135,13 +135,13 @@ def index(request, certname=None):
         event_list = puppetdb_results['event-counts']
         node_list = puppetdb_results['nodes']
 
-        failed_list, changed_list, unreported_list, mismatch_list = dictstatus(all_nodes_list,
-                                                                               event_list,
-                                                                               sort=True,
-                                                                               sortby='latestReport',
-                                                                               get_status='notall')
-        changed_list = [x for x in changed_list if
-                        x not in unreported_list and x not in failed_list]
+        failed_list, changed_list, unreported_list, mismatch_list, pending_list = dictstatus(all_nodes_list,
+                                                                                             event_list,
+                                                                                             sort=True,
+                                                                                             sortby='latestReport',
+                                                                                             get_status='notall')
+        pending_list = [x for x in pending_list if x not in unreported_list]
+        changed_list = [x for x in changed_list if x not in unreported_list and x not in failed_list and x not in pending_list]
         failed_list = [x for x in failed_list if x not in unreported_list]
         unreported_list = [x for x in unreported_list if x not in failed_list]
 
@@ -156,6 +156,8 @@ def index(request, certname=None):
             merged_nodes_list = changed_list
         elif dashboard_show == 'failed_catalogs':
             merged_nodes_list = mismatch_list
+        elif dashboard_show == 'pending':
+            merged_nodes_list = pending_list
         else:
             merged_nodes_list = dictstatus(
                 node_list, event_list, sort=False, get_status="all")
@@ -164,6 +166,7 @@ def index(request, certname=None):
         node_fail_count = len(failed_list)
         node_change_count = len(changed_list)
         node_off_timestamps_count = len(mismatch_list)
+        node_pending_count = len(pending_list)
 
         context = {'node_list': merged_nodes_list,
                    'certname': certname,
@@ -176,6 +179,7 @@ def index(request, certname=None):
                    'changed_nodes': node_change_count,
                    'unreported_nodes': node_unreported_count,
                    'weird_timestamps': node_off_timestamps_count,
+                   'pending_nodes': node_pending_count,
         }
         return render(request, 'pano/index.html', context)
 
