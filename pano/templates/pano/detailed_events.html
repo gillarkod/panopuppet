@@ -88,8 +88,10 @@
 {% block content %}
     {% if events_list %}
         <div class="row">
-            <h3>Events for {{ certname }} in {{ environment }} environment</h3>
-            <h4>Report ID: {{ hashid }} @ {{ report_timestamp|json_to_datetime|date:'Y-m-d H:i:s' }}</h4>
+            <div class="col-md-12">
+                <h3>Events for {{ certname }} in {{ environment }} environment</h3>
+                <h4>Report ID: {{ hashid }} @ {{ report_timestamp|json_to_datetime|date:'Y-m-d H:i:s' }}</h4>
+            </div>
         </div>
         <div class="row">
             <div class="col-md-12">
@@ -239,9 +241,9 @@
         </div>
     </div>
     <script>
-    $('#filebucketModal').on('hidden.bs.modal', function (e) {
-        $(this).removeData('bs.modal');
-    })
+        $('#filebucketModal').on('hidden.bs.modal', function (e) {
+            $(this).removeData('bs.modal');
+        })
     </script>
 
 
