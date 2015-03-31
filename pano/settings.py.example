@@ -2,15 +2,25 @@
 ####Pano Puppet Conf####
 ########################
 
+####
+##SSL Configuration for PuppetDB
+####
 # Must have a slash "/" at the end of the URL
-PUPPETDB_HOST = "http://puppetdb.example.com/"
-PUPPETDB_CERTIFICATES = ""
+PUPPETDB_HOST = "https://puppetdb.example.com:8081/"
+PUPPETDB_CERTIFICATES = ('/path/to/publickey.pem', '/path/to/private_key.pem') # (None, None) if you don't have any cert
+PUPPETDB_VERIFY_SSL = '/home/takeshi/ssl/ca.pem' # Default value False
+
+####
+##Non-SSL Configuration for PuppetDB
+####
+PUPPETDB_HOST = "http://puppetdb.example.com:8080/"
+PUPPETDB_CERTIFICATES = (None, None)
 PUPPETDB_VERIFY_SSL = False
 
-# Clientbucket Settings
-PUPPETMASTER_CLIENTBUCKET_SHOW = False
-PUPPETMASTER_CLIENTBUCKET_HOST = "https://puppetmaster.example.com/"
-PUPPETMASTER_CERTIFICATES = ""
+# Clientbucket Settings -- For SSL read the SSL configuration example for PuppetDB
+PUPPETMASTER_CLIENTBUCKET_SHOW = True
+PUPPETMASTER_CLIENTBUCKET_HOST = "https://puppetmaster.example.com:8140/"
+PUPPETMASTER_CERTIFICATES = (None, None) #  ('/path/to/ssl_cert', '/path/to/ssl_key')
 PUPPETMASTER_VERIFY_SSL = False
 
 # Puppet Agent Run Interval
