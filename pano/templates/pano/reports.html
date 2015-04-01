@@ -30,7 +30,7 @@
                     {% for report in reports %}
                         <tr>
                             <td>
-                                <a href="{% url 'events' certname=report.certname hashid=report.hash %}?report_timestamp={{ report|get_item:'start-time' }}">{{ report.hash }}</a>
+                                <a href="{% url 'events' certname=report.certname hashid=report.hash %}?report_timestamp={{ report|get_item:'start-time' }}&envname={{ report.environment }}">{{ report.hash }}</a>
                             </td>
                             <td>{{ report.environment }}</td>
                             <td>{{ report|get_item:'start-time'|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
