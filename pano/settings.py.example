@@ -8,7 +8,7 @@
 # Must have a slash "/" at the end of the URL
 PUPPETDB_HOST = "https://puppetdb.example.com:8081/"
 PUPPETDB_CERTIFICATES = ('/path/to/publickey.pem', '/path/to/private_key.pem') # (None, None) if you don't have any cert
-PUPPETDB_VERIFY_SSL = '/home/takeshi/ssl/ca.pem' # Default value False
+PUPPETDB_VERIFY_SSL = '/path/to/ca.pem' # Default value False
 
 ####
 ##Non-SSL Configuration for PuppetDB
@@ -22,6 +22,12 @@ PUPPETMASTER_CLIENTBUCKET_SHOW = True
 PUPPETMASTER_CLIENTBUCKET_HOST = "https://puppetmaster.example.com:8140/"
 PUPPETMASTER_CERTIFICATES = (None, None) #  ('/path/to/ssl_cert', '/path/to/ssl_key')
 PUPPETMASTER_VERIFY_SSL = False
+
+# Fileserver Settings
+PUPPETMASTER_FILESERVER_SHOW = True
+PUPPETMASTER_FILESERVER_HOST = "https://puppetmaster.example.com:8140/"
+PUPPETMASTER_FILESERVER_CERTIFICATES = ('/path/to/publickey.pem', '/path/to/private_key.pem') # (None, None) if you don't have any cert
+PUPPETMASTER_FILESERVER_VERIFY_SSL = '/pat/to/ca.pem'
 
 # Puppet Agent Run Interval
 PUPPET_RUN_INTERVAL = 30
