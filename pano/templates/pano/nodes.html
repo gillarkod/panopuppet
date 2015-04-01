@@ -37,7 +37,6 @@
                     </th>
                     <th><a href="?sortfield=skipped&sortfieldby={% if request.GET.sortfield == 'skipped' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">Skipped<span class="glyphicon{% if c_r_sfieldby == 'asc' and c_r_sfield == 'skipped' %}glyphicon-chevron-up{% elif c_r_sfieldby == 'desc' and c_r_sfield == 'skipped' %}glyphicon-chevron-down{% endif %}"></span></a>
                     </th>
-
                 </tr>
                 </thead>
                 <tbody>
