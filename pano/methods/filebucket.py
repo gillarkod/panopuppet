@@ -3,7 +3,7 @@ __author__ = 'takeshi'
 from pano.settings import PUPPETMASTER_CLIENTBUCKET_CERTIFICATES, PUPPETMASTER_CLIENTBUCKET_VERIFY_SSL, \
     PUPPETMASTER_CLIENTBUCKET_SHOW, PUPPETMASTER_CLIENTBUCKET_HOST
 from pano.settings import PUPPETMASTER_FILESERVER_CERTIFICATES, PUPPETMASTER_FILESERVER_HOST, \
-    PUPPETMASTER_FILESERVER_SHOW, PUPPETMASTER_FILESERVER_SHOW, PUPPETMASTER_FILESERVER_VERIFY_SSL
+    PUPPETMASTER_FILESERVER_SHOW, PUPPETMASTER_FILESERVER_VERIFY_SSL
 
 from pano.settings import PUPPETDB_CERTIFICATES, PUPPETDB_VERIFY_SSL
 
@@ -157,7 +157,7 @@ def get_file(certname, environment, rtitle, rtype, md5sum_from=None, md5sum_to=N
                         url = PUPPETMASTER_FILESERVER_HOST + environment + '/file_content/' + source_path
                         source_content = fetch_fileserver(url, 'get')
                         prepend_text = 'This file with MD5 %s was retrieved from the PuppetMaster Fileserver.\n\n' % (
-                        get_hash(source_content))
+                            get_hash(source_content))
                         return prepend_text + source_content
                     else:
                         return False
