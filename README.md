@@ -3,7 +3,8 @@
 ## Features
 * Fast and easy to use
 * Uses PuppetDB API to retrieve information
-* Filebucket support
+* Filebucket and Fileserver support
+* Diff support between old and new file
 * Fully featured Dashboard for use with PuppetDB
 * Analytics Page providing insight into your puppet environment
 * LDAP Authentication
