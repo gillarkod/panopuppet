@@ -537,8 +537,8 @@ def detailed_events(request, certname=None, hashid=None):
                                        params=puppetdb.mk_puppetdb_query(
                                            events_params),
         )
-        single_event = events_list[0]
-        environment = single_event['environment']
+        single_event = ''
+        environment = ''
 
         event_execution_times = []
         sorted_events = None
@@ -547,6 +547,8 @@ def detailed_events(request, certname=None, hashid=None):
         run_end_time = None
 
         if len(events_list) != 0:
+            single_event = events_list[0]
+            environment = single_event['environment']
             for event in events_list:
                 event_title = event['resource-title']
                 event_start_time = json_to_datetime(event['timestamp'])
@@ -567,6 +569,8 @@ def detailed_events(request, certname=None, hashid=None):
             sorted_events = sorted(event_execution_times, reverse=True, key=lambda field: field[1])
             if len(sorted_events) > 10:
                 sorted_events = sorted_events[:10]
+        else:
+            events_list = False
 
         context = {
             'timezones': pytz.common_timezones,

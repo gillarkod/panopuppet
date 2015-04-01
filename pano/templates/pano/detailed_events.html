@@ -86,149 +86,151 @@
 {% endblock %}
 
 {% block content %}
-    {% if events_list %}
-        <div class="row">
-            <div class="col-md-12">
-                <h3>Events for {{ certname }} in {{ environment }} environment</h3>
-                <h4>Report ID: {{ hashid }} @ {{ report_timestamp|json_to_datetime|date:'Y-m-d H:i:s' }}</h4>
-            </div>
+    <div class="row">
+        <div class="col-md-12">
+            <h3>Events for {{ certname }} in {{ request.GET.envname }} environment</h3>
+            <h4>Report ID: {{ hashid }} @ {{ report_timestamp|json_to_datetime|date:'Y-m-d H:i:s' }}</h4>
         </div>
-        <div class="row">
-            <div class="col-md-12">
-                <div class="panel-group" id="events_accordion" role="tablist" aria-multiselectable="true">
-                    <div class="panel panel-primary">
-                        <div role="tab" class="panel-heading" id="headingGraph">
-                            <h4 class="panel-title">
-                                <a data-toggle="collapse" data-parent="#events_accordion" href="#collapseGraph"
-                                   aria-expanded="false" aria-controls="collapseGraph">
-                                    Execution Times (10 Highest)
-                                </a>
-                            </h4>
-                        </div>
-                        <div id="collapseGraph" class="panel-collapse collapse" role="tabpanel"
-                             aria-labelledby="headingGraph">
-                            <div class="panel-body">
-                                <div class="row" id="exec_times"></div>
-                            </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel-group" id="events_accordion" role="tablist" aria-multiselectable="true">
+                <div class="panel panel-primary">
+                    <div role="tab" class="panel-heading" id="headingGraph">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#events_accordion" href="#collapseGraph"
+                               aria-expanded="false" aria-controls="collapseGraph">
+                                Execution Times (10 Highest)
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapseGraph" class="panel-collapse collapse" role="tabpanel"
+                         aria-labelledby="headingGraph">
+                        <div class="panel-body">
+                            <div class="row" id="exec_times"></div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <script id="js_exec_times">
-            var chart = c3.generate({
-                        bindto: '#exec_times',
-                        data: {
-                            columns: [
-                                {% for event in event_durations %}
-                                    ['{{ event.0 }}', {{ event.1|decimal_to_point }}],
-                                {% endfor    %}
-                            ],
-                            type: 'bar'
-                        },
-                        padding: {
-                            right: 20
-                        },
-                        grid: {
-                            y: {
-                                show: true
-                            }
-                        },
-                        tooltip: {
-                            grouped: false
-                        },
-                        axis: {
-                            x: {
-                                tick: {
-                                    values: ["Events"]
-                                }
-                            },
-                            y: {
-                                label: 'Seconds'
-                            }
-                        },
-                        bar: {
-                            width: {
-                                ratio: 0.5 // this makes bar width 50% of length between ticks
-                            }
+    </div>
+    <script id="js_exec_times">
+        var chart = c3.generate({
+                    bindto: '#exec_times',
+                    data: {
+                        columns: [
+                            {% for event in event_durations %}
+                                ['{{ event.0 }}', {{ event.1|decimal_to_point }}],
+                            {% endfor    %}
+                        ],
+                        type: 'bar'
+                    },
+                    padding: {
+                        right: 20
+                    },
+                    grid: {
+                        y: {
+                            show: true
                         }
-                    })
-                    ;
-        </script>
-        <div class="row">
+                    },
+                    tooltip: {
+                        grouped: false
+                    },
+                    axis: {
+                        x: {
+                            tick: {
+                                values: ["Events"]
+                            }
+                        },
+                        y: {
+                            label: 'Seconds'
+                        }
+                    },
+                    bar: {
+                        width: {
+                            ratio: 0.5 // this makes bar width 50% of length between ticks
+                        }
+                    }
+                })
+                ;
+    </script>
+    <div class="row">
         <div class="col-md-12">
-        <div class="panel panel-primary">
-        <div class="panel-heading"><h4 class="panel-title">Event Details</h4></div>
-        <table style="border-collapse: separate" id="eventsTable" class="table-responsive table-condensed tablesorter">
-        <thead>
-        <tr>
-            <th>Class</th>
-            <th>Title</th>
-            <th>Type</th>
-            <th>Timestamp Started</th>
-            <th>Property</th>
-            <th>From</th>
-            <th>To</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for event in events_list %}
-            <tr {% if event.status == 'success' %}class="bg-success parent"
-                {% elif event.status == 'failure' %}class="bg-danger parent"
-                {% elif event.status == 'noop' %}class="bg-info parent"
-                {% elif event.status == 'skipped' %}class="bg-warning parent"{% endif %}>
-                <td>{{ event|get_item:'containing-class' }}</td>
-                <td>{{ event|get_item:'resource-title' }}</td>
-                <td>{{ event|get_item:'resource-type' }}</td>
-                <td>{{ event|get_item:'timestamp'|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
-                <td>{{ event.property }}</td>
-                <td>{{ event|get_item:'old-value' }}</td>
-                <td>{{ event|get_item:'new-value' }}</td>
-            </tr>
-            {% with event|get_item:'message' as mess %}
-                {% if mess != None %}
-                    <tr class="tablesorter-childRow">
-                        <td colspan="1"><strong>Message</strong></td>
-                        <td colspan="6">{{ event|get_item:'message' }}</td>
+            <div class="panel panel-primary">
+                <div class="panel-heading"><h4 class="panel-title">Event Details</h4></div>
+                <table style="border-collapse: separate" id="eventsTable"
+                       class="table-responsive table-condensed tablesorter">
+                    <thead>
+                    <tr>
+                        <th>Class</th>
+                        <th>Title</th>
+                        <th>Type</th>
+                        <th>Timestamp Started</th>
+                        <th>Property</th>
+                        <th>From</th>
+                        <th>To</th>
                     </tr>
-                {% endif %}
-            {% endwith %}
-            {% with event|get_item:'file' as file %}
-                {% if file != None %}
-                    <tr class="tablesorter-childRow">
-                        <td colspan="1"><strong>File</strong></td>
-                        <td colspan="6">{{ event|get_item:'file' }}:{{ event|get_item:'line' }}</td>
-                    </tr>
-                {% endif %}
-            {% endwith %}
-            {% if event.property == 'content' %}
-                <tr class="tablesorter-childRow">
-                    <td colspan="1"><strong>Filebucket</strong></td>
-                    <td colspan="6">
-                        <strong>From: </strong><a id="filebucketURL"
-                                                  data-toggle="modal"
-                                                  href="{% url 'filebucket' %}?certname={{ certname }}&rtype={{ event|get_item:'resource-type' }}&rtitle={{ event|get_item:'resource-title' }}&environment={{ environment }}&file_status=from&md5_from={{ event|get_item:'old-value' }}"
-                                                  data-target="#filebucketModal">{{ event|get_item:'old-value' }}</a>
-                        <strong> To: </strong><a id="filebucketURL"
-                                                 data-toggle="modal"
-                                                 href="{% url 'filebucket' %}?certname={{ certname }}&rtype={{ event|get_item:'resource-type' }}&rtitle={{ event|get_item:'resource-title' }}&environment={{ environment }}&file_status=to&md5_to={{ event|get_item:'new-value' }}"
-                                                 data-target="#filebucketModal">{{ event|get_item:'new-value' }}</a>
-                        <strong> | </strong><a id="filebucketURL"
-                                               data-toggle="modal"
-                                               href="{% url 'filebucket' %}?certname={{ certname }}&rtype={{ event|get_item:'resource-type' }}&rtitle={{ event|get_item:'resource-title' }}&environment={{ environment }}&file_status=both&md5_from={{ event|get_item:'old-value' }}&md5_to={{ event|get_item:'new-value' }}&diff=True"
-                                               data-target="#filebucketModal"><strong>Diff</strong></a>
-                    </td>
-                </tr>
-            {% endif %}
-        {% endfor %}
-    {% else %}
-        <p>No events were found in puppetdb for <strong>{{ certname }}</strong> report id: {{ hashid }}</p>
-    {% endif %}
-</tbody>
-</table>
-</div>
-</div>
-</div>
+                    </thead>
+                    <tbody>
+                    {% if events_list %}
+                        {% for event in events_list %}
+                            <tr {% if event.status == 'success' %}class="bg-success parent"
+                                {% elif event.status == 'failure' %}class="bg-danger parent"
+                                {% elif event.status == 'noop' %}class="bg-info parent"
+                                {% elif event.status == 'skipped' %}class="bg-warning parent"{% endif %}>
+                                <td>{{ event|get_item:'containing-class' }}</td>
+                                <td>{{ event|get_item:'resource-title' }}</td>
+                                <td>{{ event|get_item:'resource-type' }}</td>
+                                <td>{{ event|get_item:'timestamp'|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
+                                <td>{{ event.property }}</td>
+                                <td>{{ event|get_item:'old-value' }}</td>
+                                <td>{{ event|get_item:'new-value' }}</td>
+                            </tr>
+                            {% with event|get_item:'message' as mess %}
+                                {% if mess != None %}
+                                    <tr class="tablesorter-childRow">
+                                        <td colspan="1"><strong>Message</strong></td>
+                                        <td colspan="6">{{ event|get_item:'message' }}</td>
+                                    </tr>
+                                {% endif %}
+                            {% endwith %}
+                            {% with event|get_item:'file' as file %}
+                                {% if file != None %}
+                                    <tr class="tablesorter-childRow">
+                                        <td colspan="1"><strong>File</strong></td>
+                                        <td colspan="6">{{ event|get_item:'file' }}:{{ event|get_item:'line' }}</td>
+                                    </tr>
+                                {% endif %}
+                            {% endwith %}
+                            {% if event.property == 'content' %}
+                                <tr class="tablesorter-childRow">
+                                    <td colspan="1"><strong>Filebucket</strong></td>
+                                    <td colspan="6">
+                                        <strong>From: </strong><a id="filebucketURL"
+                                                                  data-toggle="modal"
+                                                                  href="{% url 'filebucket' %}?certname={{ certname }}&rtype={{ event|get_item:'resource-type' }}&rtitle={{ event|get_item:'resource-title' }}&environment={{ environment }}&file_status=from&md5_from={{ event|get_item:'old-value' }}"
+                                                                  data-target="#filebucketModal">{{ event|get_item:'old-value' }}</a>
+                                        <strong> To: </strong><a id="filebucketURL"
+                                                                 data-toggle="modal"
+                                                                 href="{% url 'filebucket' %}?certname={{ certname }}&rtype={{ event|get_item:'resource-type' }}&rtitle={{ event|get_item:'resource-title' }}&environment={{ environment }}&file_status=to&md5_to={{ event|get_item:'new-value' }}"
+                                                                 data-target="#filebucketModal">{{ event|get_item:'new-value' }}</a>
+                                        <strong> | </strong><a id="filebucketURL"
+                                                               data-toggle="modal"
+                                                               href="{% url 'filebucket' %}?certname={{ certname }}&rtype={{ event|get_item:'resource-type' }}&rtitle={{ event|get_item:'resource-title' }}&environment={{ environment }}&file_status=both&md5_from={{ event|get_item:'old-value' }}&md5_to={{ event|get_item:'new-value' }}&diff=True"
+                                                               data-target="#filebucketModal"><strong>Diff</strong></a>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <p>No events were found in puppetdb for <strong>{{ certname }}</strong> report id: {{ hashid }}
+                        </p>
+                    {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
     <div class="modal fade filebucketModal" tabindex="-1"
          role="dialog"
