@@ -1,8 +1,8 @@
 __author__ = 'etaklar'
 
 # Settings for clientbucket
-from pano.settings import PUPPETMASTER_CLIENTBUCKET_SHOW, PUPPETMASTER_CLIENTBUCKET_HOST, PUPPETMASTER_CERTIFICATES, \
-    PUPPETMASTER_VERIFY_SSL
+from pano.settings import PUPPETMASTER_CLIENTBUCKET_SHOW, PUPPETMASTER_CLIENTBUCKET_HOST, PUPPETMASTER_CLIENTBUCKET_CERTIFICATES, \
+    PUPPETMASTER_CLIENTBUCKET_VERIFY_SSL
 
 # Import puppetdb api
 from pano.puppetdb.puppetdb import api_get as puppetdb_get

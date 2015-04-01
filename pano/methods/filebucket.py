@@ -1,7 +1,10 @@
 __author__ = 'takeshi'
 
-from pano.settings import PUPPETMASTER_CERTIFICATES, PUPPETMASTER_VERIFY_SSL, PUPPETMASTER_CLIENTBUCKET_SHOW, \
-    PUPPETMASTER_CLIENTBUCKET_HOST
+from pano.settings import PUPPETMASTER_CLIENTBUCKET_CERTIFICATES, PUPPETMASTER_CLIENTBUCKET_VERIFY_SSL, \
+    PUPPETMASTER_CLIENTBUCKET_SHOW, PUPPETMASTER_CLIENTBUCKET_HOST
+from pano.settings import PUPPETMASTER_FILESERVER_CERTIFICATES, PUPPETMASTER_FILESERVER_HOST, \
+    PUPPETMASTER_FILESERVER_SHOW, PUPPETMASTER_FILESERVER_SHOW, PUPPETMASTER_FILESERVER_VERIFY_SSL
+
 from pano.settings import PUPPETDB_CERTIFICATES, PUPPETDB_VERIFY_SSL
 
 from pano.puppetdb.puppetdb import api_get as pdb_api_get
@@ -33,8 +36,23 @@ def get_file(certname, environment, rtitle, rtype, md5sum_from=None, md5sum_to=N
             return False
         resp = methods[method](url,
                                headers=headers,
-                               verify=PUPPETMASTER_VERIFY_SSL,
-                               cert=PUPPETMASTER_CERTIFICATES)
+                               verify=PUPPETMASTER_CLIENTBUCKET_VERIFY_SSL,
+                               cert=PUPPETMASTER_CLIENTBUCKET_CERTIFICATES)
+        if resp.status_code != 200:
+            return False
+        else:
+            return resp.text
+
+    def fetch_fileserver(url, method):
+        methods = {'get': requests.get,
+        }
+
+        if method not in methods:
+            print('No can has method: %s' % (method))
+            return False
+        resp = methods[method](url,
+                               verify=PUPPETMASTER_FILESERVER_VERIFY_SSL,
+                               cert=PUPPETMASTER_FILESERVER_CERTIFICATES)
         if resp.status_code != 200:
             return False
         else:
@@ -85,8 +103,16 @@ def get_file(certname, environment, rtitle, rtype, md5sum_from=None, md5sum_to=N
                             # file from resource matches filebucket md5 hash
                             hash_matches = True
                     # Solve the viewing of source files by retrieving it from Puppetmaster
-                    elif 'source' in resource_to['parameters']:
-                        return False
+                    elif 'source' in resource_to['parameters'] and PUPPETMASTER_FILESERVER_SHOW is True:
+                        source_path = resource_to['parameters']['source']
+                    if source_path.startswith('puppet://'):
+                        # extract the path for the file
+                        source_path = source_path.split('/')  # ['puppet:', '', '', 'files', 'autofs', 'auto.home']
+                        source_path = '/'.join(source_path[3:])  # Skip first 3 entries since they are not needed
+                        # https://puppetmaster.example.com:8140/production/file_content/files/autofs/auto.home
+                        url = PUPPETMASTER_FILESERVER_HOST + environment + '/file_content/' + source_path
+                        resource_to = fetch_fileserver(url, 'get')
+
                 # now that we have come this far, we have both files.
                 # Lets differentiate the shit out of these files.
 
@@ -95,7 +121,6 @@ def get_file(certname, environment, rtitle, rtype, md5sum_from=None, md5sum_to=N
                 diff = difflib.unified_diff(from_split_lines, to_split_lines)
                 diff = ('\n'.join(list(diff))).split('\n')
                 return diff
-
             else:
                 return False
         else:
@@ -122,9 +147,21 @@ def get_file(certname, environment, rtitle, rtype, md5sum_from=None, md5sum_to=N
                         get_hash(resource_data['parameters']['content']))
                     return prepend_text + resource_data['parameters']['content']
                 # Todo get the data from source file - Request from Puppetmaster
-                elif 'source' in resource_data['parameters']:
-                    return
-            # the file can't be found as a resource
+                elif 'source' in resource_data['parameters'] and PUPPETMASTER_FILESERVER_SHOW is True:
+                    source_path = resource_data['parameters']['source']
+                    if source_path.startswith('puppet://'):
+                        # extract the path for the file
+                        source_path = source_path.split('/')  # ['puppet:', '', '', 'files', 'autofs', 'auto.home']
+                        source_path = '/'.join(source_path[3:])  # Skip first 3 entries since they are not needed
+                        # https://puppetmaster.example.com:8140/production/file_content/files/autofs/auto.home
+                        url = PUPPETMASTER_FILESERVER_HOST + environment + '/file_content/' + source_path
+                        source_content = fetch_fileserver(url, 'get')
+                        prepend_text = 'This file with MD5 %s was retrieved from the PuppetMaster Fileserver.\n\n' % (
+                        get_hash(source_content))
+                        return prepend_text + source_content
+                    else:
+                        return False
+            # the file can't be found as a resource and or fileserver support not enabled
             else:
                 return False
         # We probably don't want to search for resources if its the old file.
