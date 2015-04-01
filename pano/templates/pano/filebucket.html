@@ -6,10 +6,14 @@
     {% load common %}
 </head>
 <body>
-{% if isdiff == False%}
+{% if isdiff == False %}
     <pre>{{ content }}</pre>
 {% else %}
-    <pre>{{ content|colorizediff|safe }}</pre>
+    {% if content %}
+        <pre>{{ content|colorizediff|safe }}</pre>
+        {% else %}
+        <pre>No diff is available.</pre>
+    {% endif %}
 {% endif %}
 </body>
 </html>

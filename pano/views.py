@@ -660,13 +660,13 @@ def filebucket(request):
                                          md5sum_to=md5_sum_to,
                                          md5sum_from=md5_sum_from,
                                          diff=diff_files)
-        if filebucket_file:
-            context = {
-                'timezones': pytz.common_timezones,
-                'certname': certname,
-                'content': filebucket_file,
-                'isdiff': diff_files
+        context = {
+            'timezones': pytz.common_timezones,
+            'certname': certname,
+            'content': filebucket_file,
+            'isdiff': diff_files
             }
+
         return render(request, 'pano/filebucket.html', context)
 
 

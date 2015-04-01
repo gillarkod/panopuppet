@@ -66,14 +66,16 @@ def get_file(certname, environment, rtitle, rtype, md5sum_from=None, md5sum_to=N
                 if fetch_filebucket(from_url, 'head') is not False:
                     resource_from = fetch_filebucket(from_url, 'get')
                 else:
-                    return "Could not find old MD5 %s in Filebucket." % (md5sum_from)
+                    # Could not find old MD5 in Filebucket
+                    return False
                 if fetch_filebucket(to_url, 'head') is not False:
                     resource_to = fetch_filebucket(to_url, 'get')
                 # Try puppetdb resources if not found in filebucket.
                 else:
                     resource_to = get_resource(certname, rtype, rtitle)
                     if resource_to is False:
-                        return "Could not find new MD5 %s in Filebucket or as a PuppetDB Resource." % (md5sum_to)
+                        # Could not find new file in Filebucket or as a PuppetDB Resource
+                        return False
                     else:
                         resource_to = resource_to[0]
                     if 'content' in resource_to['parameters']:
@@ -82,6 +84,9 @@ def get_file(certname, environment, rtitle, rtype, md5sum_from=None, md5sum_to=N
                         if hash_of_resource == md5sum_to:
                             # file from resource matches filebucket md5 hash
                             hash_matches = True
+                    # Solve the viewing of source files by retrieving it from Puppetmaster
+                    elif 'source' in resource_to['parameters']['source']:
+                        return False
                 # now that we have come this far, we have both files.
                 # Lets differentiate the shit out of these files.
 
