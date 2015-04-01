@@ -85,7 +85,7 @@ def get_file(certname, environment, rtitle, rtype, md5sum_from=None, md5sum_to=N
                             # file from resource matches filebucket md5 hash
                             hash_matches = True
                     # Solve the viewing of source files by retrieving it from Puppetmaster
-                    elif 'source' in resource_to['parameters']['source']:
+                    elif 'source' in resource_to['parameters']:
                         return False
                 # now that we have come this far, we have both files.
                 # Lets differentiate the shit out of these files.
