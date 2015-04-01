@@ -105,17 +105,17 @@ def get_file(certname, environment, rtitle, rtype, md5sum_from=None, md5sum_to=N
                     # Solve the viewing of source files by retrieving it from Puppetmaster
                     elif 'source' in resource_to['parameters'] and PUPPETMASTER_FILESERVER_SHOW is True:
                         source_path = resource_to['parameters']['source']
-                    if source_path.startswith('puppet://'):
-                        # extract the path for the file
-                        source_path = source_path.split('/')  # ['puppet:', '', '', 'files', 'autofs', 'auto.home']
-                        source_path = '/'.join(source_path[3:])  # Skip first 3 entries since they are not needed
-                        # https://puppetmaster.example.com:8140/production/file_content/files/autofs/auto.home
-                        url = PUPPETMASTER_FILESERVER_HOST + environment + '/file_content/' + source_path
-                        resource_to = fetch_fileserver(url, 'get')
-
+                        if source_path.startswith('puppet://'):
+                            # extract the path for the file
+                            source_path = source_path.split('/')  # ['puppet:', '', '', 'files', 'autofs', 'auto.home']
+                            source_path = '/'.join(source_path[3:])  # Skip first 3 entries since they are not needed
+                            # https://puppetmaster.example.com:8140/production/file_content/files/autofs/auto.home
+                            url = PUPPETMASTER_FILESERVER_HOST + environment + '/file_content/' + source_path
+                            resource_to = fetch_fileserver(url, 'get')
+                    else:
+                        return False
                 # now that we have come this far, we have both files.
                 # Lets differentiate the shit out of these files.
-
                 from_split_lines = resource_from.split('\n')
                 to_split_lines = resource_to.split('\n')
                 diff = difflib.unified_diff(from_split_lines, to_split_lines)
@@ -161,6 +161,8 @@ def get_file(certname, environment, rtitle, rtype, md5sum_from=None, md5sum_to=N
                         return prepend_text + source_content
                     else:
                         return False
+                else:
+                    return False
             # the file can't be found as a resource and or fileserver support not enabled
             else:
                 return False
