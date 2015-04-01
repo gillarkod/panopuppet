@@ -17,14 +17,14 @@ PUPPETDB_HOST = "http://puppetdb.example.com:8080/"
 PUPPETDB_CERTIFICATES = (None, None)
 PUPPETDB_VERIFY_SSL = False
 
-# Clientbucket Settings -- For SSL read the SSL configuration example for PuppetDB
-PUPPETMASTER_CLIENTBUCKET_SHOW = True
+# Clientbucket Settings -- For SSL read the SSL configuration example for Clientbucket on the puppetmaster
+PUPPETMASTER_CLIENTBUCKET_SHOW = True # Disable support for clientbucket with False instead of True
 PUPPETMASTER_CLIENTBUCKET_HOST = "https://puppetmaster.example.com:8140/"
-PUPPETMASTER_CERTIFICATES = (None, None) #  ('/path/to/ssl_cert', '/path/to/ssl_key')
-PUPPETMASTER_VERIFY_SSL = False
+PUPPETMASTER_CLIENTBURKCET_CERTIFICATES = (None, None) #  ('/path/to/ssl_cert', '/path/to/ssl_key')
+PUPPETMASTER_CLIENTBUCKET_VERIFY_SSL = False
 
 # Fileserver Settings
-PUPPETMASTER_FILESERVER_SHOW = True
+PUPPETMASTER_FILESERVER_SHOW = True # Disable support for fileserver with False instead of True
 PUPPETMASTER_FILESERVER_HOST = "https://puppetmaster.example.com:8140/"
 PUPPETMASTER_FILESERVER_CERTIFICATES = ('/path/to/publickey.pem', '/path/to/private_key.pem') # (None, None) if you don't have any cert
 PUPPETMASTER_FILESERVER_VERIFY_SSL = '/pat/to/ca.pem'
