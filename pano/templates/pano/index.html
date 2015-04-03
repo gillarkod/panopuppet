@@ -55,9 +55,9 @@
             <ul class="nav nav-tabs">
                 <li{% if show_nodes == 'recent' %} class="active"{% endif %}><a href="{% url 'dashboard' %}">Recent</a>
                 </li>
+                <li{% if show_nodes == 'failed' %} class="active"{% endif %}><a href="?show=failed">Failed</a></li>
                 <li{% if show_nodes == 'changed' %} class="active"{% endif %}><a href="?show=changed">Changed</a></li>
                 <li{% if show_nodes == 'pending' %} class="active"{% endif %}><a href="?show=pending">Pending</a></li>
-                <li{% if show_nodes == 'failed' %} class="active"{% endif %}><a href="?show=failed">Failed</a></li>
                 <li{% if show_nodes == 'unreported' %} class="active"{% endif %}><a
                         href="?show=unreported">Unreported</a></li>
                 <li{% if show_nodes == 'failed_catalogs' %} class="active"{% endif %}><a href="?show=failed_catalogs">Missmatching
