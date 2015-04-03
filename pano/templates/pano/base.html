@@ -33,9 +33,12 @@
                     <li{% if "pano/nodes" in request.path %} class="active"{% endif %}>
                         <a href="{% url 'nodes' %}">Nodes</a>
                     </li>
-                <li{% if "pano/analytics" in request.path %} class="active"{% endif %}>
-                        <a href="{% url 'analytics' %}">Analytics</a>
-                    </li>
+                <li {% if "pano/analytics" in request.path %} class="active"{% elif "pano/event_analytics" in request.path %} class="active" %}{% endif %} class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">Analytics<span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="{% url 'event_analytics' %}">Events</a></li>
+            <li><a href="{% url 'analytics' %}">Run Times</a></li>
+          </ul>
+        </li>
                     {% if certname %}
                         <li{% if "pano/reports" in request.path %} class="active"{% endif %}>
                             <a href="{% url 'reports' certname %}">Reports</a>

@@ -25,6 +25,18 @@ def get_item(dictionary, key_id):
     """
     return dictionary.get(key_id)
 
+@register.filter
+def get_percentage(value, max_val):
+    """Returns value in dictionary from the key_id.
+       Used when you want to get a value from a dictionary key using a variable
+       :param dictionary: dict
+       :param key_id: string
+       :return: value in the dictionary[key_id]
+       How to use:
+       {{ myval|get_percentage:max_value }}
+    """
+    return "{0:.0f}".format((value / max_val) * 100)
+
 
 @register.simple_tag
 def get_status_summary(dictionary, certname, state):

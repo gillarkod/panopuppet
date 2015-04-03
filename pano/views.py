@@ -4,22 +4,14 @@ import pytz
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.views.decorators.cache import cache_page
 
 from pano.puppetdb import puppetdb
 from pano.methods.dictfuncs import dictstatus as dictstatus
-
-# Settings for puppetdb
-from pano.settings import PUPPETDB_CERTIFICATES, PUPPETDB_VERIFY_SSL, PUPPETDB_HOST
-
-# Caching for certain views.
-from django.views.decorators.cache import cache_page
 from pano.settings import CACHE_TIME
-
-# Dashboard functions
 from pano.puppetdb.pdbutils import run_puppetdb_jobs, json_to_datetime
-
-# Filebucket function
 from pano.methods.filebucket import get_file as get_filebucket
+from pano.methods import events
 
 
 def logout_view(request):
@@ -141,7 +133,8 @@ def index(request, certname=None):
                                                                                              sortby='latestReport',
                                                                                              get_status='notall')
         pending_list = [x for x in pending_list if x not in unreported_list]
-        changed_list = [x for x in changed_list if x not in unreported_list and x not in failed_list and x not in pending_list]
+        changed_list = [x for x in changed_list if
+                        x not in unreported_list and x not in failed_list and x not in pending_list]
         failed_list = [x for x in failed_list if x not in unreported_list]
         unreported_list = [x for x in unreported_list if x not in failed_list]
 
@@ -180,7 +173,7 @@ def index(request, certname=None):
                    'unreported_nodes': node_unreported_count,
                    'weird_timestamps': node_off_timestamps_count,
                    'pending_nodes': node_pending_count,
-        }
+                   }
         return render(request, 'pano/index.html', context)
 
 
@@ -225,7 +218,7 @@ def nodes(request, certname=None):
         node_list = puppetdb.api_get(path='/nodes',
                                      params=puppetdb.mk_puppetdb_query(
                                          node_params),
-        )
+                                     )
         # Work out the number of pages from the xrecords response
         # return fields that you can sort by
         valid_sort_fields = (
@@ -251,7 +244,7 @@ def nodes(request, certname=None):
         report_list = puppetdb.api_get(path='event-counts',
                                        params=puppetdb.mk_puppetdb_query(
                                            report_params),
-        )
+                                       )
         if sort_field_order == 'desc':
             merged_list = dictstatus(
                 node_list, report_list, sortby=sort_field, asc=True)
@@ -320,7 +313,7 @@ def reports(request, certname=None):
                                              api_version='v4',
                                              params=puppetdb.mk_puppetdb_query(
                                                  latest_report_params),
-            )
+                                             )
             report_hash = ""
             for report in latest_report:
                 report_hash = report['hash']
@@ -355,7 +348,7 @@ def reports(request, certname=None):
                                              api_version='v4',
                                              params=puppetdb.mk_puppetdb_query(
                                                  reports_params),
-    )
+                                             )
 
     # Work out the number of pages from the xrecords response
     xrecords = headers['X-Records']
@@ -378,7 +371,7 @@ def reports(request, certname=None):
         eventcount_list = puppetdb.api_get(path='event-counts',
                                            params=puppetdb.mk_puppetdb_query(
                                                events_params),
-        )
+                                           )
         for event in eventcount_list:
             if event['subject']['title'] == report['certname']:
                 report_status[report['hash']] = {
@@ -536,7 +529,7 @@ def detailed_events(request, certname=None, hashid=None):
                                        api_version='v4',
                                        params=puppetdb.mk_puppetdb_query(
                                            events_params),
-        )
+                                       )
         single_event = ''
         environment = ''
 
@@ -601,7 +594,7 @@ def facts(request, certname=None):
         facts_list = puppetdb.api_get(path='/facts/',
                                       params=puppetdb.mk_puppetdb_query(
                                           facts_params),
-        )
+                                      )
         context = {
             'timezones': pytz.common_timezones,
             'certname': certname,
@@ -661,14 +654,27 @@ def filebucket(request):
                                          md5sum_from=md5_sum_from,
                                          diff=diff_files)
         context = {
-            'timezones': pytz.common_timezones,
             'certname': certname,
             'content': filebucket_file,
             'isdiff': diff_files
-            }
+        }
 
         return render(request, 'pano/filebucket.html', context)
 
 
     else:
         return HttpResponse('No valid GET params was sent.')
+
+@login_required
+@cache_page(CACHE_TIME)
+def event_analytics(request):
+    if request.method == 'POST':
+        request.session['django_timezone'] = request.POST['timezone']
+        return redirect(request.POST['return_url'])
+    summary = events.get_events_summary(timespan='latest')
+
+    context = {
+        'timezones': pytz.common_timezones,
+        'summary': summary,
+    }
+    return render(request, 'pano/event_analyzer.html', context)
