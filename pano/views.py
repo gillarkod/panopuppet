@@ -394,6 +394,7 @@ def reports(request, certname=None):
 
 
 @login_required
+@cache_page(CACHE_TIME)
 def analytics(request):
     if request.method == 'POST':
         request.session['django_timezone'] = request.POST['timezone']
@@ -604,6 +605,7 @@ def facts(request, certname=None):
         return render(request, 'pano/facts.html', context)
 
 
+@login_required
 def filebucket(request):
     certname = request.GET.get('certname', False)
     rtype = request.GET.get('rtype', False)
@@ -665,9 +667,10 @@ def filebucket(request):
     else:
         return HttpResponse('No valid GET params was sent.')
 
+
 @login_required
 @cache_page(CACHE_TIME)
-def event_analytics(request):
+def event_analytics(request, view='summary'):
     if request.method == 'POST':
         request.session['django_timezone'] = request.POST['timezone']
         return redirect(request.POST['return_url'])
@@ -677,4 +680,44 @@ def event_analytics(request):
         'timezones': pytz.common_timezones,
         'summary': summary,
     }
-    return render(request, 'pano/event_analyzer.html', context)
+    # Show Classes
+    if view == 'classes' and request.GET.get('value', False):
+        class_name = request.GET.get('value')
+        title = "Class: %s" % class_name
+        class_events = events.get_report(key='containing-class', value=class_name)
+        context['events'] = class_events
+    # Show Nodes
+    elif view == 'nodes' and request.GET.get('value', False):
+        node_name = request.GET.get('value')
+        title = "Node: %s" % node_name
+        node_events = events.get_report(key='certname', value=node_name)
+        context['events'] = node_events
+    # Show Resources
+    elif view == 'resources' and request.GET.get('value', False):
+        resource_name = request.GET.get('value')
+        title = "Resource: %s" % resource_name
+        resource_events = events.get_report(key='resource-title', value=resource_name)
+        context['events'] = resource_events
+    # Show Types
+    elif view == 'types' and request.GET.get('value', False):
+        type_name = request.GET.get('value')
+        title = "Type: %s" % type_name
+        type_events = events.get_report(key='resource-type', value=type_name)
+        context['events'] = type_events
+    # Show summary if none of the above matched
+    else:
+        sum_avail = ['classes', 'nodes', 'resources', 'types']
+        stat_avail = ['failed', 'noop', 'success', 'skipped'
+                                                   '']
+        show_summary = request.GET.get('show_summary', 'classes')
+        show_status = request.GET.get('show_status', 'failed')
+        if show_summary in sum_avail and show_status in stat_avail:
+            title = "%s with status %s" % (show_summary.capitalize(), show_status.capitalize())
+            context['show_title'] = title
+        else:
+            title = 'Failed Classes'
+            context['show_title'] = title
+        return render(request, 'pano/events_details.html', context)
+    context['show_title'] = title
+    # if the above went well and did not reach the else clause we can also return the awesome.
+    return render(request, 'pano/events_inspect.html', context)

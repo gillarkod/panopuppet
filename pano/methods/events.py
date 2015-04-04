@@ -151,3 +151,25 @@ def get_events_summary(timespan='latest'):
     summary = summary_of_events(events)
     return summary
 
+
+def get_report(key, value):
+    # If key is any of the below, all is good!
+    if key == 'certname' or key == 'resource-title' or key == 'resource-type' or key == 'containing-class':
+        pass
+    # If key does not match above the default will be shown
+    else:
+        key == 'containing-class'
+
+    events_params = {
+        'query':
+            {
+                'operator': 'and',
+                1: '["=","' + key + '","' + value + '"]',
+                2: '["=","latest-report?",true]'
+            },
+    }
+    results = pdb_api_get(path='events/',
+                          api_version='v4',
+                          params=mk_puppetdb_query(events_params),
+                          )
+    return results

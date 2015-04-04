@@ -1,0 +1,457 @@
+{% extends "pano/base.html" %}
+
+{% load puppetdb_extras %}
+{% load common %}
+
+{% block head %}
+    {% load static %}
+    <!-- table sorter stuff -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.20.1/css/theme.bootstrap.css">
+    <script src="{% static 'pano/tablesorter/jquery.tablesorter.js' %}"></script>
+    <script src="{% static 'pano/tablesorter/jquery.tablesorter.widgets.js' %}"></script>
+    <script id="js">$(function () {
+
+        // NOTE: $.tablesorter.theme.bootstrap is ALREADY INCLUDED in the jquery.tablesorter.widgets.js
+        // file; it is included here to show how you can modify the default classes
+        $.tablesorter.themes.bootstrap = {
+            // these classes are added to the table. To see other table classes available,
+            // look here: http://getbootstrap.com/css/#tables
+            table: 'table table-condensed',
+            caption: 'caption',
+            // header class names
+            header: 'bootstrap-header', // give the header a gradient background (theme.bootstrap_2.css)
+            sortNone: '',
+            sortAsc: '',
+            sortDesc: '',
+            active: '', // applied when column is sorted
+            hover: '', // custom css required - a defined bootstrap style may not override other classes
+            // icon class names
+            icons: '', // add "icon-white" to make them white; this icon class is added to the <i> in the header
+            iconSortNone: 'bootstrap-icon-unsorted', // class name added to icon when column is not sorted
+            iconSortAsc: 'icon-chevron-up glyphicon glyphicon-chevron-up', // class name added to icon when column has ascending sort
+            iconSortDesc: 'icon-chevron-down glyphicon glyphicon-chevron-down', // class name added to icon when column has descending sort
+            filterRow: '', // filter row class
+            footerRow: '',
+            footerCells: '',
+            even: '', // even row zebra striping
+            odd: ''  // odd row zebra striping
+        };
+
+        // call the tablesorter plugin and apply the uitheme widget
+        $("table").tablesorter({
+            // this will apply the bootstrap theme if "uitheme" widget is included
+            // the widgetOptions.uitheme is no longer required to be set
+            theme: "bootstrap",
+            sortList: [[2,0]],
+            widthFixed: true,
+
+            headerTemplate: '{content} {icon}', // new in v2.7. Needed to add the bootstrap icon!
+
+            // widget code contained in the jquery.tablesorter.widgets.js file
+            // use the zebra stripe widget if you plan on hiding any rows (filter widget)
+            widgets: ["uitheme", "filter"],
+
+            widgetOptions: {
+                // using the default zebra striping class name, so it actually isn't included in the theme variable above
+                // this is ONLY needed for bootstrap theming if you are using the filter widget, because rows are hidden
+                zebra: ["even", "odd"],
+
+                // reset filters button
+                filter_reset: ".reset"
+
+                // set the uitheme widget to use the bootstrap theme class names
+                // this is no longer required, if theme is set
+                // ,uitheme : "bootstrap"
+
+            }
+        })
+    });</script>
+    <script>
+        jQuery(document).ready(function ($) {
+            $(".clickable-row").click(function () {
+                window.document.location = $(this).data("href");
+            });
+        });
+    </script>
+    <!-- Hide rows -->
+    <script id="js">
+        $(function () {
+            // hide child rows
+            $('.tablesorter-childRow td').hide();
+
+            $(".tablesorter")
+                    .tablesorter({
+                        theme: 'blue',
+                        // this is the default setting
+                        cssChildRow: "tablesorter-childRow"
+                    })
+        });
+    </script>
+    <!-- open events -->
+    <script id="js">
+        $(document).ready(function () {
+            $('#detailsTable').find('tr.parent').click(function () {
+                // use "nextUntil" to toggle multiple child rows
+                // toggle table cells instead of the row
+                $(this).closest('tr').nextUntil('tr:not(.tablesorter-childRow)').find('td').toggle();
+                return false;
+            });
+
+        });
+    </script>
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h1 class="panel-title">
+                            Events Analytics
+                        </h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Events Summary Pane -->
+            <div class="col-md-2">
+                <!-- CLASSES -->
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h1 class="panel-title">Classes</h1>
+                    </div>
+                    <div class="table-responsive">
+                        <table style="border-collapse: separate"
+                               class="table table-condensed">
+                            <colgroup>
+                                <col span="1" style="width: 20%;">
+                                <col span="1" style="width: 20%;">
+                                <col span="1" style="width: 60%;">
+                            </colgroup>
+                            <tbody>
+                            <tr class="clickable-row" data-href='{% url 'event_analytics' view='summary' %}?show_summary=classes&show_status=failed'>
+                                {% with summary.classes_failure|length as len_failure_classes %}
+                                    <th>Failed</th>
+                                    <td align="right">{{ len_failure_classes }}</td>
+                                    <td>
+                                        <div class="progress" style="margin-bottom: 0">
+
+                                            <div class="progress-bar progress-bar-danger" role="progressbar"
+                                                 aria-valuenow="{{ len_failure_classes }}"
+                                                 aria-valuemin="0" aria-valuemax="{{ summary.classes_total }}"
+                                                 style="width:{{ len_failure_classes|get_percentage:summary.classes_total }}%">
+                                            </div>
+                                        </div>
+                                    </td>
+                                {% endwith %}
+                            </tr>
+                            <tr class="clickable-row" data-href='{% url 'event_analytics' view='summary' %}?show_summary=classes&show_status=skipped'>
+                                {% with summary.classes_skipped|length as len_skipped_classes %}
+                                    <th>Skipped</th>
+                                    <td align="right">{{ len_skipped_classes }}</td>
+                                    <td>
+                                        <div class="progress" style="margin-bottom: 0">
+
+                                            <div class="progress-bar progress-bar-warning" role="progressbar"
+                                                 aria-valuenow="{{ len_skipped_classes }}"
+                                                 aria-valuemin="0" aria-valuemax="{{ summary.classes_total }}"
+                                                 style="width:{{ len_skipped_classes|get_percentage:summary.classes_total }}%">
+                                            </div>
+                                        </div>
+                                    </td>
+                                {% endwith %}
+                            </tr>
+                            <tr class="clickable-row" data-href='{% url 'event_analytics' view='summary' %}?show_summary=classes&show_status=success'>
+                                {% with summary.classes_success|length as len_success_classes %}
+                                    <th>Changed</th>
+                                    <td align="right">{{ len_success_classes }}</td>
+                                    <td>
+                                        <div class="progress" style="margin-bottom: 0">
+                                            <div class="progress-bar progress-bar-success" role="progressbar"
+                                                 aria-valuenow="{{ len_success_classes }}"
+                                                 aria-valuemin="0" aria-valuemax="{{ summary.classes_total }}"
+                                                 style="width:{{ len_success_classes|get_percentage:summary.classes_total }}%">
+                                            </div>
+                                        </div>
+                                    </td>
+                                {% endwith %}
+                            </tr>
+                            <tr class="clickable-row" data-href='{% url 'event_analytics' view='summary' %}?show_summary=classes&show_status=noop'>
+                                {% with summary.classes_noop|length as len_noop_classes %}
+                                    <th>Noop</th>
+                                    <td align="right">{{ len_noop_classes }}</td>
+                                    <td>
+                                        <div class="progress" style="margin-bottom: 0">
+                                            <div class="progress-bar progress-bar-info" role="progressbar"
+                                                 aria-valuenow="{{ len_noop_classes }}"
+                                                 aria-valuemin="0" aria-valuemax="{{ summary.classes_total }}"
+                                                 style="width:{{ len_noop_classes|get_percentage:summary.classes_total }}%">
+                                            </div>
+                                        </div>
+                                    </td>
+                                {% endwith %}
+                            </tr>
+                            </tbody>
+                            <tfoot></tfoot>
+                        </table>
+                    </div>
+                </div>
+                <!-- NODES -->
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h1 class="panel-title">Nodes:</h1>
+                    </div>
+                    <div class="table-responsive">
+                        <table style="border-collapse: separate"
+                               class="table table-condensed">
+                            <colgroup>
+                                <col span="1" style="width: 20%;">
+                                <col span="1" style="width: 20%;">
+                                <col span="1" style="width: 60%;">
+                            </colgroup>
+                            <tbody>
+                            <tr class="clickable-row" data-href='{% url 'event_analytics' view='summary' %}?show_summary=nodes&show_status=failed'>
+                                {% with summary.nodes_failure|length as len_failure_nodes %}
+                                    <th>Failed</th>
+                                    <td align="right">{{ len_failure_nodes }}</td>
+                                    <td>
+                                        <div class="progress" style="margin-bottom: 0">
+
+                                            <div class="progress-bar progress-bar-danger" role="progressbar"
+                                                 aria-valuenow="{{ len_failure_nodes }}"
+                                                 aria-valuemin="0" aria-valuemax="{{ summary.nodes_total }}"
+                                                 style="width:{{ len_failure_nodes|get_percentage:summary.nodes_total }}%">
+                                            </div>
+                                        </div>
+                                    </td>
+                                {% endwith %}
+                            </tr>
+                            <tr class="clickable-row" data-href='{% url 'event_analytics' view='summary' %}?show_summary=nodes&show_status=skipped'>
+                                {% with summary.nodes_skipped|length as len_skipped_nodes %}
+                                    <th>Skipped</th>
+                                    <td align="right">{{ len_skipped_nodes }}</td>
+                                    <td>
+                                        <div class="progress" style="margin-bottom: 0">
+
+                                            <div class="progress-bar progress-bar-warning" role="progressbar"
+                                                 aria-valuenow="{{ len_skipped_nodes }}"
+                                                 aria-valuemin="0" aria-valuemax="{{ summary.nodes_total }}"
+                                                 style="width:{{ len_skipped_nodes|get_percentage:summary.nodes_total }}%">
+                                            </div>
+                                        </div>
+                                    </td>
+                                {% endwith %}
+                            </tr>
+                            <tr class="clickable-row" data-href='{% url 'event_analytics' view='summary' %}?show_summary=nodes&show_status=success'>
+                                {% with summary.nodes_success|length as len_success_nodes %}
+                                    <th>Changed</th>
+                                    <td align="right">{{ len_success_nodes }}</td>
+                                    <td>
+                                        <div class="progress" style="margin-bottom: 0">
+                                            <div class="progress-bar progress-bar-success" role="progressbar"
+                                                 aria-valuenow="{{ len_success_nodes }}"
+                                                 aria-valuemin="0" aria-valuemax="{{ summary.nodes_total }}"
+                                                 style="width:{{ len_success_nodes|get_percentage:summary.nodes_total }}%">
+                                            </div>
+                                        </div>
+                                    </td>
+                                {% endwith %}
+                            </tr>
+                            <tr class="clickable-row" data-href='{% url 'event_analytics' view='summary' %}?show_summary=nodes&show_status=noop'>
+                                {% with summary.nodes_noop|length as len_noop_nodes %}
+                                    <th>Noop</th>
+                                    <td align="right">{{ len_noop_nodes }}</td>
+                                    <td>
+                                        <div class="progress" style="margin-bottom: 0">
+                                            <div class="progress-bar progress-bar-info" role="progressbar"
+                                                 aria-valuenow="{{ len_noop_nodes }}"
+                                                 aria-valuemin="0" aria-valuemax="{{ summary.nodes_total }}"
+                                                 style="width:{{ len_noop_nodes|get_percentage:summary.nodes_total }}%">
+                                            </div>
+                                        </div>
+                                    </td>
+                                {% endwith %}
+                            </tr>
+                            </tbody>
+                            <tfoot></tfoot>
+                        </table>
+                    </div>
+                </div>
+                <!-- RESOURCES -->
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h1 class="panel-title">Resources: </h1>
+                    </div>
+                    <div class="table-responsive">
+                        <table style="border-collapse: separate"
+                               class="table table-condensed">
+                            <colgroup>
+                                <col span="1" style="width: 20%;">
+                                <col span="1" style="width: 20%;">
+                                <col span="1" style="width: 60%;">
+                            </colgroup>
+                            <tbody>
+                            <tr class="clickable-row" data-href='{% url 'event_analytics' view='summary' %}?show_summary=resources&show_status=failed'>
+                                {% with summary.resources_failure|length as len_failure_resources %}
+                                    <th>Failed</th>
+                                    <td align="right">{{ len_failure_resources }}</td>
+                                    <td>
+                                        <div class="progress" style="margin-bottom: 0">
+
+                                            <div class="progress-bar progress-bar-danger" role="progressbar"
+                                                 aria-valuenow="{{ len_failure_resources }}"
+                                                 aria-valuemin="0" aria-valuemax="{{ summary.resources_total }}"
+                                                 style="width:{{ len_failure_resources|get_percentage:summary.resources_total }}%">
+                                            </div>
+                                        </div>
+                                    </td>
+                                {% endwith %}
+                            </tr>
+                            <tr class="clickable-row" data-href='{% url 'event_analytics' view='summary' %}?show_summary=resources&show_status=skipped'>
+                                {% with summary.resources_skipped|length as len_skipped_resources %}
+                                    <th>Skipped</th>
+                                    <td align="right">{{ len_skipped_resources }}</td>
+                                    <td>
+                                        <div class="progress" style="margin-bottom: 0">
+
+                                            <div class="progress-bar progress-bar-warning" role="progressbar"
+                                                 aria-valuenow="{{ len_skipped_resources }}"
+                                                 aria-valuemin="0" aria-valuemax="{{ summary.resources_total }}"
+                                                 style="width:{{ len_skipped_resources|get_percentage:summary.resources_total }}%">
+                                            </div>
+                                        </div>
+                                    </td>
+                                {% endwith %}
+                            </tr>
+                            <tr class="clickable-row" data-href='{% url 'event_analytics' view='summary' %}?show_summary=resources&show_status=success'>
+                                {% with summary.resources_success|length as len_success_resources %}
+                                    <th>Changed</th>
+                                    <td align="right">{{ len_success_resources }}</td>
+                                    <td>
+                                        <div class="progress" style="margin-bottom: 0">
+                                            <div class="progress-bar progress-bar-success" role="progressbar"
+                                                 aria-valuenow="{{ len_success_resources }}"
+                                                 aria-valuemin="0" aria-valuemax="{{ summary.resources_total }}"
+                                                 style="width:{{ len_success_resources|get_percentage:summary.resources_total }}%">
+                                            </div>
+                                        </div>
+                                    </td>
+                                {% endwith %}
+                            </tr>
+                            <tr class="clickable-row" data-href='{% url 'event_analytics' view='summary' %}?show_summary=resources&show_status=noop'>
+                                {% with summary.resources_noop|length as len_noop_resources %}
+                                    <th>Noop</th>
+                                    <td align="right">{{ len_noop_resources }}</td>
+                                    <td>
+                                        <div class="progress" style="margin-bottom: 0">
+                                            <div class="progress-bar progress-bar-info" role="progressbar"
+                                                 aria-valuenow="{{ len_noop_resources }}"
+                                                 aria-valuemin="0" aria-valuemax="{{ summary.resources_total }}"
+                                                 style="width:{{ len_noop_resources|get_percentage:summary.resources_total }}%">
+                                            </div>
+                                        </div>
+                                    </td>
+                                {% endwith %}
+                            </tr>
+                            </tbody>
+                            <tfoot></tfoot>
+                        </table>
+                    </div>
+                </div>
+                <!-- TYPES -->
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h1 class="panel-title">Types: </h1>
+                    </div>
+                    <div class="table-responsive">
+                        <table style="border-collapse: separate"
+                               class="table table-condensed">
+                            <colgroup>
+                                <col span="1" style="width: 20%;">
+                                <col span="1" style="width: 20%;">
+                                <col span="1" style="width: 60%;">
+                            </colgroup>
+                            <tbody>
+                            <tr class="clickable-row" data-href='{% url 'event_analytics' view='summary' %}?show_summary=types&show_status=failed'>
+                                {% with summary.types_failure|length as len_failure_types %}
+                                    <th>Failed</th>
+                                    <td align="right">{{ len_failure_types }}</td>
+                                    <td>
+                                        <div class="progress" style="margin-bottom: 0">
+
+                                            <div class="progress-bar progress-bar-danger" role="progressbar"
+                                                 aria-valuenow="{{ len_failure_types }}"
+                                                 aria-valuemin="0" aria-valuemax="{{ summary.types_total }}"
+                                                 style="width:{{ len_failure_types|get_percentage:summary.types_total }}%">
+                                            </div>
+                                        </div>
+                                    </td>
+                                {% endwith %}
+                            </tr>
+                            <tr class="clickable-row" data-href='{% url 'event_analytics' view='summary' %}?show_summary=types&show_status=skipped'>
+                                {% with summary.types_skipped|length as len_skipped_types %}
+                                    <th>Skipped</th>
+                                    <td align="right">{{ len_skipped_types }}</td>
+                                    <td>
+                                        <div class="progress" style="margin-bottom: 0">
+
+                                            <div class="progress-bar progress-bar-warning" role="progressbar"
+                                                 aria-valuenow="{{ len_skipped_types }}"
+                                                 aria-valuemin="0" aria-valuemax="{{ summary.types_total }}"
+                                                 style="width:{{ len_skipped_types|get_percentage:summary.types_total }}%">
+                                            </div>
+                                        </div>
+                                    </td>
+                                {% endwith %}
+                            </tr>
+                            <tr class="clickable-row" data-href='{% url 'event_analytics' view='summary' %}?show_summary=types&show_status=success'>
+                                {% with summary.types_success|length as len_success_types %}
+                                    <th>Changed</th>
+                                    <td align="right">{{ len_success_types }}</td>
+                                    <td>
+                                        <div class="progress" style="margin-bottom: 0">
+                                            <div class="progress-bar progress-bar-success" role="progressbar"
+                                                 aria-valuenow="{{ len_success_types }}"
+                                                 aria-valuemin="0" aria-valuemax="{{ summary.types_total }}"
+                                                 style="width:{{ len_success_types|get_percentage:summary.types_total }}%">
+                                            </div>
+                                        </div>
+                                    </td>
+                                {% endwith %}
+                            </tr>
+                            <tr class="clickable-row" data-href='{% url 'event_analytics' view='summary' %}?show_summary=types&show_status=noop'>
+                                {% with summary.types_noop|length as len_noop_types %}
+                                    <th>Noop</th>
+                                    <td align="right">{{ len_noop_types }}</td>
+                                    <td>
+                                        <div class="progress" style="margin-bottom: 0">
+                                            <div class="progress-bar progress-bar-info" role="progressbar"
+                                                 aria-valuenow="{{ len_noop_types }}"
+                                                 aria-valuemin="0" aria-valuemax="{{ summary.types_total }}"
+                                                 style="width:{{ len_noop_types|get_percentage:summary.types_total }}%">
+                                            </div>
+                                        </div>
+                                    </td>
+                                {% endwith %}
+                            </tr>
+                            </tbody>
+                            <tfoot></tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- Details Pane -->
+            <div class="col-md-10">
+                <div class="panel panel-info">
+                    {% block details %}
+                    {% endblock %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

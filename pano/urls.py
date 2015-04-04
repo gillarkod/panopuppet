@@ -15,6 +15,7 @@ urlpatterns = patterns('',
                        url(r'^events/(?P<certname>[\w\.-]+)/(?P<hashid>[\w\.-]+)/$', views.detailed_events,
                            name='events'),
                        url(r'^analytics/$', views.analytics, name='analytics'),
-                       url(r'^event_analytics/$', views.event_analytics, name='event_analytics'),
+                       url(r'^eventanalytics/$', views.event_analytics, name='event_analytics'),
+                       url(r'^eventanalytics/(?P<view>[\w]+)/$', views.event_analytics, name='event_analytics'),
                        url(r'^facts/(?P<certname>[\w\.-]+)/$', views.facts, name='facts'),
                        )
