@@ -62,7 +62,7 @@ Recommended to use virtualenv (+ virtualenvwrapper)
 I had some issues installing python-ldap using the python3 fork on a RHEL6 server
 Here are some of the issues I had...
  * missing dependencies - yum install python-devel openldap-devel cyrus-sasl-devel
- * GCC not compiling... Follow instructions here... http://bugs.python.org/issue21121
+ * GCC not compiling the python-ldap module... Follow instructions here... http://bugs.python.org/issue21121
 
 
 ### Installation
