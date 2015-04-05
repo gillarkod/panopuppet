@@ -43,7 +43,19 @@
             // this will apply the bootstrap theme if "uitheme" widget is included
             // the widgetOptions.uitheme is no longer required to be set
             theme: "bootstrap",
-            sortList: [[2, 0]],
+            {% block sortbycol %}
+                {% if request.GET.show_status == 'failed' %}
+                    sortList: [[1, 1]],
+                {% elif request.GET.show_status == 'skipped' %}
+                    sortList: [[2, 1]],
+                {% elif request.GET.show_status == 'success' %}
+                    sortList: [[3, 1]],
+                {% elif request.GET.show_status == 'noop' %}
+                    sortList: [[4, 1]],
+                {% else %}
+                    sortList: [[1, 1]],
+                {% endif %}
+            {% endblock %}
             widthFixed: true,
 
             headerTemplate: '{content} {icon}', // new in v2.7. Needed to add the bootstrap icon!
