@@ -26,23 +26,28 @@
                 </tr>
                 </thead>
                 <tbody>
+                {# List Format: hashid(0), certname(1), environment(2), time start(3), time end(4), success(5), noop(6), failure(7), pending(8) #}
                 {% if reports %}
                     {% for report in reports %}
                         <tr>
                             <td>
-                                <a href="{% url 'events' certname=report.certname hashid=report.hash %}?report_timestamp={{ report|get_item:'start-time' }}&envname={{ report.environment }}">{{ report.hash }}</a>
+                                {% if report.5 or report.6 or report.7 or    report.8 %}
+                                <a href="{% url 'events' certname=report.1 hashid=report.0 %}?report_timestamp={{ report.3 }}&envname={{ report.3 }}">{{ report.0 }}</a>
+                                {% else %}
+                                    {{ report.0 }}
+                                {% endif %}
                             </td>
-                            <td>{{ report.environment }}</td>
-                            <td>{{ report|get_item:'start-time'|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
-                            <td>{{ report|get_item:'end-time'|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
+                            <td>{{ report.2 }}</td>
+                            <td>{{ report.3|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
+                            <td>{{ report.4|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
                             <td class="success">
-                                <strong>{% get_status_summary report_status report.hash 'success' %}</strong></td>
-                            <td class="info"><strong>{% get_status_summary report_status report.hash 'noop' %}</strong>
+                                <strong>{{ report.5 }}</strong></td>
+                            <td class="info"><strong>{{ report.6 }}</strong>
                             </td>
                             <td class="danger">
-                                <strong>{% get_status_summary report_status report.hash 'failure' %}</strong></td>
+                                <strong>{{ report.7 }}</strong></td>
                             <td class="warning">
-                                <strong>{% get_status_summary report_status report.hash 'skipped' %}</strong></td>
+                                <strong>{{ report.8 }}</strong></td>
                         </tr>
                     {% endfor %}
                 {% else %}

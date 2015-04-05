@@ -8,6 +8,7 @@ from django.views.decorators.cache import cache_page
 
 from pano.puppetdb import puppetdb
 from pano.methods.dictfuncs import dictstatus as dictstatus
+from pano.methods.dictfuncs import sort_table as sort_tables
 from pano.settings import CACHE_TIME
 from pano.puppetdb.pdbutils import run_puppetdb_jobs, json_to_datetime
 from pano.methods.filebucket import get_file as get_filebucket
@@ -291,6 +292,7 @@ def reports(request, certname=None):
         request.session['django_timezone'] = request.POST['timezone']
         return redirect(request.POST['return_url'])
 
+    # Redirects to the events page if GET param latest is true..
     if request.GET.get('latest', False):
         if request.GET.get('latest') == "true":
             latest_report_params = {
@@ -316,9 +318,10 @@ def reports(request, certname=None):
                                              )
             report_hash = ""
             for report in latest_report:
+                report_env = report['environment']
                 report_hash = report['hash']
             return redirect('/pano/events/' + certname + '/' + report_hash + '?report_timestamp=' + request.GET.get(
-                'report_timestamp'))
+                'report_timestamp') + '&envname=' + report_env)
 
     page_num = int(request.GET.get('page', 0))
     if page_num <= 0:
@@ -359,8 +362,9 @@ def reports(request, certname=None):
     else:
         num_pages = num_pages_wodec
 
-    report_status = {}
+    report_status = []
     for report in reports_list:
+        found_report = False
         events_params = {
             'query':
                 {
@@ -369,23 +373,26 @@ def reports(request, certname=None):
             'summarize-by': 'certname',
         }
         eventcount_list = puppetdb.api_get(path='event-counts',
+                                           api_version='v4',
                                            params=puppetdb.mk_puppetdb_query(
                                                events_params),
                                            )
+        # Make list of the results
         for event in eventcount_list:
             if event['subject']['title'] == report['certname']:
-                report_status[report['hash']] = {
-                    'failure': event['failures'],
-                    'success': event['successes'],
-                    'noop': event['noops'],
-                    'skipped': event['skips'],
-                }
-
+                found_report = True
+                # hashid, certname, environment, time start, time end, success, noop, failure, pending
+                report_status.append([report['hash'], report['certname'], report['environment'], report['start-time'], report['end-time'],
+                           event['successes'], event['noops'], event['failures'], event['skips']])
+                break
+        if found_report is False:
+            report_status.append([report['hash'], report['certname'], report['environment'], report['start-time'], report['end-time'],
+                           0, 0, 0, 0])
+    report_status =sort_tables(report_status, order=True, col=3)
     context = {
         'timezones': pytz.common_timezones,
         'certname': certname,
-        'reports': reports_list,
-        'report_status': report_status,
+        'reports': report_status,
         'curr_page': page_num,
         'tot_pages': "{:.0f}".format(num_pages),
     }
@@ -500,7 +507,7 @@ def analytics(request):
             'run_avg': avg_run_time,
         }
 
-        return render(request, 'pano/analytics.html', context)
+        return render(request, 'pano/analytics/analytics.html', context)
 
 
 @login_required
@@ -717,7 +724,7 @@ def event_analytics(request, view='summary'):
         else:
             title = 'Failed Classes'
             context['show_title'] = title
-        return render(request, 'pano/events_details.html', context)
+        return render(request, 'pano/analytics/events_details.html', context)
     context['show_title'] = title
     # if the above went well and did not reach the else clause we can also return the awesome.
-    return render(request, 'pano/events_inspect.html', context)
+    return render(request, 'pano/analytics/events_inspect.html', context)
