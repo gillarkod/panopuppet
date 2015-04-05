@@ -8,6 +8,7 @@
 * Fully featured Dashboard for use with PuppetDB
 * Analytics Page providing insight into your puppet environment
 * LDAP Authentication
+* Events Analyzer (Like Events Inspector from Puppet Enterprise)
 
 ## Future plans
 * Docker image to quickly install a panopuppet dashboard
