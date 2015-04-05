@@ -88,10 +88,18 @@
                                 <td>{{ node.1|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
                                 <td>{{ node.2|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
                                 <td>{{ node.3|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
-                                <td class="success"><strong>{{ node.4 }}</strong></td>
-                                <td class="info"><strong>{{ node.5 }}</strong></td>
-                                <td class="danger"><strong>{{ node.6 }}</strong></td>
-                                <td class="warning"><strong>{{ node.7 }}</strong></td>
+                                <td style="text-align: center"><p style="margin-bottom: 0"
+                                                                  class="bg-success img-rounded">
+                                    <strong>{{ node.4 }}</strong></p></td>
+                                <td style="text-align: center"><p style="margin-bottom: 0"
+                                                                  class="bg-info img-rounded">
+                                    <strong>{{ node.5 }}</strong></p></td>
+                                <td style="text-align: center"><p style="margin-bottom: 0"
+                                                                  class="bg-danger img-rounded">
+                                    <strong>{{ node.6 }}</strong></p></td>
+                                <td style="text-align: center"><p style="margin-bottom: 0"
+                                                                  class="bg-warning img-rounded">
+                                    <strong>{{ node.7 }}</strong></p></td>
                             </tr>
                         {% endfor %}
                     {% else %}

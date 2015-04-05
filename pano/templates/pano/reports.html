@@ -32,7 +32,7 @@
                         <tr>
                             <td>
                                 {% if report.5 or report.6 or report.7 or    report.8 %}
-                                <a href="{% url 'events' certname=report.1 hashid=report.0 %}?report_timestamp={{ report.3 }}&envname={{ report.3 }}">{{ report.0 }}</a>
+                                    <a href="{% url 'events' certname=report.1 hashid=report.0 %}?report_timestamp={{ report.3 }}&envname={{ report.3 }}">{{ report.0 }}</a>
                                 {% else %}
                                     {{ report.0 }}
                                 {% endif %}
@@ -40,14 +40,18 @@
                             <td>{{ report.2 }}</td>
                             <td>{{ report.3|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
                             <td>{{ report.4|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
-                            <td class="success">
-                                <strong>{{ report.5 }}</strong></td>
-                            <td class="info"><strong>{{ report.6 }}</strong>
-                            </td>
-                            <td class="danger">
-                                <strong>{{ report.7 }}</strong></td>
-                            <td class="warning">
-                                <strong>{{ report.8 }}</strong></td>
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-success img-rounded">
+                                <strong>{{ report.5 }}</strong></p></td>
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-info img-rounded">
+                                <strong>{{ report.6 }}</strong></p></td>
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-danger img-rounded">
+                                <strong>{{ report.7 }}</strong></p></td>
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-warning img-rounded">
+                                <strong>{{ report.8 }}</strong></p></td>
                         </tr>
                     {% endfor %}
                 {% else %}
