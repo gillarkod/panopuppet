@@ -5,6 +5,9 @@ from pano.settings import PUPPET_RUN_INTERVAL
 from datetime import timedelta
 
 
+def sort_table(table, col=0, order=False):
+    return sorted(table, reverse=order, key=lambda field: field[col])
+
 def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_status="all"):
     """
     :param node_dict: dict
@@ -41,9 +44,6 @@ def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_st
     # (
     # ('certname', 'latestCatalog', 'latestReport', 'latestFacts', 'success', 'noop', 'failure', 'skipped'),
     # )
-    def sort_table(table, col=0, order=False):
-        return sorted(table, reverse=order, key=lambda field: field[col])
-
     def check_failed_compile(report_timestamp, fact_timestamp, catalog_timestamp):
         """
         :param report_timestamp: str
@@ -89,7 +89,7 @@ def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_st
     if sortby:
         # Sort by the field recieved, if valid field was not supplied, fallback
         # to report
-        sortbycol = sortables.get(sortby, 5)
+        sortbycol = sortables.get(sortby, 2)
     else:
         sortbycol = 2
 
@@ -232,3 +232,10 @@ def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_st
         return merged_list
     else:
         return failed_list, changed_list, unreported_list, mismatch_list, pending_list
+
+def merge_reports(reports_hash, events_hash):
+    for report in reports_hash:
+        found_report = False
+        print(report)
+        for event in events_hash:
+            print(event)
