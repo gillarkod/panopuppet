@@ -43,7 +43,7 @@
             // this will apply the bootstrap theme if "uitheme" widget is included
             // the widgetOptions.uitheme is no longer required to be set
             theme: "bootstrap",
-            sortList: [[2,0]],
+            sortList: [[2, 0]],
             widthFixed: true,
 
             headerTemplate: '{content} {icon}', // new in v2.7. Needed to add the bootstrap icon!
@@ -119,7 +119,7 @@
     <div class="container-fluid">
         <div class="row">
             <!-- Events Summary Pane -->
-            <div class="col-md-2">
+            <div class="col-md-3">
                 <!-- CLASSES -->
                 <div class="panel panel-info">
                     <div class="panel-heading">
@@ -134,7 +134,8 @@
                                 <col span="1" style="width: 60%;">
                             </colgroup>
                             <tbody>
-                            <tr class="clickable-row" data-href='{% url 'event_analytics' view='summary' %}?show_summary=classes&show_status=failed'>
+                            <tr class="clickable-row"
+                                data-href='{% url 'event_analytics' view='summary' %}?show_summary=classes&show_status=failed'>
                                 {% with summary.classes_failure|length as len_failure_classes %}
                                     <th>Failed</th>
                                     <td align="right">{{ len_failure_classes }}</td>
@@ -150,7 +151,8 @@
                                     </td>
                                 {% endwith %}
                             </tr>
-                            <tr class="clickable-row" data-href='{% url 'event_analytics' view='summary' %}?show_summary=classes&show_status=skipped'>
+                            <tr class="clickable-row"
+                                data-href='{% url 'event_analytics' view='summary' %}?show_summary=classes&show_status=skipped'>
                                 {% with summary.classes_skipped|length as len_skipped_classes %}
                                     <th>Skipped</th>
                                     <td align="right">{{ len_skipped_classes }}</td>
@@ -166,7 +168,8 @@
                                     </td>
                                 {% endwith %}
                             </tr>
-                            <tr class="clickable-row" data-href='{% url 'event_analytics' view='summary' %}?show_summary=classes&show_status=success'>
+                            <tr class="clickable-row"
+                                data-href='{% url 'event_analytics' view='summary' %}?show_summary=classes&show_status=success'>
                                 {% with summary.classes_success|length as len_success_classes %}
                                     <th>Changed</th>
                                     <td align="right">{{ len_success_classes }}</td>
@@ -181,7 +184,8 @@
                                     </td>
                                 {% endwith %}
                             </tr>
-                            <tr class="clickable-row" data-href='{% url 'event_analytics' view='summary' %}?show_summary=classes&show_status=noop'>
+                            <tr class="clickable-row"
+                                data-href='{% url 'event_analytics' view='summary' %}?show_summary=classes&show_status=noop'>
                                 {% with summary.classes_noop|length as len_noop_classes %}
                                     <th>Noop</th>
                                     <td align="right">{{ len_noop_classes }}</td>
@@ -201,6 +205,8 @@
                         </table>
                     </div>
                 </div>
+            </div>
+            <div class="col-md-3">
                 <!-- NODES -->
                 <div class="panel panel-info">
                     <div class="panel-heading">
@@ -215,7 +221,8 @@
                                 <col span="1" style="width: 60%;">
                             </colgroup>
                             <tbody>
-                            <tr class="clickable-row" data-href='{% url 'event_analytics' view='summary' %}?show_summary=nodes&show_status=failed'>
+                            <tr class="clickable-row"
+                                data-href='{% url 'event_analytics' view='summary' %}?show_summary=nodes&show_status=failed'>
                                 {% with summary.nodes_failure|length as len_failure_nodes %}
                                     <th>Failed</th>
                                     <td align="right">{{ len_failure_nodes }}</td>
@@ -231,7 +238,8 @@
                                     </td>
                                 {% endwith %}
                             </tr>
-                            <tr class="clickable-row" data-href='{% url 'event_analytics' view='summary' %}?show_summary=nodes&show_status=skipped'>
+                            <tr class="clickable-row"
+                                data-href='{% url 'event_analytics' view='summary' %}?show_summary=nodes&show_status=skipped'>
                                 {% with summary.nodes_skipped|length as len_skipped_nodes %}
                                     <th>Skipped</th>
                                     <td align="right">{{ len_skipped_nodes }}</td>
@@ -247,7 +255,8 @@
                                     </td>
                                 {% endwith %}
                             </tr>
-                            <tr class="clickable-row" data-href='{% url 'event_analytics' view='summary' %}?show_summary=nodes&show_status=success'>
+                            <tr class="clickable-row"
+                                data-href='{% url 'event_analytics' view='summary' %}?show_summary=nodes&show_status=success'>
                                 {% with summary.nodes_success|length as len_success_nodes %}
                                     <th>Changed</th>
                                     <td align="right">{{ len_success_nodes }}</td>
@@ -262,7 +271,8 @@
                                     </td>
                                 {% endwith %}
                             </tr>
-                            <tr class="clickable-row" data-href='{% url 'event_analytics' view='summary' %}?show_summary=nodes&show_status=noop'>
+                            <tr class="clickable-row"
+                                data-href='{% url 'event_analytics' view='summary' %}?show_summary=nodes&show_status=noop'>
                                 {% with summary.nodes_noop|length as len_noop_nodes %}
                                     <th>Noop</th>
                                     <td align="right">{{ len_noop_nodes }}</td>
@@ -282,6 +292,8 @@
                         </table>
                     </div>
                 </div>
+            </div>
+            <div class="col-md-3">
                 <!-- RESOURCES -->
                 <div class="panel panel-info">
                     <div class="panel-heading">
@@ -296,7 +308,8 @@
                                 <col span="1" style="width: 60%;">
                             </colgroup>
                             <tbody>
-                            <tr class="clickable-row" data-href='{% url 'event_analytics' view='summary' %}?show_summary=resources&show_status=failed'>
+                            <tr class="clickable-row"
+                                data-href='{% url 'event_analytics' view='summary' %}?show_summary=resources&show_status=failed'>
                                 {% with summary.resources_failure|length as len_failure_resources %}
                                     <th>Failed</th>
                                     <td align="right">{{ len_failure_resources }}</td>
@@ -312,7 +325,8 @@
                                     </td>
                                 {% endwith %}
                             </tr>
-                            <tr class="clickable-row" data-href='{% url 'event_analytics' view='summary' %}?show_summary=resources&show_status=skipped'>
+                            <tr class="clickable-row"
+                                data-href='{% url 'event_analytics' view='summary' %}?show_summary=resources&show_status=skipped'>
                                 {% with summary.resources_skipped|length as len_skipped_resources %}
                                     <th>Skipped</th>
                                     <td align="right">{{ len_skipped_resources }}</td>
@@ -328,7 +342,8 @@
                                     </td>
                                 {% endwith %}
                             </tr>
-                            <tr class="clickable-row" data-href='{% url 'event_analytics' view='summary' %}?show_summary=resources&show_status=success'>
+                            <tr class="clickable-row"
+                                data-href='{% url 'event_analytics' view='summary' %}?show_summary=resources&show_status=success'>
                                 {% with summary.resources_success|length as len_success_resources %}
                                     <th>Changed</th>
                                     <td align="right">{{ len_success_resources }}</td>
@@ -343,7 +358,8 @@
                                     </td>
                                 {% endwith %}
                             </tr>
-                            <tr class="clickable-row" data-href='{% url 'event_analytics' view='summary' %}?show_summary=resources&show_status=noop'>
+                            <tr class="clickable-row"
+                                data-href='{% url 'event_analytics' view='summary' %}?show_summary=resources&show_status=noop'>
                                 {% with summary.resources_noop|length as len_noop_resources %}
                                     <th>Noop</th>
                                     <td align="right">{{ len_noop_resources }}</td>
@@ -363,6 +379,8 @@
                         </table>
                     </div>
                 </div>
+            </div>
+            <div class="col-md-3">
                 <!-- TYPES -->
                 <div class="panel panel-info">
                     <div class="panel-heading">
@@ -377,7 +395,8 @@
                                 <col span="1" style="width: 60%;">
                             </colgroup>
                             <tbody>
-                            <tr class="clickable-row" data-href='{% url 'event_analytics' view='summary' %}?show_summary=types&show_status=failed'>
+                            <tr class="clickable-row"
+                                data-href='{% url 'event_analytics' view='summary' %}?show_summary=types&show_status=failed'>
                                 {% with summary.types_failure|length as len_failure_types %}
                                     <th>Failed</th>
                                     <td align="right">{{ len_failure_types }}</td>
@@ -393,7 +412,8 @@
                                     </td>
                                 {% endwith %}
                             </tr>
-                            <tr class="clickable-row" data-href='{% url 'event_analytics' view='summary' %}?show_summary=types&show_status=skipped'>
+                            <tr class="clickable-row"
+                                data-href='{% url 'event_analytics' view='summary' %}?show_summary=types&show_status=skipped'>
                                 {% with summary.types_skipped|length as len_skipped_types %}
                                     <th>Skipped</th>
                                     <td align="right">{{ len_skipped_types }}</td>
@@ -409,7 +429,8 @@
                                     </td>
                                 {% endwith %}
                             </tr>
-                            <tr class="clickable-row" data-href='{% url 'event_analytics' view='summary' %}?show_summary=types&show_status=success'>
+                            <tr class="clickable-row"
+                                data-href='{% url 'event_analytics' view='summary' %}?show_summary=types&show_status=success'>
                                 {% with summary.types_success|length as len_success_types %}
                                     <th>Changed</th>
                                     <td align="right">{{ len_success_types }}</td>
@@ -424,7 +445,8 @@
                                     </td>
                                 {% endwith %}
                             </tr>
-                            <tr class="clickable-row" data-href='{% url 'event_analytics' view='summary' %}?show_summary=types&show_status=noop'>
+                            <tr class="clickable-row"
+                                data-href='{% url 'event_analytics' view='summary' %}?show_summary=types&show_status=noop'>
                                 {% with summary.types_noop|length as len_noop_types %}
                                     <th>Noop</th>
                                     <td align="right">{{ len_noop_types }}</td>
@@ -445,8 +467,10 @@
                     </div>
                 </div>
             </div>
+        </div>
+        <div class="row">
             <!-- Details Pane -->
-            <div class="col-md-10">
+            <div class="col-md-12">
                 <div class="panel panel-info">
                     {% block details %}
                     {% endblock %}
