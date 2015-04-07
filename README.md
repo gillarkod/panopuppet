@@ -66,8 +66,88 @@ Here are some of the issues I had...
 
 
 ### Installation
-I have yet to write proper instructions for installing this mod_wsgi or mod_uwsgi.
-This is something that will come...
+
+#### RHEL/CentOS 6
+```
+This installation "guide" assumes that panopuppet has been extracted to /srv/repo
+mkdir -p /srv/repo
+cd /srv/repo
+git clone https://github.com/propyless/panopuppet.git panopuppet
+```
+
+1. Add the IUS and EPEL repository
+```
+$ sudo yum install epel-release
+$ sudo yum install http://dl.iuscommunity.org/pub/ius/stable/CentOS/6/x86_64/ius-release-1.0-11.ius.centos6.noarch.rpm
+```
+2. Now we can install python 3.x and the ldap dependencies for the python-ldap module
+`$ sudo yum install python33 python33-devel openldap-devel cyrus-sasl-devel gcc make`
+```
+Side note: You should install virtualenv if you do not already use it because its fantastic.
+$ sudo yum install virtualenv virtualenvwrapper
+```
+3. Install httpd and mod_wsgi for python33
+`$ sudo yum install httpd python33-mod_wsgi`
+4. We will now if configure virtualenv abit.
+```
+I usually add the lines below to my .bashrc file and set some environment variables used for virtualenv.
+export WORKON_HOME=/srv/.virtualenvs
+export PROJECT_HOME=/srv/repo
+source /usr/bin/virtualenvwrapper.sh
+
+After adding the above lines we need to create the /srv/.virtualenvs directory.
+$ mkdir /srv/.virtualenvs
+```
+5. Create a virtualenv instance for panopuppet. (Make sure that you sourced the bashrc file after modifying it)
+`$ which python3`
+This will give us the path to python3 which we installed at step 2.
+`$ mkvirtualenv -p /usr/bin/python3 panopuppet`
+You now have a python virtualenv in /srv/.virtualenvs/panopuppet, if you run the below command you will see that python3 is chosen from the .virtualenv directory.
+`$ which python3`
+If you want to use the system python3 binary again you can run the command
+`$ deactivate`
+6. If you ran the deactivate command, run the below command to activate the virtualenv again.
+`workon panopuppet`
+7. We will install the python modules needed for panopuppet to function.
+```
+$ cd /srv/repo/panopuppet
+$ pip install -r requirements.txt
+```
+If you hit any troubles with the python-ldap module you may need to run this command before running the pip install command again.
+This work around was taken from: http://bugs.python.org/issue21121
+`export CFLAGS=$(python3.3 -c 'import sysconfig; print(sysconfig.get_config_var("CFLAGS").replace("-Werror=declaration-after-statement",""))')`
+8. This directory will be needed to serve the static files.
+mkdir /srv/staticfiles
+9. Apache httpd config
+```
+WSGISocketPrefix /var/run/wsgi
+<VirtualHost *:80>
+    ServerName pp.your.domain.com
+    WSGIDaemonProcess panopuppet user=apache group=apache threads=5 python-path=/srv/repo/panopuppet:/srv/.virtualenvs/panopuppet/lib/python3.3/site-packages
+    WSGIScriptAlias / /srv/repo/panopuppet/puppet/wsgi.py
+    ErrorLog /var/log/httpd/panopuppet.error.log
+    CustomLog /var/log/httpd/panopuppet.access.log combined
+
+    Alias /static /srv/staticfiles/
+    <Directory /srv/repo/panopuppet>
+        Satisfy Any
+        Allow from all
+    </Directory>
+
+    <Directory /srv/repo/panopuppet/>
+        WSGIProcessGroup panopuppet
+    </Directory>
+</VirtualHost>
+```
+10. Populate the /srv/staticfiles with the staticfiles
+`$ cd /srv/repo/panopuppet`
+`$ python manage.py collectstatic` Say yes to the question it might ask about overwriting files in the /srv/collectstatic folder.
+
+11. Restart Httpd service and it should work.
+`/etc/init.d/httpd restart`
+
+
+### Available branches
 
 The master branch has a release which includes:
 * ldap authentication
@@ -75,7 +155,7 @@ The master branch has a release which includes:
 
 Upcoming branches:
 * no_auth
-** There will be no ldap authentication support included.
+  * There will be no ldap authentication support included.
 
 #### Getting Started
 manage.py migrate
