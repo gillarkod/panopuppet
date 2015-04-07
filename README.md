@@ -75,30 +75,33 @@ cd /srv/repo
 git clone https://github.com/propyless/panopuppet.git panopuppet
 ```
 
-1. Add the IUS and EPEL repository
+1) Add the IUS and EPEL repository
 ```
 $ sudo yum install epel-release
 $ sudo yum install http://dl.iuscommunity.org/pub/ius/stable/CentOS/6/x86_64/ius-release-1.0-11.ius.centos6.noarch.rpm
 ```
-2. Now we can install python 3.x and the ldap dependencies for the python-ldap module
+
+2) Now we can install python 3.x and the ldap dependencies for the python-ldap module
 `$ sudo yum install python33 python33-devel openldap-devel cyrus-sasl-devel gcc make`
 ```
 Side note: You should install virtualenv if you do not already use it because its fantastic.
 $ sudo yum install virtualenv virtualenvwrapper
 ```
-3. Install httpd and mod_wsgi for python33
+
+3) Install httpd and mod_wsgi for python33
 `$ sudo yum install httpd python33-mod_wsgi`
-4. We will now if configure virtualenv abit.
+
+4) We will now if configure virtualenv abit.
 ```
 I usually add the lines below to my .bashrc file and set some environment variables used for virtualenv.
 export WORKON_HOME=/srv/.virtualenvs
 export PROJECT_HOME=/srv/repo
 source /usr/bin/virtualenvwrapper.sh
-
-After adding the above lines we need to create the /srv/.virtualenvs directory.
-$ mkdir /srv/.virtualenvs
 ```
-5. Create a virtualenv instance for panopuppet. (Make sure that you sourced the bashrc file after modifying it)
+After adding the above lines we need to create the /srv/.virtualenvs directory.
+`$ mkdir /srv/.virtualenvs`
+
+5) Create a virtualenv instance for panopuppet. (Make sure that you sourced the bashrc file after modifying it)
 `$ which python3`
 This will give us the path to python3 which we installed at step 2.
 `$ mkvirtualenv -p /usr/bin/python3 panopuppet`
@@ -106,19 +109,24 @@ You now have a python virtualenv in /srv/.virtualenvs/panopuppet, if you run the
 `$ which python3`
 If you want to use the system python3 binary again you can run the command
 `$ deactivate`
-6. If you ran the deactivate command, run the below command to activate the virtualenv again.
+
+6) If you ran the deactivate command, run the below command to activate the virtualenv again.
 `workon panopuppet`
-7. We will install the python modules needed for panopuppet to function.
+
+7)We will install the python modules needed for panopuppet to function.
 ```
 $ cd /srv/repo/panopuppet
 $ pip install -r requirements.txt
 ```
+
 If you hit any troubles with the python-ldap module you may need to run this command before running the pip install command again.
 This work around was taken from: http://bugs.python.org/issue21121
 `export CFLAGS=$(python3.3 -c 'import sysconfig; print(sysconfig.get_config_var("CFLAGS").replace("-Werror=declaration-after-statement",""))')`
-8. This directory will be needed to serve the static files.
+
+8) This directory will be needed to serve the static files.
 mkdir /srv/staticfiles
-9. Apache httpd config
+
+9) Apache httpd config
 ```
 WSGISocketPrefix /var/run/wsgi
 <VirtualHost *:80>
@@ -139,12 +147,42 @@ WSGISocketPrefix /var/run/wsgi
     </Directory>
 </VirtualHost>
 ```
-10. Populate the /srv/staticfiles with the staticfiles
+
+10) Configure PanoPuppet
+`$ cp /srv/repo/panopuppet/pano/settings.py.example /srv/repo/panopuppet/pano/settings.py`
+Use your favourite text editor to modify the file with the correct values for your envionrment.
+
+You also need to modify the file `/srv/repo/panopuppet/puppet/settings.py`. This is the django configuration.
+
+The following line numbers are important that you take a look at...
+```
+21 - Secret key
+24, 26 - Debug Values for the lines 24 and 26 should be set to False when running in production.
+28 - Allowed hosts should be set to something sensible so that people can access it. I use ['*'] because i'm so sensible
+150-154 - Timezone and locale settings. Set the timezone to something you feel is "home"
+```
+
+11) Populate the /srv/staticfiles with the staticfiles
 `$ cd /srv/repo/panopuppet`
 `$ python manage.py collectstatic` Say yes to the question it might ask about overwriting files in the /srv/collectstatic folder.
 
-11. Restart Httpd service and it should work.
+12) Modify `pano/settings.py` so that the settings are configured for your puppet infrastructure.
+
+13) Populate the django database so that users logging in with LDAP or local users are populated into django.
+`$ python manage.py migrate`
+
+14) OPTIONAL STEP IF YOU DON'T WANT TO USE LDAP AND YOU ARE JUST TESTING.
+Create a local superuser to log in as
+`$ python manage.py createsuperuser`
+You are able to create some other users in the admin page located at http://panopuppet.your-domain.com/admin
+
+15) Restart Httpd service and it should work.
 `/etc/init.d/httpd restart`
+
+
+### Notes
+
+
 
 
 ### Available branches
