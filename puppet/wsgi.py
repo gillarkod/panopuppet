@@ -8,6 +8,10 @@ https://docs.djangoproject.com/en/1.7/howto/deployment/wsgi/
 """
 
 import os
+import sys
+path = '/srv/repo/panopuppet'
+if path not in sys.path:
+    sys.path.insert(0, path)
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "puppet.settings")
 
 from django.core.wsgi import get_wsgi_application
