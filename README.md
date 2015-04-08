@@ -51,14 +51,56 @@ Code has been relatively fixed and optimized even though i'm sure there is much 
 * [pypuppetdb](https://github.com/puppet-community/pypuppetdb) - Solved some issues which I got stuck at
 
 ### Screenshots
+#### Login Page
 ![Login Page](screenshots/pp_login.png)
+
+#### Dashboard - Recent Tab is the default view
+Here you get a quick view over your puppet environment, it shows a summary over
+the failed, changed, pending and unreported nodes.
+There also is another interesting value you get, the "Missmatching Timestamps"
+Since there is currently no implemented way in puppetdb to report nodes with
+failed catalog compilations or runs this compares the three different timestamps.
+Usually the facts are calculated first and if the latest catalog timestamp is not
+within a few minutes of the latest facts timestamp its quite accurate to assume
+that the compilation has failed.
 ![Dashboard](screenshots/pp_dashboard.png)
-![Nodes View](screenshots/pp_nodespages.png)
+
+#### Nodes View
+Here you see all the nodes in paginated iew. You can sort the data by any column.
+You also get a quick link to the latest report if there are any events available.
+![Nodes View](screenshots/pp_nodespage.png)
+
+#### Nodes Search
 ![Nodes Search Results](screenshots/pp_nodesearch.png)
+
+#### Nodes Reports
+Lists each report available for this node, also urlifys the hash id for the
+report there are any events linked to it.
 ![Node Reports View](screenshots/pp_nodes_reports.png)
+
+#### Nodes Report Events
+You can see detailed information for each report event.
+If you have the feature activated you can even get files from the Filebucket,
+PuppetDB resource and Fileserver. If both files are available you will be
+able to get a diff between the files.
 ![Node Report Events View](screenshots/pp_node_report_events.png)
+
+#### Node Report Events Execution Times
+This graph shows the 10 highest execution times for the puppet run.
 ![Node Report Events Execution Times](screenshots/pp_report_events_execution_times.png)
+
+#### Latest Run Graphs
+Information and events for the latest puppet runs are analyzed and graphs are
+drawn to show information about the (up to 100 last runs if available) showing
+the puppet run times and a baseline value as the average run time.
+It also shows a breakdown over the percentage of classes changed for
+the latest puppet runs and percentages over failed, successs and pending
 ![Latest Run Analytics](screenshots/pp_latestrun_graphs.png)
+
+#### Events Analytics
+The events analyzer lets you quickly see which class, resource, type and node
+is failing in your environment. If you have 1000 nodes failing, you can quickly
+identify and see if the class "ntp" is failing for all 1000 nodes.
 ![Latest Events Analytics](screenshots/pp_events_analytics_failed_classes.png)
 ![Latest Events Analytics](screenshots/pp_events_analytics_successfull_resources.png)
 ![Latest Events Analytics](screenshots/pp_events_analytics_successfull_resources_detailed.png)
