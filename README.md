@@ -1,5 +1,12 @@
 # PanoPuppet
 
+## Requirements
+PuppetDB requires at least PuppetDB 2.0 or higher
+
+It also assumes that you store puppet run reports in PuppetDB
+To be able to use Filebucket and Fileserver features and file diffs
+you will need to have puppet masters filebucket and fileserver enabled.
+
 ## Features
 * Fast and easy to use
 * Uses PuppetDB API to retrieve information
