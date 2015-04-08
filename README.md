@@ -44,12 +44,17 @@ Code has been relatively fixed and optimized even though i'm sure there is much 
 * [pypuppetdb](https://github.com/puppet-community/pypuppetdb) - Solved some issues which I got stuck at
 
 ### Screenshots
-![Dashboard](screenshots/pano_dash.png)
-![Nodes View](screenshots/pano_nodes.png)
-![Reports View](screenshots/pano_reports.png)
-![Events View](screenshots/pano_events.png)
-![Facts View](screenshots/pano_facts.png)
-
+![Login Page](screenshots/pp_login.png)
+![Dashboard](screenshots/pp_dashboard.png)
+![Nodes View](screenshots/pp_nodespages.png)
+![Nodes Search Results](screenshots/pp_nodesearch.png)
+![Node Reports View](screenshots/pp_nodes_reports.png)
+![Node Report Events View](screenshots/pp_node_report_events.png)
+![Node Report Events Execution Times](screenshots/pp_report_events_execution_times.png)
+![Latest Run Analytics](screenshots/pp_latestrun_graphs.png)
+![Latest Events Analytics](screenshots/pp_events_analytics_failed_classes.png)
+![Latest Events Analytics](screenshots/pp_events_analytics_successfull_resources.png)
+![Latest Events Analytics](screenshots/pp_events_analytics_successfull_resources_detailed.png)
 
 ### Requirements
 
