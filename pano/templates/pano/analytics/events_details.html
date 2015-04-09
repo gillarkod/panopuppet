@@ -41,12 +41,14 @@
                             <!-- failure -->
                             <td style="text-align: center"><p style="margin-bottom: 0"
                                                               class="bg-danger img-rounded">
-                                {% if summary.nodes_failure|get_item:key %}{{ summary.nodes_failure|get_item:key }}{% else %}0{% endif %}</p>
+                                {% if summary.nodes_failure|get_item:key %}
+                                    {{ summary.nodes_failure|get_item:key }}{% else %}0{% endif %}</p>
                             </td>
                             <!-- Skips -->
                             <td style="text-align: center"><p style="margin-bottom: 0"
                                                               class="bg-warning img-rounded">
-                                {% if summary.nodes_skipped|get_item:key %}{{ summary.nodes_skipped|get_item:key }}{% else %}0{% endif %}</p>
+                                {% if summary.nodes_skipped|get_item:key %}
+                                    {{ summary.nodes_skipped|get_item:key }}{% else %}0{% endif %}</p>
                             </td>
                             <!-- Changes -->
                             <td style="text-align: center"><p style="margin-bottom: 0"
@@ -55,7 +57,8 @@
                             <!-- Noops -->
                             <td style="text-align: center"><p style="margin-bottom: 0"
                                                               class="bg-info img-rounded">
-                                {% if summary.nodes_noop|get_item:key %}{{ summary.nodes_noop|get_item:key }}{% else %}0{% endif %}</p>
+                                {% if summary.nodes_noop|get_item:key %}
+                                    {{ summary.nodes_noop|get_item:key }}{% else %}0{% endif %}</p>
                             </td>
                         </tr>
                     {% endfor %}
@@ -68,17 +71,20 @@
                             <!-- Failure -->
                             <td style="text-align: center"><p style="margin-bottom: 0"
                                                               class="bg-danger img-rounded">
-                                {% if summary.nodes_failure|get_item:key %}{{ summary.nodes_failure|get_item:key }}{% else %}0{% endif %}</p>
+                                {% if summary.nodes_failure|get_item:key %}
+                                    {{ summary.nodes_failure|get_item:key }}{% else %}0{% endif %}</p>
                             </td>
                             <!-- Skips -->
                             <td style="text-align: center"><p style="margin-bottom: 0"
                                                               class="bg-warning img-rounded">
-                                {% if summary.nodes_skipped|get_item:key %}{{ summary.nodes_skipped|get_item:key }}{% else %}0{% endif %}</p>
+                                {% if summary.nodes_skipped|get_item:key %}
+                                    {{ summary.nodes_skipped|get_item:key }}{% else %}0{% endif %}</p>
                             </td>
                             <!-- Changes -->
                             <td style="text-align: center"><p style="margin-bottom: 0"
                                                               class="bg-success img-rounded">
-                                {% if summary.nodes_success|get_item:key %}{{ summary.nodes_success|get_item:key }}{% else %}0{% endif %}</p>
+                                {% if summary.nodes_success|get_item:key %}
+                                    {{ summary.nodes_success|get_item:key }}{% else %}0{% endif %}</p>
                             </td>
                             <!-- Noops -->
                             <td style="text-align: center"><p
@@ -95,7 +101,8 @@
                             <!-- failure -->
                             <td style="text-align: center"><p style="margin-bottom: 0"
                                                               class="bg-danger img-rounded">
-                                {% if summary.nodes_failure|get_item:key %}{{ summary.nodes_failure|get_item:key }}{% else %}0{% endif %}</p>
+                                {% if summary.nodes_failure|get_item:key %}
+                                    {{ summary.nodes_failure|get_item:key }}{% else %}0{% endif %}</p>
                             </td>
                             <!-- Skips -->
                             <td style="text-align: center"><p style="margin-bottom: 0"
@@ -105,12 +112,14 @@
                             <!-- Changes -->
                             <td style="text-align: center"><p style="margin-bottom: 0"
                                                               class="bg-success img-rounded">
-                                {% if summary.nodes_success|get_item:key %}{{ summary.nodes_success|get_item:key }}{% else %}0{% endif %}</p>
+                                {% if summary.nodes_success|get_item:key %}
+                                    {{ summary.nodes_success|get_item:key }}{% else %}0{% endif %}</p>
                             </td>
                             <!-- Noops -->
                             <td style="text-align: center"><p style="margin-bottom: 0"
                                                               class="bg-info img-rounded">
-                                {% if summary.nodes_noop|get_item:key %}{{ summary.nodes_noop|get_item:key }}{% else %}0{% endif %}</p>
+                                {% if summary.nodes_noop|get_item:key %}
+                                    {{ summary.nodes_noop|get_item:key }}{% else %}0{% endif %}</p>
                             </td>
                         </tr>
                     {% endfor %}
@@ -127,17 +136,20 @@
                             <!-- Skips -->
                             <td style="text-align: center"><p style="margin-bottom: 0"
                                                               class="bg-warning img-rounded">
-                                {% if summary.nodes_skipped|get_item:key %}{{ summary.nodes_skipped|get_item:key }}{% else %}0{% endif %}</p>
+                                {% if summary.nodes_skipped|get_item:key %}
+                                    {{ summary.nodes_skipped|get_item:key }}{% else %}0{% endif %}</p>
                             </td>
                             <!-- Changes -->
                             <td style="text-align: center"><p style="margin-bottom: 0"
                                                               class="bg-success img-rounded">
-                                {% if summary.nodes_success|get_item:key %}{{ summary.nodes_success|get_item:key }}{% else %}0{% endif %}</p>
+                                {% if summary.nodes_success|get_item:key %}
+                                    {{ summary.nodes_success|get_item:key }}{% else %}0{% endif %}</p>
                             </td>
                             <!-- Noops -->
                             <td style="text-align: center"><p style="margin-bottom: 0"
                                                               class="bg-info img-rounded">
-                                {% if summary.nodes_noop|get_item:key %}{{ summary.nodes_noop|get_item:key }}{% else %}0{% endif %}</p>
+                                {% if summary.nodes_noop|get_item:key %}
+                                    {{ summary.nodes_noop|get_item:key }}{% else %}0{% endif %}</p>
                             </td>
                         </tr>
                     {% endfor %}
@@ -156,13 +168,15 @@
                             <td style="text-align: center"><p style="margin-bottom: 0"
                                                               class="bg-danger img-rounded">
                                 {% if summary.resources_failure|get_item:key %}
-                                    {{ summary.resources_failure|get_item:key }}{% else %}0{% endif %}</p>
+                                    {{ summary.resources_failure|get_item:key }}{% else %}
+                                    0{% endif %}</p>
                             </td>
                             <!-- Skips -->
                             <td style="text-align: center"><p style="margin-bottom: 0"
                                                               class="bg-warning img-rounded">
                                 {% if summary.resources_skipped|get_item:key %}
-                                    {{ summary.resources_skipped|get_item:key }}{% else %}0{% endif %}</p>
+                                    {{ summary.resources_skipped|get_item:key }}{% else %}
+                                    0{% endif %}</p>
                             </td>
                             <!-- Changes -->
                             <td style="text-align: center"><p style="margin-bottom: 0"
@@ -171,7 +185,8 @@
                             <!-- Noops -->
                             <td style="text-align: center"><p style="margin-bottom: 0"
                                                               class="bg-info img-rounded">
-                                {% if summary.resources_noop|get_item:key %}{{ summary.resources_noop|get_item:key }}{% else %}0{% endif %}</p>
+                                {% if summary.resources_noop|get_item:key %}
+                                    {{ summary.resources_noop|get_item:key }}{% else %}0{% endif %}</p>
                             </td>
                         </tr>
                     {% endfor %}
@@ -185,19 +200,22 @@
                             <td style="text-align: center"><p style="margin-bottom: 0"
                                                               class="bg-danger img-rounded">
                                 {% if summary.resources_failure|get_item:key %}
-                                    {{ summary.resources_failure|get_item:key }}{% else %}0{% endif %}</p>
+                                    {{ summary.resources_failure|get_item:key }}{% else %}
+                                    0{% endif %}</p>
                             </td>
                             <!-- Skips -->
                             <td style="text-align: center"><p style="margin-bottom: 0"
                                                               class="bg-warning img-rounded">
                                 {% if summary.resources_skipped|get_item:key %}
-                                    {{ summary.resources_skipped|get_item:key }}{% else %}0{% endif %}</p>
+                                    {{ summary.resources_skipped|get_item:key }}{% else %}
+                                    0{% endif %}</p>
                             </td>
                             <!-- Changes -->
                             <td style="text-align: center"><p style="margin-bottom: 0"
                                                               class="bg-success img-rounded">
                                 {% if summary.resources_success|get_item:key %}
-                                    {{ summary.resources_success|get_item:key }}{% else %}0{% endif %}</p>
+                                    {{ summary.resources_success|get_item:key }}{% else %}
+                                    0{% endif %}</p>
                             </td>
                             <!-- Noops -->
                             <td style="text-align: center"><p
@@ -214,7 +232,8 @@
                             <!-- failure -->
                             <td style="text-align: center"><p style="margin-bottom: 0"
                                                               class="bg-danger img-rounded">
-                                {% if summary.resources_failure|get_item:key %}{{ summary.resources_failure|get_item:key }}{% else %}0{% endif %}</p>
+                                {% if summary.resources_failure|get_item:key %}
+                                    {{ summary.resources_failure|get_item:key }}{% else %}0{% endif %}</p>
                             </td>
                             <!-- Skips -->
                             <td style="text-align: center"><p style="margin-bottom: 0"
@@ -224,12 +243,14 @@
                             <!-- Changes -->
                             <td style="text-align: center"><p style="margin-bottom: 0"
                                                               class="bg-success img-rounded">
-                                {% if summary.resources_success|get_item:key %}{{ summary.resources_success|get_item:key }}{% else %}0{% endif %}</p>
+                                {% if summary.resources_success|get_item:key %}
+                                    {{ summary.resources_success|get_item:key }}{% else %}0{% endif %}</p>
                             </td>
                             <!-- Noops -->
                             <td style="text-align: center"><p style="margin-bottom: 0"
                                                               class="bg-info img-rounded">
-                                {% if summary.resources_noop|get_item:key %}{{ summary.resources_noop|get_item:key }}{% else %}0{% endif %}</p>
+                                {% if summary.resources_noop|get_item:key %}
+                                    {{ summary.resources_noop|get_item:key }}{% else %}0{% endif %}</p>
                             </td>
                         </tr>
                     {% endfor %}
@@ -246,17 +267,20 @@
                             <!-- Skips -->
                             <td style="text-align: center"><p style="margin-bottom: 0"
                                                               class="bg-warning img-rounded">
-                                {% if summary.resources_skipped|get_item:key %}{{ summary.resources_skipped|get_item:key }}{% else %}0{% endif %}</p>
+                                {% if summary.resources_skipped|get_item:key %}
+                                    {{ summary.resources_skipped|get_item:key }}{% else %}0{% endif %}</p>
                             </td>
                             <!-- Changes -->
                             <td style="text-align: center"><p style="margin-bottom: 0"
                                                               class="bg-success img-rounded">
-                                {% if summary.resources_success|get_item:key %}{{ summary.resources_success|get_item:key }}{% else %}0{% endif %}</p>
+                                {% if summary.resources_success|get_item:key %}
+                                    {{ summary.resources_success|get_item:key }}{% else %}0{% endif %}</p>
                             </td>
                             <!-- Noops -->
                             <td style="text-align: center"><p style="margin-bottom: 0"
                                                               class="bg-info img-rounded">
-                                {% if summary.resources_noop|get_item:key %}{{ summary.resources_noop|get_item:key }}{% else %}0{% endif %}</p>
+                                {% if summary.resources_noop|get_item:key %}
+                                    {{ summary.resources_noop|get_item:key }}{% else %}0{% endif %}</p>
                             </td>
                         </tr>
                     {% endfor %}
@@ -274,12 +298,14 @@
                             <!-- failure -->
                             <td style="text-align: center"><p style="margin-bottom: 0"
                                                               class="bg-danger img-rounded">
-                                {% if summary.types_failure|get_item:key %}{{ summary.types_failure|get_item:key }}{% else %}0{% endif %}</p>
+                                {% if summary.types_failure|get_item:key %}
+                                    {{ summary.types_failure|get_item:key }}{% else %}0{% endif %}</p>
                             </td>
                             <!-- Skips -->
                             <td style="text-align: center"><p style="margin-bottom: 0"
                                                               class="bg-warning img-rounded">
-                                {% if summary.types_skipped|get_item:key %}{{ summary.types_skipped|get_item:key }}{% else %}0{% endif %}</p>
+                                {% if summary.types_skipped|get_item:key %}
+                                    {{ summary.types_skipped|get_item:key }}{% else %}0{% endif %}</p>
                             </td>
                             <!-- Changes -->
                             <td style="text-align: center"><p style="margin-bottom: 0"
@@ -288,7 +314,8 @@
                             <!-- Noops -->
                             <td style="text-align: center"><p style="margin-bottom: 0"
                                                               class="bg-info img-rounded">
-                                {% if summary.types_noop|get_item:key %}{{ summary.types_noop|get_item:key }}{% else %}0{% endif %}</p>
+                                {% if summary.types_noop|get_item:key %}
+                                    {{ summary.types_noop|get_item:key }}{% else %}0{% endif %}</p>
                             </td>
                         </tr>
                     {% endfor %}
@@ -301,17 +328,20 @@
                             <!-- Failure -->
                             <td style="text-align: center"><p style="margin-bottom: 0"
                                                               class="bg-danger img-rounded">
-                                {% if summary.types_failure|get_item:key %}{{ summary.types_failure|get_item:key }}{% else %}0{% endif %}</p>
+                                {% if summary.types_failure|get_item:key %}
+                                    {{ summary.types_failure|get_item:key }}{% else %}0{% endif %}</p>
                             </td>
                             <!-- Skips -->
                             <td style="text-align: center"><p style="margin-bottom: 0"
                                                               class="bg-warning img-rounded">
-                                {% if summary.types_skipped|get_item:key %}{{ summary.types_skipped|get_item:key }}{% else %}0{% endif %}</p>
+                                {% if summary.types_skipped|get_item:key %}
+                                    {{ summary.types_skipped|get_item:key }}{% else %}0{% endif %}</p>
                             </td>
                             <!-- Changes -->
                             <td style="text-align: center"><p style="margin-bottom: 0"
                                                               class="bg-success img-rounded">
-                                {% if summary.types_success|get_item:key %}{{ summary.types_success|get_item:key }}{% else %}0{% endif %}</p>
+                                {% if summary.types_success|get_item:key %}
+                                    {{ summary.types_success|get_item:key }}{% else %}0{% endif %}</p>
                             </td>
                             <!-- Noops -->
                             <td style="text-align: center"><p
@@ -328,7 +358,8 @@
                             <!-- failure -->
                             <td style="text-align: center"><p style="margin-bottom: 0"
                                                               class="bg-danger img-rounded">
-                                {% if summary.types_failure|get_item:key %}{{ summary.types_failure|get_item:key }}{% else %}0{% endif %}</p>
+                                {% if summary.types_failure|get_item:key %}
+                                    {{ summary.types_failure|get_item:key }}{% else %}0{% endif %}</p>
                             </td>
                             <!-- Skips -->
                             <td style="text-align: center"><p style="margin-bottom: 0"
@@ -338,12 +369,14 @@
                             <!-- Changes -->
                             <td style="text-align: center"><p style="margin-bottom: 0"
                                                               class="bg-success img-rounded">
-                                {% if summary.types_success|get_item:key %}{{ summary.types_success|get_item:key }}{% else %}0{% endif %}</p>
+                                {% if summary.types_success|get_item:key %}
+                                    {{ summary.types_success|get_item:key }}{% else %}0{% endif %}</p>
                             </td>
                             <!-- Noops -->
                             <td style="text-align: center"><p style="margin-bottom: 0"
                                                               class="bg-info img-rounded">
-                                {% if summary.types_noop|get_item:key %}{{ summary.types_noop|get_item:key }}{% else %}0{% endif %}</p>
+                                {% if summary.types_noop|get_item:key %}
+                                    {{ summary.types_noop|get_item:key }}{% else %}0{% endif %}</p>
                             </td>
                         </tr>
                     {% endfor %}
@@ -360,17 +393,20 @@
                             <!-- Skips -->
                             <td style="text-align: center"><p style="margin-bottom: 0"
                                                               class="bg-warning img-rounded">
-                                {% if summary.types_skipped|get_item:key %}{{ summary.types_skipped|get_item:key }}{% else %}0{% endif %}</p>
+                                {% if summary.types_skipped|get_item:key %}
+                                    {{ summary.types_skipped|get_item:key }}{% else %}0{% endif %}</p>
                             </td>
                             <!-- Changes -->
                             <td style="text-align: center"><p style="margin-bottom: 0"
                                                               class="bg-success img-rounded">
-                                {% if summary.types_success|get_item:key %}{{ summary.types_success|get_item:key }}{% else %}0{% endif %}</p>
+                                {% if summary.types_success|get_item:key %}
+                                    {{ summary.types_success|get_item:key }}{% else %}0{% endif %}</p>
                             </td>
                             <!-- Noops -->
                             <td style="text-align: center"><p style="margin-bottom: 0"
                                                               class="bg-info img-rounded">
-                                {% if summary.types_noop|get_item:key %}{{ summary.types_noop|get_item:key }}{% else %}0{% endif %}</p>
+                                {% if summary.types_noop|get_item:key %}
+                                    {{ summary.types_noop|get_item:key }}{% else %}0{% endif %}</p>
                             </td>
                         </tr>
                     {% endfor %}
@@ -388,12 +424,14 @@
                             <!-- failure -->
                             <td style="text-align: center"><p style="margin-bottom: 0"
                                                               class="bg-danger img-rounded">
-                                {% if summary.classes_failure|get_item:key %}{{ summary.classes_failure|get_item:key }}{% else %}0{% endif %}</p>
+                                {% if summary.classes_failure|get_item:key %}
+                                    {{ summary.classes_failure|get_item:key }}{% else %}0{% endif %}</p>
                             </td>
                             <!-- Skips -->
                             <td style="text-align: center"><p style="margin-bottom: 0"
                                                               class="bg-warning img-rounded">
-                                {% if summary.classes_skipped|get_item:key %}{{ summary.classes_skipped|get_item:key }}{% else %}0{% endif %}</p>
+                                {% if summary.classes_skipped|get_item:key %}
+                                    {{ summary.classes_skipped|get_item:key }}{% else %}0{% endif %}</p>
                             </td>
                             <!-- Changes -->
                             <td style="text-align: center"><p style="margin-bottom: 0"
@@ -402,7 +440,8 @@
                             <!-- Noops -->
                             <td style="text-align: center"><p style="margin-bottom: 0"
                                                               class="bg-info img-rounded">
-                                {% if summary.classes_noop|get_item:key %}{{ summary.classes_noop|get_item:key }}{% else %}0{% endif %}</p>
+                                {% if summary.classes_noop|get_item:key %}
+                                    {{ summary.classes_noop|get_item:key }}{% else %}0{% endif %}</p>
                             </td>
                         </tr>
                     {% endfor %}
@@ -415,17 +454,20 @@
                             <!-- Failure -->
                             <td style="text-align: center"><p style="margin-bottom: 0"
                                                               class="bg-danger img-rounded">
-                                {% if summary.classes_failure|get_item:key %}{{ summary.classes_failure|get_item:key }}{% else %}0{% endif %}</p>
+                                {% if summary.classes_failure|get_item:key %}
+                                    {{ summary.classes_failure|get_item:key }}{% else %}0{% endif %}</p>
                             </td>
                             <!-- Skips -->
                             <td style="text-align: center"><p style="margin-bottom: 0"
                                                               class="bg-warning img-rounded">
-                                {% if summary.classes_skipped|get_item:key %}{{ summary.classes_skipped|get_item:key }}{% else %}0{% endif %}</p>
+                                {% if summary.classes_skipped|get_item:key %}
+                                    {{ summary.classes_skipped|get_item:key }}{% else %}0{% endif %}</p>
                             </td>
                             <!-- Changes -->
                             <td style="text-align: center"><p style="margin-bottom: 0"
                                                               class="bg-success img-rounded">
-                                {% if summary.classes_success|get_item:key %}{{ summary.classes_success|get_item:key }}{% else %}0{% endif %}</p>
+                                {% if summary.classes_success|get_item:key %}
+                                    {{ summary.classes_success|get_item:key }}{% else %}0{% endif %}</p>
                             </td>
                             <!-- Noops -->
                             <td style="text-align: center"><p
@@ -442,7 +484,8 @@
                             <!-- failure -->
                             <td style="text-align: center"><p style="margin-bottom: 0"
                                                               class="bg-danger img-rounded">
-                                {% if summary.classes_failure|get_item:key %}{{ summary.classes_failure|get_item:key }}{% else %}0{% endif %}</p>
+                                {% if summary.classes_failure|get_item:key %}
+                                    {{ summary.classes_failure|get_item:key }}{% else %}0{% endif %}</p>
                             </td>
                             <!-- Skips -->
                             <td style="text-align: center"><p style="margin-bottom: 0"
@@ -452,12 +495,14 @@
                             <!-- Changes -->
                             <td style="text-align: center"><p style="margin-bottom: 0"
                                                               class="bg-success img-rounded">
-                                {% if summary.classes_success|get_item:key %}{{ summary.classes_success|get_item:key }}{% else %}0{% endif %}</p>
+                                {% if summary.classes_success|get_item:key %}
+                                    {{ summary.classes_success|get_item:key }}{% else %}0{% endif %}</p>
                             </td>
                             <!-- Noops -->
                             <td style="text-align: center"><p style="margin-bottom: 0"
                                                               class="bg-info img-rounded">
-                                {% if summary.classes_noop|get_item:key %}{{ summary.classes_noop|get_item:key }}{% else %}0{% endif %}</p>
+                                {% if summary.classes_noop|get_item:key %}
+                                    {{ summary.classes_noop|get_item:key }}{% else %}0{% endif %}</p>
                             </td>
                         </tr>
                     {% endfor %}
@@ -474,17 +519,20 @@
                             <!-- Skips -->
                             <td style="text-align: center"><p style="margin-bottom: 0"
                                                               class="bg-warning img-rounded">
-                                {% if summary.classes_skipped|get_item:key %}{{ summary.classes_skipped|get_item:key }}{% else %}0{% endif %}</p>
+                                {% if summary.classes_skipped|get_item:key %}
+                                    {{ summary.classes_skipped|get_item:key }}{% else %}0{% endif %}</p>
                             </td>
                             <!-- Changes -->
                             <td style="text-align: center"><p style="margin-bottom: 0"
                                                               class="bg-success img-rounded">
-                                {% if summary.classes_success|get_item:key %}{{ summary.classes_success|get_item:key }}{% else %}0{% endif %}</p>
+                                {% if summary.classes_success|get_item:key %}
+                                    {{ summary.classes_success|get_item:key }}{% else %}0{% endif %}</p>
                             </td>
                             <!-- Noops -->
                             <td style="text-align: center"><p style="margin-bottom: 0"
                                                               class="bg-info img-rounded">
-                                {% if summary.classes_noop|get_item:key %}{{ summary.classes_noop|get_item:key }}{% else %}0{% endif %}</p>
+                                {% if summary.classes_noop|get_item:key %}
+                                    {{ summary.classes_noop|get_item:key }}{% else %}0{% endif %}</p>
                             </td>
                         </tr>
                     {% endfor %}
