@@ -32,7 +32,7 @@
                         <tr>
                             <td>
                                 {% if report.5 or report.6 or report.7 or    report.8 %}
-                                    <a href="{% url 'events' certname=report.1 hashid=report.0 %}?report_timestamp={{ report.3 }}&envname={{ report.3 }}">{{ report.0 }}</a>
+                                    <a href="{% url 'events' certname=report.1 hashid=report.0 %}?report_timestamp={{ report.3 }}&envname={{ report.2 }}">{{ report.0 }}</a>
                                 {% else %}
                                     {{ report.0 }}
                                 {% endif %}
