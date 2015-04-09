@@ -87,8 +87,8 @@
                                     {{ summary.nodes_success|get_item:key }}{% else %}0{% endif %}</p>
                             </td>
                             <!-- Noops -->
-                            <td style="text-align: center"><p
-                                    class="bg-info img-rounded">{{ value }}</p>
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-info img-rounded">{{ value }}</p>
                             </td>
 
                         </tr>
@@ -161,7 +161,8 @@
                 <!-- show successes -->
                 {% if request.GET.show_status == 'success' %}
                     {% for key, value  in summary.resources_success.items %}
-                        <tr class="clickable-row" data-href='{% url 'event_analytics' view='resources' %}?value={{ key }}'>
+                        <tr class="clickable-row"
+                            data-href='{% url 'event_analytics' view='resources' %}?value={{ key }}'>
                             <!-- title -->
                             <td><strong>{{ key }}</strong></td>
                             <!-- failure -->
@@ -193,7 +194,8 @@
                     <!-- show noops -->
                 {% elif request.GET.show_status == 'noop' %}
                     {% for key, value  in summary.resources_noop.items %}
-                        <tr class="clickable-row" data-href='{% url 'event_analytics' view='resources' %}?value={{ key }}'>
+                        <tr class="clickable-row"
+                            data-href='{% url 'event_analytics' view='resources' %}?value={{ key }}'>
                             <!-- title -->
                             <td><strong>{{ key }}</strong></td>
                             <!-- Failure -->
@@ -218,15 +220,16 @@
                                     0{% endif %}</p>
                             </td>
                             <!-- Noops -->
-                            <td style="text-align: center"><p
-                                    class="bg-info img-rounded">{{ value }}</p>
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-info img-rounded">{{ value }}</p>
                             </td>
 
                         </tr>
                     {% endfor %}
                 {% elif request.GET.show_status == 'skipped' %}
                     {% for key, value  in summary.resources_skipped.items %}
-                        <tr class="clickable-row" data-href='{% url 'event_analytics' view='resources' %}?value={{ key }}'>
+                        <tr class="clickable-row"
+                            data-href='{% url 'event_analytics' view='resources' %}?value={{ key }}'>
                             <!-- title -->
                             <td><strong>{{ key }}</strong></td>
                             <!-- failure -->
@@ -257,7 +260,8 @@
                     <!-- show failures if anything other value is given. -->
                 {% else %}
                     {% for key, value  in summary.resources_failure.items %}
-                        <tr class="clickable-row" data-href='{% url 'event_analytics' view='resources' %}?value={{ key }}'>
+                        <tr class="clickable-row"
+                            data-href='{% url 'event_analytics' view='resources' %}?value={{ key }}'>
                             <!-- title -->
                             <td><strong>{{ key }}</strong></td>
                             <!-- failure -->
@@ -344,8 +348,8 @@
                                     {{ summary.types_success|get_item:key }}{% else %}0{% endif %}</p>
                             </td>
                             <!-- Noops -->
-                            <td style="text-align: center"><p
-                                    class="bg-info img-rounded">{{ value }}</p>
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-info img-rounded">{{ value }}</p>
                             </td>
 
                         </tr>
@@ -418,7 +422,8 @@
                 <!-- show successes -->
                 {% if request.GET.show_status == 'success' %}
                     {% for key, value  in summary.classes_success.items %}
-                        <tr class="clickable-row" data-href='{% url 'event_analytics' view='classes' %}?value={{ key }}'>
+                        <tr class="clickable-row"
+                            data-href='{% url 'event_analytics' view='classes' %}?value={{ key }}'>
                             <!-- title -->
                             <td><strong>{{ key }}</strong></td>
                             <!-- failure -->
@@ -448,7 +453,8 @@
                     <!-- show noops -->
                 {% elif request.GET.show_status == 'noop' %}
                     {% for key, value  in summary.classes_noop.items %}
-                        <tr class="clickable-row" data-href='{% url 'event_analytics' view='classes' %}?value={{ key }}'>
+                        <tr class="clickable-row"
+                            data-href='{% url 'event_analytics' view='classes' %}?value={{ key }}'>
                             <!-- title -->
                             <td><strong>{{ key }}</strong></td>
                             <!-- Failure -->
@@ -470,15 +476,16 @@
                                     {{ summary.classes_success|get_item:key }}{% else %}0{% endif %}</p>
                             </td>
                             <!-- Noops -->
-                            <td style="text-align: center"><p
-                                    class="bg-info img-rounded">{{ value }}</p>
+                            <td style="text-align: center"><p style="margin-bottom: 0"§
+                                                              class="bg-info img-rounded">{{ value }}</p>
                             </td>
 
                         </tr>
                     {% endfor %}
                 {% elif request.GET.show_status == 'skipped' %}
                     {% for key, value  in summary.classes_skipped.items %}
-                        <tr class="clickable-row" data-href='{% url 'event_analytics' view='classes' %}?value={{ key }}'>
+                        <tr class="clickable-row"
+                            data-href='{% url 'event_analytics' view='classes' %}?value={{ key }}'>
                             <!-- title -->
                             <td><strong>{{ key }}</strong></td>
                             <!-- failure -->
@@ -509,7 +516,8 @@
                     <!-- show failures if anything other value is given. -->
                 {% else %}
                     {% for key, value  in summary.classes_failure.items %}
-                        <tr class="clickable-row" data-href='{% url 'event_analytics' view='classes' %}?value={{ key }}'>
+                        <tr class="clickable-row"
+                            data-href='{% url 'event_analytics' view='classes' %}?value={{ key }}'>
                             <!-- title -->
                             <td><strong>{{ key }}</strong></td>
                             <!-- failure -->
