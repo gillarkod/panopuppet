@@ -20,7 +20,7 @@ PUPPETDB_VERIFY_SSL = False
 # Clientbucket Settings -- For SSL read the SSL configuration example for Clientbucket on the puppetmaster
 PUPPETMASTER_CLIENTBUCKET_SHOW = True # Disable support for clientbucket with False instead of True
 PUPPETMASTER_CLIENTBUCKET_HOST = "https://puppetmaster.example.com:8140/"
-PUPPETMASTER_CLIENTBURKCET_CERTIFICATES = (None, None) #  ('/path/to/ssl_cert', '/path/to/ssl_key')
+PUPPETMASTER_CLIENTBUCKET_CERTIFICATES = (None, None) #  ('/path/to/ssl_cert', '/path/to/ssl_key')
 PUPPETMASTER_CLIENTBUCKET_VERIFY_SSL = False
 
 # Fileserver Settings
