@@ -2,7 +2,8 @@ __author__ = 'etaklar'
 
 from pano.puppetdb.puppetdb import api_get as pdb_api_get
 from pano.puppetdb.puppetdb import mk_puppetdb_query
-
+import queue
+from threading import Thread
 
 def summary_of_events(events_hash):
     summary = {
@@ -30,95 +31,123 @@ def summary_of_events(events_hash):
         'types_skipped': {},
         'types_total': 0,
     }
+    def sort_events(all_events, threads=2):
+        if type(threads) != int:
+            threads = 6
+        jobs_q = queue.Queue()
+        out_q = queue.Queue()
 
-    for event in events_hash:
-        if event['status'] == 'success':
-            # Classes
-            if not event['containing-class'] in summary['classes_success']:
-                summary['classes_success'][event['containing-class']] = 1
-            else:
-                summary['classes_success'][event['containing-class']] += 1
-            # Nodes
-            if not event['certname'] in summary['nodes_success']:
-                summary['nodes_success'][event['certname']] = 1
-            else:
-                summary['nodes_success'][event['certname']] += 1
-            # Resources
-            if not event['resource-title'] in summary['resources_success']:
-                summary['resources_success'][event['resource-title']] = 1
-            else:
-                summary['resources_success'][event['resource-title']] += 1
-            # Types
-            if not event['resource-type'] in summary['types_success']:
-                summary['types_success'][event['resource-type']] = 1
-            else:
-                summary['types_success'][event['resource-type']] += 1
+        def db_threaded_requests(i, q):
+            while True:
+                t_event = q.get()
+                if t_event['status'] == 'success':
+                    # Classes
+                    if not t_event['containing-class'] in summary['classes_success']:
+                        summary['classes_success'][t_event['containing-class']] = 1
+                    else:
+                        summary['classes_success'][t_event['containing-class']] += 1
+                    # Nodes
+                    if not t_event['certname'] in summary['nodes_success']:
+                        summary['nodes_success'][t_event['certname']] = 1
+                    else:
+                        summary['nodes_success'][t_event['certname']] += 1
+                    # Resources
+                    if not t_event['resource-title'] in summary['resources_success']:
+                        summary['resources_success'][t_event['resource-title']] = 1
+                    else:
+                        summary['resources_success'][t_event['resource-title']] += 1
+                    # Types
+                    if not t_event['resource-type'] in summary['types_success']:
+                        summary['types_success'][t_event['resource-type']] = 1
+                    else:
+                        summary['types_success'][t_event['resource-type']] += 1
 
-        if event['status'] == 'noop':
-            # Classes
-            if not event['containing-class'] in summary['classes_noop']:
-                summary['classes_noop'][event['containing-class']] = 1
-            else:
-                summary['classes_noop'][event['containing-class']] += 1
-            # Nodes
-            if not event['certname'] in summary['nodes_noop']:
-                summary['nodes_noop'][event['certname']] = 1
-            else:
-                summary['nodes_noop'][event['certname']] += 1
-            # Resources
-            if not event['resource-title'] in summary['resources_noop']:
-                summary['resources_noop'][event['resource-title']] = 1
-            else:
-                summary['resources_noop'][event['resource-title']] += 1
-            # Types
-            if not event['resource-type'] in summary['types_noop']:
-                summary['types_noop'][event['resource-type']] = 1
-            else:
-                summary['types_noop'][event['resource-type']] += 1
+                if t_event['status'] == 'noop':
+                    # Classes
+                    if not t_event['containing-class'] in summary['classes_noop']:
+                        summary['classes_noop'][t_event['containing-class']] = 1
+                    else:
+                        summary['classes_noop'][t_event['containing-class']] += 1
+                    # Nodes
+                    if not t_event['certname'] in summary['nodes_noop']:
+                        summary['nodes_noop'][t_event['certname']] = 1
+                    else:
+                        summary['nodes_noop'][t_event['certname']] += 1
+                    # Resources
+                    if not t_event['resource-title'] in summary['resources_noop']:
+                        summary['resources_noop'][t_event['resource-title']] = 1
+                    else:
+                        summary['resources_noop'][t_event['resource-title']] += 1
+                    # Types
+                    if not t_event['resource-type'] in summary['types_noop']:
+                        summary['types_noop'][t_event['resource-type']] = 1
+                    else:
+                        summary['types_noop'][t_event['resource-type']] += 1
 
-        if event['status'] == 'failure':
-            # Classes
-            if not event['containing-class'] in summary['classes_failure']:
-                summary['classes_failure'][event['containing-class']] = 1
-            else:
-                summary['classes_failure'][event['containing-class']] += 1
-            # Nodes
-            if not event['certname'] in summary['nodes_failure']:
-                summary['nodes_failure'][event['certname']] = 1
-            else:
-                summary['nodes_failure'][event['certname']] += 1
-            # Resources
-            if not event['resource-title'] in summary['resources_failure']:
-                summary['resources_failure'][event['resource-title']] = 1
-            else:
-                summary['resources_failure'][event['resource-title']] += 1
-            # Types
-            if not event['resource-type'] in summary['types_failure']:
-                summary['types_failure'][event['resource-type']] = 1
-            else:
-                summary['types_failure'][event['resource-type']] += 1
+                if t_event['status'] == 'failure':
+                    # Classes
+                    if not t_event['containing-class'] in summary['classes_failure']:
+                        summary['classes_failure'][t_event['containing-class']] = 1
+                    else:
+                        summary['classes_failure'][t_event['containing-class']] += 1
+                    # Nodes
+                    if not t_event['certname'] in summary['nodes_failure']:
+                        summary['nodes_failure'][t_event['certname']] = 1
+                    else:
+                        summary['nodes_failure'][t_event['certname']] += 1
+                    # Resources
+                    if not t_event['resource-title'] in summary['resources_failure']:
+                        summary['resources_failure'][t_event['resource-title']] = 1
+                    else:
+                        summary['resources_failure'][t_event['resource-title']] += 1
+                    # Types
+                    if not t_event['resource-type'] in summary['types_failure']:
+                        summary['types_failure'][t_event['resource-type']] = 1
+                    else:
+                        summary['types_failure'][t_event['resource-type']] += 1
 
-        if event['status'] == 'skipped':
-            # Classes
-            if not event['containing-class'] in summary['classes_skipped']:
-                summary['classes_skipped'][event['containing-class']] = 1
-            else:
-                summary['classes_skipped'][event['containing-class']] += 1
-            # Nodes
-            if not event['certname'] in summary['nodes_skipped']:
-                summary['nodes_skipped'][event['certname']] = 1
-            else:
-                summary['nodes_skipped'][event['certname']] += 1
-            # Resources
-            if not event['resource-title'] in summary['resources_skipped']:
-                summary['resources_skipped'][event['resource-title']] = 1
-            else:
-                summary['resources_skipped'][event['resource-title']] += 1
-            # Types
-            if not event['resource-type'] in summary['types_skipped']:
-                summary['types_skipped'][event['resource-type']] = 1
-            else:
-                summary['types_skipped'][event['resource-type']] += 1
+                if t_event['status'] == 'skipped':
+                    # Classes
+                    if not t_event['containing-class'] in summary['classes_skipped']:
+                        summary['classes_skipped'][t_event['containing-class']] = 1
+                    else:
+                        summary['classes_skipped'][t_event['containing-class']] += 1
+                    # Nodes
+                    if not t_event['certname'] in summary['nodes_skipped']:
+                        summary['nodes_skipped'][t_event['certname']] = 1
+                    else:
+                        summary['nodes_skipped'][t_event['certname']] += 1
+                    # Resources
+                    if not t_event['resource-title'] in summary['resources_skipped']:
+                        summary['resources_skipped'][t_event['resource-title']] = 1
+                    else:
+                        summary['resources_skipped'][t_event['resource-title']] += 1
+                    # Types
+                    if not t_event['resource-type'] in summary['types_skipped']:
+                        summary['types_skipped'][t_event['resource-type']] = 1
+                    else:
+                        summary['types_skipped'][t_event['resource-type']] += 1
+                out_q.put(i)
+                q.task_done()
+
+        for i in range(threads):
+            worker = Thread(target=db_threaded_requests, args=(i, jobs_q))
+            worker.setDaemon(True)
+            worker.start()
+
+        for single_event in all_events:
+            jobs_q.put(single_event)
+        jobs_q.join()
+
+        while True:
+            try:
+                out_q.get_nowait()
+            except queue.Empty:
+                break
+    import datetime
+    print(datetime.datetime.now())
+    sort_events(events_hash)
+    print(datetime.datetime.now())
     # count totals
     # Classes
     summary['classes_total'] = len(summary['classes_success']) + len(summary['classes_noop']) + len(
@@ -154,11 +183,12 @@ def get_events_summary(timespan='latest'):
 
 def get_report(key, value):
     # If key is any of the below, all is good!
-    if key == 'certname' or key == 'resource-title' or key == 'resource-type' or key == 'containing-class':
+    allowed_keys = ['certname', 'resource-title', 'resource-type', 'containing-class']
+    if key in allowed_keys:
         pass
     # If key does not match above the default will be shown
     else:
-        key == 'containing-class'
+        key = 'containing-class'
 
     events_params = {
         'query':
