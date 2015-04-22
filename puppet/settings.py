@@ -143,6 +143,11 @@ if AUTH_METHOD == "LDAP":
             },
         }
     }
+else:
+    AUTHENTICATION_BACKENDS = (
+        'django.contrib.auth.backends.ModelBackend',
+    )
+    LOGIN_URL = '/pano/login/'
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/
