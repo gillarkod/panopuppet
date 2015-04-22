@@ -28,9 +28,9 @@
             </tr>
             </thead>
             <colgroup>
-                <col span="1" style="width: 20%;">
-                <!-- Class -->
                 <col span="1" style="width: 15%;">
+                <!-- Class -->
+                <col span="1" style="width: 20%;">
                 <!-- Title -->
                 <col span="1" style="width: 15%;">
                 <!-- Timestamp -->
@@ -51,7 +51,7 @@
                         {% elif event.status == 'noop' %}class="bg-info parent"
                         {% elif event.status == 'skipped' %}class="bg-warning parent"{% endif %}>
                         <td><strong>{{ event|get_item:'certname' }}</strong></td>
-                        <td style="word-wrap:break-word;">{{ event|get_item:'resource-title' }}</td>
+                        <td style="word-wrap:break-word; word-break: break-all">{{ event|get_item:'resource-title' }}</td>
                         <td>{{ event|get_item:'timestamp'|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
                         <td>{{ event|get_item:'resource-type' }}</td>
                         <td>{{ event.property }}</td>
