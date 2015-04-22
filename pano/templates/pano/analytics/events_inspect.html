@@ -18,7 +18,7 @@
                class="table table-condensed tablesorter">
             <thead>
             <tr>
-                <th>Class</th>
+                <th>Certname</th>
                 <th>Title</th>
                 <th>Event Time</th>
                 <th>Type</th>
@@ -50,7 +50,7 @@
                         {% elif event.status == 'failure' %}class="bg-danger parent"
                         {% elif event.status == 'noop' %}class="bg-info parent"
                         {% elif event.status == 'skipped' %}class="bg-warning parent"{% endif %}>
-                        <td>{{ event|get_item:'containing-class' }}</td>
+                        <td><strong>{{ event|get_item:'certname' }}</strong></td>
                         <td style="word-wrap:break-word;">{{ event|get_item:'resource-title' }}</td>
                         <td>{{ event|get_item:'timestamp'|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
                         <td>{{ event|get_item:'resource-type' }}</td>
