@@ -144,10 +144,7 @@ def summary_of_events(events_hash):
                 out_q.get_nowait()
             except queue.Empty:
                 break
-    import datetime
-    print(datetime.datetime.now())
     sort_events(events_hash)
-    print(datetime.datetime.now())
     # count totals
     # Classes
     summary['classes_total'] = len(summary['classes_success']) + len(summary['classes_noop']) + len(
