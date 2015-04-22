@@ -10,9 +10,28 @@
 {% block details %}
     <div class="panel-heading">
         <h1 class="panel-title">
+            Filters
+        </h1>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-4"></div>
+            <div class="col-md-1"><input type="checkbox" id="success" name="success" value="success" checked>
+                Success<br></div>
+            <div class="col-md-1"><input type="checkbox" id="noop" name="noop" value="noop" checked> Noop<br></div>
+            <div class="col-md-1"><input type="checkbox" id="skipped" name="skipped" value="skipped" checked> Skipped<br>
+            </div>
+            <div class="col-md-1"><input type="checkbox" id="failure" name="failure" value="failure" checked> Failed<br>
+            </div>
+            <div class="col-md-4"></div>
+        </div>
+    </div>
+    <div class="panel-heading">
+        <h1 class="panel-title">
             Details {{ show_title }}
         </h1>
     </div>
+
     <div class="table-responsive">
         <table id="detailsTable" style="border-collapse: separate"
                class="table table-condensed tablesorter">
@@ -125,5 +144,29 @@
         $('#filebucketModal').on('hidden.bs.modal', function (e) {
             $(this).removeData('bs.modal');
         })
+    </script>
+    <script>
+        $("#success").change(function () {
+            var self = this;
+            $("#detailsTable tr.bg-success").toggle(self.checked);
+        }).change();
+    </script>
+    <script>
+        $("#noop").change(function () {
+            var self = this;
+            $("#detailsTable tr.bg-info").toggle(self.checked);
+        }).change();
+    </script>
+    <script>
+        $("#skipped").change(function () {
+            var self = this;
+            $("#detailsTable tr.bg-warning").toggle(self.checked);
+        }).change();
+    </script>
+    <script>
+        $("#failure").change(function () {
+            var self = this;
+            $("#detailsTable tr.bg-danger").toggle(self.checked);
+        }).change();
     </script>
 {% endblock %}
