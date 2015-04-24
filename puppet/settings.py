@@ -83,7 +83,7 @@ DATABASES = {
 from pano.settings import AUTH_METHOD, LDAP_SERVER, LDAP_BIND_DN, LDAP_BIND_PW, LDAP_ALLOW_GRP, LDAP_USEARCH_PATH, \
     LDAP_GSEARCH_PATH
 
-if AUTH_METHOD == "LDAP":
+if AUTH_METHOD == 'ldap':
     import ldap
     from django_auth_ldap.config import LDAPSearch, ActiveDirectoryGroupType
 
@@ -143,7 +143,7 @@ if AUTH_METHOD == "LDAP":
             },
         }
     }
-else:
+else:  # or otherwise known as 'basic' auth
     AUTHENTICATION_BACKENDS = (
         'django.contrib.auth.backends.ModelBackend',
     )
