@@ -203,24 +203,23 @@ WSGISocketPrefix /var/run/wsgi
 ```
 
 10) Configure PanoPuppet
-`$ cp /srv/repo/panopuppet/pano/settings.py.example /srv/repo/panopuppet/pano/settings.py`
+`$ cp /srv/repo/panopuppet/config.yaml.example /srv/repo/panopuppet/config.yaml`
 Use your favourite text editor to modify the file with the correct values for your envionrment.
+Please note that the example configuration file contains an example for puppetdb connection with and without SSL.
 
-You also need to modify the file `/srv/repo/panopuppet/puppet/settings.py`. This is the django configuration.
+Depending on your puppet infrastructure you may or may not need to specify public, private and cacert to authenticate
+with puppetdb, puppetmaster filebucket and fileserver.
 
-The following line numbers are important that you take a look at...
-```
-21 - Secret key
-24, 26 - Debug Values for the lines 24 and 26 should be set to False when running in production.
-28 - Allowed hosts should be set to something sensible so that people can access it. I use ['*'] because i'm so sensible
-150-154 - Timezone and locale settings. Set the timezone to something you feel is "home"
-```
 
 11) Populate the /srv/staticfiles with the staticfiles
 `$ cd /srv/repo/panopuppet`
 `$ python manage.py collectstatic` Say yes to the question it might ask about overwriting files in the /srv/collectstatic folder.
 
-12) Modify `pano/settings.py` so that the settings are configured for your puppet infrastructure.
+12) chown the /srv/repo/panopuppet directory recursively to the http user you want running panopuppet.
+This is to make sure that the panopuppet application can access the local database containing users etc.
+Support for other databases will be added at a later time.
+Make sure to replace 'apache' with the appropriate user and group.
+` chown -R apache:apache /srv/repo/panopuppet`
 
 13) Populate the django database so that users logging in with LDAP or local users are populated into django.
 `$ python manage.py migrate`
@@ -235,8 +234,6 @@ You are able to create some other users in the admin page located at http://pano
 
 
 ### Notes
-
-
 
 
 ### Available branches
