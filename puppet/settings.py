@@ -8,6 +8,12 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.7/ref/settings/
 """
 
+import yaml
+
+with open("config.yaml", 'r') as ymlfile:
+    cfg = yaml.load(ymlfile)
+
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 
@@ -18,15 +24,18 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'change_this_to_something_secret'
+SECRET_KEY = cfg.get('SECRET_KEY', None)
+if SECRET_KEY is None:
+    print('Secret is not specified')
+    exit(1)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-TEMPLATE_DEBUG = True
-
-ALLOWED_HOSTS = ['127.0.0.1']
-
+DEBUG = cfg.get('DEBUG', True)
+TEMPLATE_DEBUG = cfg.get('TEMPLATE_DEBUG', True)
+ALLOWED_HOSTS = cfg.get('ALLOWED_HOSTS', ['127.0.0.1'])
+if type(ALLOWED_HOSTS) != list:
+    print('ALLOWED_HOSTS must be specified as an array.')
+    exit(1)
 
 # Application definition
 
@@ -152,8 +161,8 @@ else:  # or otherwise known as 'basic' auth
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/
 
-LANGUAGE_CODE = 'sv-SE'
-TIME_ZONE = 'Europe/Stockholm'
+LANGUAGE_CODE = cfg.get('LANGUAGE_CODE', 'sv-SE')
+TIME_ZONE = cfg.get('TIME_ZONE', 'Europe/Stockholm')
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
