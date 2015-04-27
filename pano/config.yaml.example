@@ -1,0 +1,50 @@
+# Time to hold the cache for pages - specified in seconds
+CACHE_TIME: 60
+
+# SSL CONFIGURATION FOR PUPPETDB
+PUPPETDB_HOST: 'https://puppetdb.example.com:8081/'
+PUPPETDB_CERTIFICATES:
+  - '/path/to/public.key'
+  - '/path/to/private.key'
+PUPPETDB_VERIFY_SSL: '/path/to/cacert'
+
+PUPPETDB_HOST: 'http://puppetdb.example.com:8080/'
+
+# NON SSL CONFIGRURATION FOR PUPPETDB
+# Clientbucket Settings -- For SSL read the SSL configuration example for Clientbucket on the puppetmaster
+# Disable support for clientbucket with false and enable with true
+# If false the other clientbucket configuration lines will be ignored.
+PUPPETMASTER_CLIENTBUCKET_SHOW: false
+
+PUPPETMASTER_CLIENTBUCKET_HOST: 'https://puppetmaster.example.com:8140/'
+PUPPETMASTER_CLIENTBUCKET_CERTIFICATES:
+  - '/path/to/public.key'
+  - '/path/to/private.key'
+PUPPETMASTER_CLIENTBUCKET_VERIFY_SSL: false
+
+# Fileserver Settings
+# Disable support for fileserver with false and enable with true
+# If false the other fileserver configuration lines will be ignored.
+PUPPETMASTER_FILESERVER_SHOW: false
+PUPPETMASTER_FILESERVER_HOST: 'https://puppetmaster.example.com:8140/'
+PUPPETMASTER_FILESERVER_CERTIFICATES:
+  - '/path/to/public.key'
+  - '/path/to/private.key'
+PUPPETMASTER_FILESERVER_VERIFY_SSL: '/path/to/ca.pem'
+
+# Puppet Agent Run Interval
+PUPPET_RUN_INTERVAL: 30
+
+# Authentication method
+# Available auth methods = ldap and None
+AUTH_METHOD: None
+
+#LDAP Authentication
+LDAP_METHOD: 'ldap'
+LDAP_SERVER: 'ldap://ldap.forumsys.com'
+LDAP_BIND_DN: 'cn=read-only-admin,dc=example,dc=com'
+LDAP_BIND_PW: 'password'
+LDAP_USEARCH_PATH: 'dc=example,dc=com'
+LDAP_GSEARCH_PATH:
+LDAP_ALLOW_GRP:
+LDAP_DENY_GRP:
