@@ -40,7 +40,7 @@ PUPPET_RUN_INTERVAL: 30
 AUTH_METHOD: None
 
 #LDAP Authentication
-LDAP_METHOD: 'ldap'
+AUTH_METHOD: 'ldap'
 LDAP_SERVER: 'ldap://ldap.forumsys.com'
 LDAP_BIND_DN: 'cn=read-only-admin,dc=example,dc=com'
 LDAP_BIND_PW: 'password'
