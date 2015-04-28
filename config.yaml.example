@@ -40,7 +40,15 @@ CACHE_TIME: 60
 
 # Authentication method - Available auth methods = ldap and basic
 AUTH_METHOD: 'basic'
-
+# Or if you want ldap authentication
+AUTH_METHOD: 'ldap'
+LDAP_SERVER: 'ldap://ldap.forumsys.com'
+LDAP_BIND_DN: 'cn=read-only-admin,dc=example,dc=com'
+LDAP_BIND_PW: 'password'
+LDAP_USEARCH_PATH: 'dc=example,dc=com'
+LDAP_GSEARCH_PATH:
+LDAP_ALLOW_GRP:
+LDAP_DENY_GRP:
 
 ########################
 # DJANGO CONFIGURATION #
