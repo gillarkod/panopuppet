@@ -730,3 +730,8 @@ def event_analytics(request, view='summary'):
     context['show_title'] = title
     # if the above went well and did not reach the else clause we can also return the awesome.
     return render(request, 'pano/analytics/events_inspect.html', context)
+
+
+@login_required
+def api(request):
+    return False
