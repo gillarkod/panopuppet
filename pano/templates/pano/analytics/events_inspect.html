@@ -156,23 +156,32 @@
         })
     </script>
     <script>
+        function hideRows() {
+            // hide child rows
+            $('.tablesorter-childRow td').hide();
+        };
+
         $("#success").change(function () {
             var self = this;
+            hideRows()
             $("#detailsTable tr.bg-success").toggle(self.checked);
         }).change();
 
         $("#noop").change(function () {
             var self = this;
+            hideRows()
             $("#detailsTable tr.bg-info").toggle(self.checked);
         }).change();
 
         $("#skipped").change(function () {
             var self = this;
+            hideRows()
             $("#detailsTable tr.bg-warning").toggle(self.checked);
         }).change();
 
         $("#failure").change(function () {
             var self = this;
+            hideRows()
             $("#detailsTable tr.bg-danger").toggle(self.checked);
         }).change();
     </script>
