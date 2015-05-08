@@ -80,7 +80,7 @@ def index(request, certname=None):
                     'field': 'report-timestamp',
                     'order': 'desc',
                 },
-                'query-field': {'field': 'name'},
+                'query-field': {'field': 'certname'},
             },
         }
 
@@ -98,6 +98,7 @@ def index(request, certname=None):
                 'path': '/metrics/mbean/com.puppetlabs.puppetdb.query.population:type=default,name=avg-resources-per-node',
             },
             'all_nodes': {
+                'api_version': 'v4',
                 'id': 'all_nodes',
                 'path': '/nodes',
             },
@@ -107,6 +108,7 @@ def index(request, certname=None):
                 'params': events_params,
             },
             'nodes': {
+                'api_version': 'v4',
                 'id': 'nodes',
                 'path': '/nodes',
                 'params': nodes_params,
@@ -208,7 +210,7 @@ def nodes(request, certname=None):
             node_params = {
                 'query':
                     {
-                        1: '["~","name","' + search_node + '"]'
+                        1: search_node
                     },
             }
         else:
@@ -217,6 +219,7 @@ def nodes(request, certname=None):
             }
 
         node_list = puppetdb.api_get(path='/nodes',
+                                     api_version='v4',
                                      params=puppetdb.mk_puppetdb_query(
                                          node_params),
                                      )

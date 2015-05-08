@@ -6,67 +6,92 @@
 {% block head %}
     {% load staticfiles %}
     <script src="{% static 'pano/js/query-builder.js' %}"></script>
+    <script src="{% static 'pano/js/bootbox.min.js' %}"></script>
     <link rel="stylesheet" href="{% static 'pano/css/query-filter.css' %}">
 {% endblock %}
 
 {% block content %}
-        {% csrf_token %}
-        <div class="row">
-            <div class="col-md-12">
-                <div id="builder">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel-group" id="filters_accordion" role="tablist" aria-multiselectable="true">
+                <div class="panel panel-primary">
+                    <div role="tab" class="panel-heading" id="headingFilter">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#filters_accordion" href="#collapseFilter"
+                               aria-expanded="false" aria-controls="collapseFilter">
+                                Query Builder
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapseFilter" class="panel-collapse collapse in" role="tabpanel"
+                         aria-labelledby="headingFilter">
+                        <div class="panel-body">
+                            <div id="builder-nodes"></div>
+                            <div class="btn-group">
+                                <form id="searchform" action="{% url 'nodes' %}" method="get">
+                                    <input type="hidden" id="search" name="search" value=""/>
+                                </form>
+                                <button class="btn btn-primary search-puppet" data-target="nodes">Search</button>
+                                <button class="btn btn-primary parse-puppet" data-target="nodes">Generate</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+    </div>
     <script>
-        $('#builder').queryBuilder({
-            plugins: ['bt-tooltip-errors'],
+        $('#builder-nodes').queryBuilder({
+            plugins: [
+                'bt-tooltip-errors',
+                'filter-description'],
 
-            filters: [{
-                id: 'name',
-                label: 'Name',
-                type: 'string'
-            }, {
-                id: 'category',
-                label: 'Category',
-                type: 'integer',
-                input: 'select',
-                values: {
-                    1: 'certname',
-                    2: 'resource-title',
-                    3: 'Music',
-                    4: 'Tools',
-                    5: 'Goodies',
-                    6: 'Clothes'
+            filters: [
+                {
+                    id: 'certname',
+                    label: 'Certname',
+                    type: 'string',
+                    description: 'Enter the FQDN for a node in Puppet.',
+                    operators: ['equal', 'regex_match'],
+                    placeholder: 'host.example.com'
                 },
-                operators: ['equal', 'not_equal', 'in', 'not_in', 'is_null', 'is_not_null']
-            }, {
-                id: 'in_stock',
-                label: 'In stock',
-                type: 'integer',
-                input: 'radio',
-                values: {
-                    1: 'Yes',
-                    0: 'No'
+                {
+                    id: 'facts',
+                    label: 'Fact',
+                    type: 'string',
+                    description: 'The fact name should be in the first text field and the fact value should be in the second text field.',
+                    operators: ['puppet_equal', 'puppet_nequal', 'puppet_g', 'puppet_ge', 'puppet_l', 'puppet_le', 'puppet_re_match', 'is_null'],
+                    placeholder: 'Fact, Value'
                 },
-                operators: ['equal']
-            }, {
-                id: 'price',
-                label: 'Price',
-                type: 'double',
-                validation: {
-                    min: 0,
-                    step: 0.01
+                {
+                    id: 'resources',
+                    label: 'Resource',
+                    type: 'string',
+                    description: 'The resource type should be entered into the first text field (i.e "Package") and the resource title should be in the second tex field (i.e "Puppet")',
+                    operators: ['puppet_equal', 'puppet_nequal','puppet_g', 'puppet_ge', 'puppet_l', 'puppet_le', 'puppet_re_match', 'is_null'],
+                    placeholder: 'Type, Name'
                 }
-            }, {
-                id: 'id',
-                label: 'Identifier',
-                type: 'string',
-                placeholder: '____-____-____',
-                operators: ['equal', 'not_equal'],
-                validation: {
-                    format: /^.{4}-.{4}-.{4}$/
-                }
-            }],
+            ]
+        });
+    </script>
+    <script>
+        // get rules
+        $('.parse-puppet').on('click', function () {
+            var res = $('#builder-' + $(this).data('target')).queryBuilder('getPuppet');
+            if (!$.isEmptyObject(res)) {
+                bootbox.alert({
+                    title: $(this).text(),
+                    message: '<pre class="code-popup">' + res + '</pre>'
+                });
+            }
+        });
+        $('.search-puppet').on('click', function () {
+            var res = $('#builder-' + $(this).data('target')).queryBuilder('getPuppet');
+            if (!$.isEmptyObject(res)) {
+                $('#search').val(res);
+                $('#searchform').submit();
+            }
         });
     </script>
     <div class="row">
