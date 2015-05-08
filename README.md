@@ -244,6 +244,11 @@ You are able to create some other users in the admin page located at http://pano
 15) Restart Httpd service and it should work.
 `/etc/init.d/httpd restart`
 
+# Upgrading
+Upgrading PanoPuppet should be no harder than doing a git pull origin/master in the /srv/repo/panopuppet directory.
+But its recommended to run the collectstatic command again in case new css/javascripts have been added so that they
+are served to your clients. Also make sure to read the config.yaml.example file and see if any new variables have been
+implemented!
 
 ### Notes
 
