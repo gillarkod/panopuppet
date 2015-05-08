@@ -1,10 +1,11 @@
 from django.shortcuts import redirect, render
 from django.http import HttpResponseBadRequest, HttpResponseRedirect, HttpResponse
-import pytz
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.views.decorators.cache import cache_page
+import pytz
+import datetime
 
 from pano.puppetdb import puppetdb
 from pano.methods.dictfuncs import dictstatus as dictstatus
@@ -13,7 +14,8 @@ from pano.settings import CACHE_TIME
 from pano.puppetdb.pdbutils import run_puppetdb_jobs, json_to_datetime
 from pano.methods.filebucket import get_file as get_filebucket
 from pano.methods import events
-
+import csv
+from django.http import StreamingHttpResponse
 
 def logout_view(request):
     logout(request)
@@ -57,6 +59,14 @@ def splash(request):
                    'username': user}
         return render(request, 'pano/splash.html', context)
 
+
+class Echo(object):
+    """An object that implements just the write method of the file-like
+    interface.
+    """
+    def write(self, value):
+        """Write the value by returning it, instead of storing in a buffer."""
+        return value
 
 @login_required
 @cache_page(CACHE_TIME)
@@ -191,21 +201,20 @@ def nodes(request, certname=None):
             limits = int(request.GET.get('limits', 50))
             if limits <= 0:
                 limits = 50
-        except:
-            return HttpResponseBadRequest('Oh no! Your filters were invalid.')
-
-        page_num = int(request.GET.get('page', 1))
-
-        try:
             sort_field = str(request.GET.get('sortfield', 'latestReport'))
-        except:
-            return HttpResponseBadRequest('Oh no! Your filters were invalid.')
-        try:
             sort_field_order = str(request.GET.get('sortfieldby', 'desc'))
+            page_num = int(request.GET.get('page', 1))
+            # Search parameters takes a valid puppetdb query string
+            search_node = request.GET.get('search', None)
+            # If user requested to download csv formatted file. Default value is False
+            dl_csv = request.GET.get('dl_csv', False)
+            if dl_csv == 'true':
+                dl_csv = True
+            else:
+                dl_csv = False
         except:
             return HttpResponseBadRequest('Oh no! Your filters were invalid.')
 
-        search_node = request.GET.get('search', None)
         if search_node is not None:
             node_params = {
                 'query':
@@ -257,6 +266,31 @@ def nodes(request, certname=None):
             merged_list = dictstatus(
                 node_list, report_list, sortby=sort_field, asc=False)
             sort_field_order_opposite = 'desc'
+
+        if dl_csv is True:
+            if merged_list == []:
+                pass
+            else:
+                # Generate a sequence of rows. The range is based on the maximum number of
+                # rows that can be handled by a single sheet in most spreadsheet
+                # applications.
+                csv_headers = ('Certname',
+                               'Latest Catalog',
+                               'Latest Report',
+                               'Latest Facts',
+                               'Success',
+                               'Noop',
+                               'Failure',
+                               'Skipped')
+
+                merged_list.insert(0, csv_headers)
+                rows = merged_list
+                pseudo_buffer = Echo()
+                writer = csv.writer(pseudo_buffer)
+                response = StreamingHttpResponse((writer.writerow(row) for row in rows),
+                                                 content_type="text/csv")
+                response['Content-Disposition'] = 'attachment; filename="puppetdata-%s.csv"' % (datetime.datetime.now())
+                return response
         paginator = Paginator(merged_list, limits)
 
         try:

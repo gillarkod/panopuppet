@@ -31,6 +31,7 @@
                             <div class="btn-group">
                                 <form id="searchform" action="{% url 'nodes' %}" method="get">
                                     <input type="hidden" id="search" name="search" value=""/>
+                                    <input type="hidden" id="dl_csv" name="dl_csv" value="false"/>
                                 </form>
                                 <button class="btn btn-primary search-puppet" data-target="nodes">Search</button>
                                 <button class="btn btn-primary parse-puppet" data-target="nodes">Generate</button>
@@ -145,6 +146,9 @@
                 {% endif %}
                 </tbody>
                 <tfoot>
+                <tr>
+                    <td><strong>Download as: </strong><a href="?{% if request.GET.search %}search={{ request.GET.search }}{% endif %}&dl_csv=true">CSV</a></td>
+                </tr>
                 <tr>
                     <td colspan="8">
                         <ul class="pagination pagination-sm">
