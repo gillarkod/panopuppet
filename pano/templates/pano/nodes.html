@@ -3,19 +3,97 @@
 {% load puppetdb_extras %}
 {% load common %}
 
+{% block head %}
+    {% load staticfiles %}
+    <script src="{% static 'pano/js/query-builder.js' %}"></script>
+    <script src="{% static 'pano/js/bootbox.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'pano/css/query-filter.css' %}">
+{% endblock %}
+
 {% block content %}
-    <form action="{% url 'nodes' %}" method="GET">
-        {% csrf_token %}
-        <div class="row">
-            <div class="col-md-12">
-            <span class="dropdown-header">Search for node:<br>
-                 <label for="search">
-                     <input class="form-control input-sm" name="search" id="search" type="text">
-                 </label>
-            </span>
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel-group" id="filters_accordion" role="tablist" aria-multiselectable="true">
+                <div class="panel panel-primary">
+                    <div role="tab" class="panel-heading" id="headingFilter">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#filters_accordion" href="#collapseFilter"
+                               aria-expanded="false" aria-controls="collapseFilter">
+                                Query Builder
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapseFilter" class="panel-collapse collapse in" role="tabpanel"
+                         aria-labelledby="headingFilter">
+                        <div class="panel-body">
+                            <div id="builder-nodes"></div>
+                            <div class="btn-group">
+                                <form id="searchform" action="{% url 'nodes' %}" method="get">
+                                    <input type="hidden" id="search" name="search" value=""/>
+                                </form>
+                                <button class="btn btn-primary search-puppet" data-target="nodes">Search</button>
+                                <button class="btn btn-primary parse-puppet" data-target="nodes">Generate</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </form>
+    </div>
+    <script>
+        $('#builder-nodes').queryBuilder({
+            plugins: [
+                'bt-tooltip-errors',
+                'filter-description'],
+
+            filters: [
+                {
+                    id: 'certname',
+                    label: 'Certname',
+                    type: 'string',
+                    description: 'Enter the FQDN for a node in Puppet.',
+                    operators: ['equal', 'regex_match'],
+                    placeholder: 'host.example.com'
+                },
+                {
+                    id: 'facts',
+                    label: 'Fact',
+                    type: 'string',
+                    description: 'The fact name should be in the first text field and the fact value should be in the second text field.',
+                    operators: ['puppet_equal', 'puppet_nequal', 'puppet_g', 'puppet_ge', 'puppet_l', 'puppet_le', 'puppet_re_match', 'is_null'],
+                    placeholder: 'Fact, Value'
+                },
+                {
+                    id: 'resources',
+                    label: 'Resource',
+                    type: 'string',
+                    description: 'The resource type should be entered into the first text field (i.e "Package") and the resource title should be in the second tex field (i.e "Puppet")',
+                    operators: ['puppet_equal', 'puppet_nequal','puppet_g', 'puppet_ge', 'puppet_l', 'puppet_le', 'puppet_re_match', 'is_null'],
+                    placeholder: 'Type, Name'
+                }
+            ]
+        });
+    </script>
+    <script>
+        // get rules
+        $('.parse-puppet').on('click', function () {
+            var res = $('#builder-' + $(this).data('target')).queryBuilder('getPuppet');
+            if (!$.isEmptyObject(res)) {
+                bootbox.alert({
+                    title: $(this).text(),
+                    message: '<pre class="code-popup">' + res + '</pre>'
+                });
+            }
+        });
+        $('.search-puppet').on('click', function () {
+            var res = $('#builder-' + $(this).data('target')).queryBuilder('getPuppet');
+            if (!$.isEmptyObject(res)) {
+                $('#search').val(res);
+                $('#searchform').submit();
+            }
+        });
+    </script>
     <div class="row">
         <div class="col-md-12">
             <table class="table table-condensed table-striped">
@@ -46,18 +124,18 @@
                             {% endif %}
                             </td>
                             <td>{{ node.3|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
-                                <td style="text-align: center"><p style="margin-bottom: 0"
-                                                                  class="bg-success img-rounded">
-                                    <strong>{{ node.4 }}</strong></p></td>
-                                <td style="text-align: center"><p style="margin-bottom: 0"
-                                                                  class="bg-info img-rounded">
-                                    <strong>{{ node.5 }}</strong></p></td>
-                                <td style="text-align: center"><p style="margin-bottom: 0"
-                                                                  class="bg-danger img-rounded">
-                                    <strong>{{ node.6 }}</strong></p></td>
-                                <td style="text-align: center"><p style="margin-bottom: 0"
-                                                                  class="bg-warning img-rounded">
-                                    <strong>{{ node.7 }}</strong></p></td>
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-success img-rounded">
+                                <strong>{{ node.4 }}</strong></p></td>
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-info img-rounded">
+                                <strong>{{ node.5 }}</strong></p></td>
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-danger img-rounded">
+                                <strong>{{ node.6 }}</strong></p></td>
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-warning img-rounded">
+                                <strong>{{ node.7 }}</strong></p></td>
                         </tr>
                     {% endfor %}
                 {% else %}

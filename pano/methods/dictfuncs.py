@@ -103,14 +103,14 @@ def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_st
     for node in node_dict:
         found_node = False
         for status in status_dict:
-            if node['name'] == status['subject']['title']:
+            if node['certname'] == status['subject']['title']:
                 found_node = True
                 if get_status == "all":
                     merged_list.append((
-                        node['name'],
-                        node['catalog_timestamp'] or '',
-                        node['report_timestamp'] or '',
-                        node['facts_timestamp'] or '',
+                        node['certname'],
+                        node['catalog-timestamp'] or '',
+                        node['report-timestamp'] or '',
+                        node['facts-timestamp'] or '',
                         status['successes'],
                         status['noops'],
                         status['failures'],
@@ -120,35 +120,35 @@ def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_st
                     # If the node has failures
                     if status['failures'] > 0:
                         failed_list.append((
-                            node['name'],
-                            node['catalog_timestamp'] or '',
-                            node['report_timestamp'] or '',
-                            node['facts_timestamp'] or '',
+                            node['certname'],
+                            node['catalog-timestamp'] or '',
+                            node['report-timestamp'] or '',
+                            node['facts-timestamp'] or '',
                             status['successes'],
                             status['noops'],
                             status['failures'],
                             status['skips'],
                         ))
-                    if check_failed_compile(report_timestamp=node.get('report_timestamp', None),
-                                            fact_timestamp=node.get('facts_timestamp', None),
-                                            catalog_timestamp=node.get('catalog_timestamp', None)):
+                    if check_failed_compile(report_timestamp=node.get('report-timestamp', None),
+                                            fact_timestamp=node.get('facts-timestamp', None),
+                                            catalog_timestamp=node.get('catalog-timestamp', None)):
                         mismatch_list.append((
-                            node['name'],
-                            node['catalog_timestamp'] or '',
-                            node['report_timestamp'] or '',
-                            node['facts_timestamp'] or '',
+                            node['certname'],
+                            node['catalog-timestamp'] or '',
+                            node['report-timestamp'] or '',
+                            node['facts-timestamp'] or '',
                             status['successes'],
                             status['noops'],
                             status['failures'],
                             status['skips'],
                         ))
                     # If the node is unreported
-                    if is_unreported(node['report_timestamp']):
+                    if is_unreported(node['report-timestamp']):
                         unreported_list.append((
-                            node['name'],
-                            node['catalog_timestamp'] or '',
-                            node['report_timestamp'] or '',
-                            node['facts_timestamp'] or '',
+                            node['certname'],
+                            node['catalog-timestamp'] or '',
+                            node['report-timestamp'] or '',
+                            node['facts-timestamp'] or '',
                             status['successes'],
                             status['noops'],
                             status['failures'],
@@ -157,10 +157,10 @@ def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_st
                     # If the node has noops
                     if status['noops'] > 0 and status['successes'] == 0 and status['failures'] == 0 and status['skips'] == 0:
                         pending_list.append((
-                            node['name'],
-                            node['catalog_timestamp'] or '',
-                            node['report_timestamp'] or '',
-                            node['facts_timestamp'] or '',
+                            node['certname'],
+                            node['catalog-timestamp'] or '',
+                            node['report-timestamp'] or '',
+                            node['facts-timestamp'] or '',
                             status['successes'],
                             status['noops'],
                             status['failures'],
@@ -168,10 +168,10 @@ def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_st
                         ))
                     # The node was found in the events list so it has to have changed
                     changed_list.append((
-                        node['name'],
-                        node['catalog_timestamp'] or '',
-                        node['report_timestamp'] or '',
-                        node['facts_timestamp'] or '',
+                        node['certname'],
+                        node['catalog-timestamp'] or '',
+                        node['report-timestamp'] or '',
+                        node['facts-timestamp'] or '',
                         status['successes'],
                         status['noops'],
                         status['failures'],
@@ -182,10 +182,10 @@ def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_st
         if found_node is False:
             if get_status == "all":
                 merged_list.append((
-                    node['name'],
-                    node['catalog_timestamp'] or '',
-                    node['report_timestamp'] or '',
-                    node['facts_timestamp'] or '',
+                    node['certname'],
+                    node['catalog-timestamp'] or '',
+                    node['report-timestamp'] or '',
+                    node['facts-timestamp'] or '',
                     0,
                     0,
                     0,
@@ -193,25 +193,25 @@ def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_st
                 ))
             else:
                 # If the node is unreported
-                if is_unreported(node['report_timestamp']):
+                if is_unreported(node['report-timestamp']):
                     unreported_list.append((
-                        node['name'],
-                        node['catalog_timestamp'] or '',
-                        node['report_timestamp'] or '',
-                        node['facts_timestamp'] or '',
+                        node['certname'],
+                        node['catalog-timestamp'] or '',
+                        node['report-timestamp'] or '',
+                        node['facts-timestamp'] or '',
                         0,
                         0,
                         0,
                         0,
                     ))
-                if check_failed_compile(report_timestamp=node.get('report_timestamp', None),
-                                        fact_timestamp=node.get('facts_timestamp', None),
-                                        catalog_timestamp=node.get('catalog_timestamp', None)):
+                if check_failed_compile(report_timestamp=node.get('report-timestamp', None),
+                                        fact_timestamp=node.get('facts-timestamp', None),
+                                        catalog_timestamp=node.get('catalog-timestamp', None)):
                     mismatch_list.append((
-                        node['name'],
-                        node['catalog_timestamp'] or '',
-                        node['report_timestamp'] or '',
-                        node['facts_timestamp'] or '',
+                        node['certname'],
+                        node['catalog-timestamp'] or '',
+                        node['report-timestamp'] or '',
+                        node['facts-timestamp'] or '',
                         0,
                         0,
                         0,

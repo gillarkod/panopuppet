@@ -65,7 +65,10 @@ def api_get(api_url=PUPPETDB_HOST,
     if 'X-records' in resp.headers:
         return json.loads(resp.text), resp.headers
     else:
-        return json.loads(resp.text)
+        try:
+            return json.loads(resp.text)
+        except:
+            return []
 
 
 def mk_puppetdb_query(params):

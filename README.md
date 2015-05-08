@@ -1,7 +1,10 @@
 # PanoPuppet
+PanoPuppet is still the
 
 ## Requirements
 PuppetDB requires at least PuppetDB 2.0 or higher
+Puppetv3
+Puppetv4 has changed the endpoints for the filebucket and fileserver so you will not be able to view files
 
 It also assumes that you store puppet run reports in PuppetDB
 To be able to use Filebucket and Fileserver features and file diffs
@@ -16,10 +19,10 @@ you will need to have puppet masters filebucket and fileserver enabled.
 * Analytics Page providing insight into your puppet environment
 * LDAP Authentication
 * Events Analyzer (Like Events Inspector from Puppet Enterprise)
+* Search nodes by facts and subqueries (Query Builder)
 
 ## Future plans
 * Docker image to quickly install a panopuppet dashboard
-* Search nodes by facts and subqueries
 
 
 ### Introduction
@@ -37,6 +40,15 @@ suffer from a slow frontend. When you reach a point where the environment could
 have over 20k puppetized nodes you need something fast.
 
 This was written for a multi-tenant site across several datacenters.
+
+### Issues
+####QueryBuilder
+* I have seen some issues with the querybuilder and the usage of comparison operators. If you have stringify_facts enabled
+you may not be able to use the less/less or equal/greater/greater or equal operators since its not possible to
+compare string values "123" with "124". You will only be able to use the equal operator for these values.
+* PanoPuppet is still under development so there are still some missing cosmetic/helpful features. One of which for
+query-builder is that the filter you queried for will dissapear after the search. This is something that will be fixed
+later but the release of the code comes now so that you can test the new features.
 
 ### About the code
 
