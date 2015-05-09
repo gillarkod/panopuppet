@@ -167,13 +167,12 @@ def get_events_summary(timespan='latest'):
         events_params = {
             'query':
                 {
-                    1: '["=","latest-report?",true]'
+                    1: '["and",["=","latest-report?",true],["in", "certname",["extract", "certname",["select-nodes",["null?","deactivated",true]]]]]'
                 },
         }
     events = pdb_api_get(path='events/',
-                         api_version='v3',
-                         params=mk_puppetdb_query(
-                             events_params))
+                         api_version='v4',
+                         params=mk_puppetdb_query(events_params))
     summary = summary_of_events(events)
     return summary
 
