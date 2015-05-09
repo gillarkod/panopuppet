@@ -1,10 +1,22 @@
 # PanoPuppet
-PanoPuppet is still the
+PanoPuppet is still under development so be prepared for big changes.
+All config will be taken from a specific file. There will be a example config file
+you can work from, but remember that when upgrading to a new version panopuppet may
+break and you will need to follow the instructions specified in the upgrade section
+of this readme.
+
+While panopuppet is very stable there may be a few bugs here and there. I appreciate any
+Pull Requests or Issues created for me to take a look at. While there are no tests today
+to verify functionality, I am working on creating tests for verification.
+
+Thank you for taking your time to try PanoPuppet.
 
 ## Requirements
 PuppetDB requires at least PuppetDB 2.0 or higher
 Puppetv3
-Puppetv4 has changed the endpoints for the filebucket and fileserver so you will not be able to view files
+
+### Notes about puppetv4
+* Puppetv4 has changed the endpoints for the filebucket and fileserver so you will not be able to view files
 
 It also assumes that you store puppet run reports in PuppetDB
 To be able to use Filebucket and Fileserver features and file diffs
@@ -20,6 +32,7 @@ you will need to have puppet masters filebucket and fileserver enabled.
 * LDAP Authentication
 * Events Analyzer (Like Events Inspector from Puppet Enterprise)
 * Search nodes by facts and subqueries (Query Builder)
+* Export data to CSV
 
 ## Future plans
 * Docker image to quickly install a panopuppet dashboard
