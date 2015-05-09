@@ -23,7 +23,7 @@
 
             // widget code contained in the jquery.tablesorter.widgets.js file
             // use the zebra stripe widget if you plan on hiding any rows (filter widget)
-            widgets: ["uitheme", "filter", "zebra"],
+            widgets: ["uitheme", "zebra"],
 
             widgetOptions: {
                 // using the default zebra striping class name, so it actually isn't included in the theme variable above
@@ -105,47 +105,57 @@
         </div>
         <div class="row">
             <table class="table table-condensed table-striped tablesorter">
-                    <thead>
-                    <tr>
-                        <th>Certname</th>
-                        <th>Latest Catalog</th>
-                        <th>Latest Report</th>
-                        <th>Latest Facts</th>
-                        <th>Success</th>
-                        <th>Noop</th>
-                        <th>Failure</th>
-                        <th>Skipped</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% if node_list %}
-                        {% for node in node_list %}
-                            <tr>
-                                <td><a href="{% url 'reports' node.0 %}">{{ node.0 }}</a></td>
-                                <td>{{ node.1|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
-                                <td>{{ node.2|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
-                                <td>{{ node.3|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
-                                <td style="text-align: center"><p style="margin-bottom: 0"
-                                                                  class="bg-success img-rounded">
-                                    <strong>{{ node.4 }}</strong></p></td>
-                                <td style="text-align: center"><p style="margin-bottom: 0"
-                                                                  class="bg-info img-rounded">
-                                    <strong>{{ node.5 }}</strong></p></td>
-                                <td style="text-align: center"><p style="margin-bottom: 0"
-                                                                  class="bg-danger img-rounded">
-                                    <strong>{{ node.6 }}</strong></p></td>
-                                <td style="text-align: center"><p style="margin-bottom: 0"
-                                                                  class="bg-warning img-rounded">
-                                    <strong>{{ node.7 }}</strong></p></td>
-                            </tr>
-                        {% endfor %}
-                    {% else %}
+                <colgroup>
+                    <col span="1" style="width: 25%;">
+                    <col span="1" style="width: 15%;">
+                    <col span="1" style="width: 15%;">
+                    <col span="1" style="width: 15%;">
+                    <col span="1" style="width: 5%;">
+                    <col span="1" style="width: 5%;">
+                    <col span="1" style="width: 5%;">
+                    <col span="1" style="width: 5%;">
+                </colgroup>
+                <thead>
+                <tr>
+                    <th>Certname</th>
+                    <th>Latest Catalog</th>
+                    <th>Latest Report</th>
+                    <th>Latest Facts</th>
+                    <th>Success</th>
+                    <th>Noop</th>
+                    <th>Failure</th>
+                    <th>Skipped</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% if node_list %}
+                    {% for node in node_list %}
                         <tr>
-                            <td colspan="8">No nodes were found for this query.</td>
+                            <td><a href="{% url 'reports' node.0 %}">{{ node.0 }}</a></td>
+                            <td>{{ node.1|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
+                            <td>{{ node.2|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
+                            <td>{{ node.3|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-success img-rounded">
+                                <strong>{{ node.4 }}</strong></p></td>
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-info img-rounded">
+                                <strong>{{ node.5 }}</strong></p></td>
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-danger img-rounded">
+                                <strong>{{ node.6 }}</strong></p></td>
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-warning img-rounded">
+                                <strong>{{ node.7 }}</strong></p></td>
                         </tr>
-                    {% endif %}
-                    </tbody>
-                </table>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="8">No nodes were found for this query.</td>
+                    </tr>
+                {% endif %}
+                </tbody>
+            </table>
         </div>
     </div>
 {% endblock %}
