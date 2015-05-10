@@ -43,6 +43,14 @@
         </div>
     </div>
     <script>
+        {% if request.GET.search %}
+            {% with request.GET.search|query_to_rules as rules %}
+                {% autoescape off %}
+                var rules ={{ rules }};
+                {% endautoescape %}
+                console.log(rules);
+            {% endwith %}
+        {% endif %}
         $('#builder-nodes').queryBuilder({
             plugins: [
                 'bt-tooltip-errors',
@@ -73,7 +81,8 @@
                     operators: ['puppet_equal', 'puppet_nequal','puppet_g', 'puppet_ge', 'puppet_l', 'puppet_le', 'puppet_re_match', 'is_null'],
                     placeholder: 'Type, Name'
                 }
-            ]
+            ],
+            rules: rules
         });
     </script>
     <script>

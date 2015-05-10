@@ -1,16 +1,15 @@
 __author__ = 'etaklar'
 
-# Settings for clientbucket
-from pano.settings import PUPPETMASTER_CLIENTBUCKET_SHOW, PUPPETMASTER_CLIENTBUCKET_HOST, PUPPETMASTER_CLIENTBUCKET_CERTIFICATES, \
-    PUPPETMASTER_CLIENTBUCKET_VERIFY_SSL
-
-# Import puppetdb api
-from pano.puppetdb.puppetdb import api_get as puppetdb_get
-import requests
-
+from urllib import parse
 from django import template
+import json
 
 register = template.Library()
+
+
+@register.filter
+def unquote_raw(value):
+    return parse.unquote(value)
 
 
 @register.filter
@@ -24,6 +23,82 @@ def get_item(dictionary, key_id):
        {{ mydict|get_item:item.NAME }}
     """
     return dictionary.get(key_id)
+
+
+@register.filter
+def query_to_rules(query):
+    operators = ['not', 'and', 'or']
+    allowed_equality_operators = ['=', '>', '>=', '<', '<=', '~']
+    search_equality_operators = {
+        '=': 'equal',
+        '~': 'regex'
+    }
+    subq_operators = {
+        '=': 'puppet_equal',
+        '<': 'puppet_l',
+        '<=': 'puppet_le',
+        '>': 'puppet_g',
+        '>=': 'puppet_ge',
+        '~': 'puppet_regex',
+    }
+
+    def read_query(data):
+        rules = {
+            'condition': '',
+            'rules': []
+        }
+
+        def certname_search(cert_filter):
+            contents = dict()
+            # Operator
+            contents['operator'] = search_equality_operators[cert_filter[0]]
+            # ID
+            contents['id'] = cert_filter[1]
+            # Value
+            contents['value'] = cert_filter[2]
+            return contents
+
+        def subquery(subq_filter):
+            contents = dict()
+            contents['value'] = list()
+            # ID
+            if subq_filter[2][2][0] == "select-facts":
+                contents['id'] = 'facts'
+            elif subq_filter[2][2][0] == "select-resources":
+                contents['id'] = 'resources'
+            # Value 1
+            contents['value'].append(subq_filter[2][2][1][1][2])
+            # Value 2
+            contents['value'].append(subq_filter[2][2][1][2][2])
+            # Operator
+            contents['operator'] = subq_operators[subq_filter[2][2][1][2][0]]
+            return contents
+
+
+
+        i = 0
+        while i < len(data):
+            # Is it an operator?
+            if data[i] in operators:
+                rules['condition'] = data[i].upper()
+            # identify certname search
+            if type(data[i]) is list:
+                # if its an equality operator its a certname search
+                if data[i][0] in allowed_equality_operators:
+                    rules['rules'].append(certname_search(data[i]))
+                # is it an operator? Start of a new group?
+                elif data[i][0] in operators:
+                    rules['rules'].append(read_query(data[i]))
+                # if its type string "in" then its the start of a sub query!
+                elif data[i][0] == "in":
+                    rules['rules'].append(subquery(data[i]))
+            i += 1
+        return rules
+
+    pdb_query = json.loads(query)
+    pdb_parsed = read_query(pdb_query)
+    return json.dumps(pdb_parsed)
+
 
 @register.filter
 def get_percentage(value, max_val):
@@ -96,6 +171,7 @@ def colorizediff(content):
         else:
             color_diff.append('<br>' + line.rstrip('\n'))
     return ''.join(color_diff)
+
 
 @register.filter
 def get_range(value):
