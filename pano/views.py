@@ -17,6 +17,7 @@ from pano.methods import events
 import csv
 from django.http import StreamingHttpResponse
 
+
 def logout_view(request):
     logout(request)
     return HttpResponseRedirect("/pano/dashboard")
@@ -64,9 +65,11 @@ class Echo(object):
     """An object that implements just the write method of the file-like
     interface.
     """
+
     def write(self, value):
         """Write the value by returning it, instead of storing in a buffer."""
         return value
+
 
 @login_required
 @cache_page(CACHE_TIME)
@@ -79,7 +82,7 @@ def index(request, certname=None):
         events_params = {
             'query':
                 {
-                    1: '["=","latest-report?",true]'
+                    1: '["and",["=","latest-report?",true],["in", "certname",["extract", "certname",["select-nodes",["null?","deactivated",true]]]]]'
                 },
             'summarize-by': 'certname',
         }
@@ -115,6 +118,7 @@ def index(request, certname=None):
             'events': {
                 'id': 'event-counts',
                 'path': 'event-counts',
+                'api_version': 'v4',
                 'params': events_params,
             },
             'nodes': {
@@ -250,7 +254,7 @@ def nodes(request, certname=None):
         report_params = {
             'query':
                 {
-                    1: '["=","latest-report?",true]'
+                    1: '["and",["=","latest-report?",true],["in", "certname",["extract", "certname",["select-nodes",["null?","deactivated",true]]]]]'
                 },
             'summarize-by': 'certname',
         }
@@ -419,13 +423,15 @@ def reports(request, certname=None):
             if event['subject']['title'] == report['certname']:
                 found_report = True
                 # hashid, certname, environment, time start, time end, success, noop, failure, pending
-                report_status.append([report['hash'], report['certname'], report['environment'], report['start-time'], report['end-time'],
-                           event['successes'], event['noops'], event['failures'], event['skips']])
+                report_status.append([report['hash'], report['certname'], report['environment'], report['start-time'],
+                                      report['end-time'],
+                                      event['successes'], event['noops'], event['failures'], event['skips']])
                 break
         if found_report is False:
-            report_status.append([report['hash'], report['certname'], report['environment'], report['start-time'], report['end-time'],
-                           0, 0, 0, 0])
-    report_status =sort_tables(report_status, order=True, col=3)
+            report_status.append(
+                [report['hash'], report['certname'], report['environment'], report['start-time'], report['end-time'],
+                 0, 0, 0, 0])
+    report_status = sort_tables(report_status, order=True, col=3)
     context = {
         'timezones': pytz.common_timezones,
         'certname': certname,
@@ -447,21 +453,21 @@ def analytics(request):
         events_class_params = {
             'query':
                 {
-                    1: '["=","latest-report?",true]'
+                    1: '["and",["=","latest-report?",true],["in", "certname",["extract", "certname",["select-nodes",["null?","deactivated",true]]]]]'
                 },
             'summarize-by': 'containing-class',
         }
         events_resource_params = {
             'query':
                 {
-                    1: '["=","latest-report?",true]'
+                    1: '["and",["=","latest-report?",true],["in", "certname",["extract", "certname",["select-nodes",["null?","deactivated",true]]]]]'
                 },
             'summarize-by': 'resource',
         }
         events_status_params = {
             'query':
                 {
-                    1: '["=","latest-report?",true]'
+                    1: '["and",["=","latest-report?",true],["in", "certname",["extract", "certname",["select-nodes",["null?","deactivated",true]]]]]'
                 },
             'summarize-by': 'resource',
         }
@@ -479,16 +485,19 @@ def analytics(request):
             'events_class_list': {
                 'id': 'events_class_list',
                 'path': '/event-counts',
+                'api_version': 'v4',
                 'params': events_class_params,
             },
             'events_resource_list': {
                 'id': 'events_resource_list',
                 'path': '/event-counts',
+                'api_version': 'v4',
                 'params': events_resource_params,
             },
             'events_status_list': {
                 'id': 'events_status_list',
                 'path': '/aggregate-event-counts',
+                'api_version': 'v4',
                 'params': events_status_params,
             },
             'reports_run_avg': {

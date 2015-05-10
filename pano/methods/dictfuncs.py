@@ -8,6 +8,7 @@ from datetime import timedelta
 def sort_table(table, col=0, order=False):
     return sorted(table, reverse=order, key=lambda field: field[col])
 
+
 def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_status="all"):
     """
     :param node_dict: dict
@@ -44,7 +45,10 @@ def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_st
     # (
     # ('certname', 'latestCatalog', 'latestReport', 'latestFacts', 'success', 'noop', 'failure', 'skipped'),
     # )
-    def check_failed_compile(report_timestamp, fact_timestamp, catalog_timestamp):
+    def check_failed_compile(report_timestamp,
+                             fact_timestamp,
+                             catalog_timestamp,
+                             puppet_run_interval=PUPPET_RUN_INTERVAL):
         """
         :param report_timestamp: str
         :param fact_timestamp: str
@@ -68,9 +72,9 @@ def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_st
         # Time elapsed between fact time and report time
         elapsed_report = report_time - fact_time
 
-        if elapsed_catalog > timedelta(minutes=PUPPET_RUN_INTERVAL / 2):
+        if elapsed_catalog > timedelta(minutes=puppet_run_interval / 2):
             return True
-        elif elapsed_report > timedelta(minutes=PUPPET_RUN_INTERVAL / 2):
+        elif elapsed_report > timedelta(minutes=puppet_run_interval / 2):
             return True
         else:
             return False
@@ -155,7 +159,10 @@ def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_st
                             status['skips'],
                         ))
                     # If the node has noops
-                    if status['noops'] > 0 and status['successes'] == 0 and status['failures'] == 0 and status['skips'] == 0:
+                    if status['noops'] > 0 \
+                            and status['successes'] == 0 \
+                            and status['failures'] == 0 \
+                            and status['skips'] == 0:
                         pending_list.append((
                             node['certname'],
                             node['catalog-timestamp'] or '',
@@ -226,16 +233,13 @@ def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_st
         sorted_failed_list = sort_table(failed_list, order=asc, col=sortbycol)
         sorted_mismatch_list = sort_table(mismatch_list, order=asc, col=sortbycol)
         sorted_pending_list = sort_table(pending_list, order=asc, col=sortbycol)
-        return sorted_failed_list, sorted_changed_list, sorted_unreported_list, sorted_mismatch_list, sorted_pending_list
+        return sorted_failed_list, \
+               sorted_changed_list, \
+               sorted_unreported_list, \
+               sorted_mismatch_list, \
+               sorted_pending_list
 
     if get_status == 'all':
         return merged_list
     else:
         return failed_list, changed_list, unreported_list, mismatch_list, pending_list
-
-def merge_reports(reports_hash, events_hash):
-    for report in reports_hash:
-        found_report = False
-        print(report)
-        for event in events_hash:
-            print(event)

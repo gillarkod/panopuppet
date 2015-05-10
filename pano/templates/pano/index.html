@@ -6,40 +6,36 @@
     {% load static %}
     <!-- table sorter stuff -->
     <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.20.1/css/theme.bootstrap.css">
-    <script src="{% static 'pano/tablesorter/jquery.tablesorter.js' %}"></script>
-    <script src="{% static 'pano/tablesorter/jquery.tablesorter.widgets.js' %}"></script>
+          href="{% static 'pano/tablesorter/theme.bootstrap.min.css' %}">
+    <script src="{% static 'pano/tablesorter/jquery.tablesorter.min.js' %}"></script>
+    <script src="{% static 'pano/tablesorter/jquery.tablesorter.widgets.min.js' %}"></script>
     <script id="js">
         $(function () {
-        // call the tablesorter plugin and apply the uitheme widget
-        $("table").tablesorter({
-            // this will apply the bootstrap theme if "uitheme" widget is included
-            // the widgetOptions.uitheme is no longer required to be set
-            theme: "bootstrap",
+            // call the tablesorter plugin and apply the uitheme widget
+            $("table").tablesorter({
+                // this will apply the bootstrap theme if "uitheme" widget is included
+                // the widgetOptions.uitheme is no longer required to be set
+                theme: "bootstrap",
 
-            widthFixed: true,
+                widthFixed: true,
 
-            headerTemplate: '{content} {icon}', // new in v2.7. Needed to add the bootstrap icon!
+                headerTemplate: '{content} {icon}', // new in v2.7. Needed to add the bootstrap icon!
 
-            // widget code contained in the jquery.tablesorter.widgets.js file
-            // use the zebra stripe widget if you plan on hiding any rows (filter widget)
-            widgets: ["uitheme", "zebra"],
+                // widget code contained in the jquery.tablesorter.widgets.js file
+                // use the zebra stripe widget if you plan on hiding any rows (filter widget)
+                widgets: ["uitheme", "zebra"],
 
-            widgetOptions: {
-                // using the default zebra striping class name, so it actually isn't included in the theme variable above
-                // this is ONLY needed for bootstrap theming if you are using the filter widget, because rows are hidden
-                zebra: ["even", "odd"],
+                widgetOptions: {
+                    // using the default zebra striping class name, so it actually isn't included in the theme variable above
+                    // this is ONLY needed for bootstrap theming if you are using the filter widget, because rows are hidden
+                    zebra: ["even", "odd"],
 
-                // reset filters button
-                filter_reset: ".reset"
+                    // reset filters button
+                    filter_reset: ".reset"
 
-                // set the uitheme widget to use the bootstrap theme class names
-                // this is no longer required, if theme is set
-                // ,uitheme : "bootstrap"
-
-            }
-        })
-    });</script>
+                }
+            })
+        });</script>
 {% endblock %}
 {% block content %}
     <div class="container-fluid">
@@ -66,7 +62,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-md-3 respon" align="center">
+            <div class="col-md-3" align="center">
                 <p class="bg-info img-rounded"><strong>Population</strong></p>
 
                 <p>{{ population }}</p>
@@ -90,72 +86,79 @@
     </div>
     <div class="container-fluid">
         <div class="row">
-            <ul class="nav nav-tabs">
-                <li{% if show_nodes == 'recent' %} class="active"{% endif %}><a href="{% url 'dashboard' %}">Recent</a>
-                </li>
-                <li{% if show_nodes == 'failed' %} class="active"{% endif %}><a href="?show=failed">Failed</a></li>
-                <li{% if show_nodes == 'changed' %} class="active"{% endif %}><a href="?show=changed">Changed</a></li>
-                <li{% if show_nodes == 'pending' %} class="active"{% endif %}><a href="?show=pending">Pending</a></li>
-                <li{% if show_nodes == 'unreported' %} class="active"{% endif %}><a
-                        href="?show=unreported">Unreported</a></li>
-                <li{% if show_nodes == 'failed_catalogs' %} class="active"{% endif %}><a href="?show=failed_catalogs">Missmatching
-                    Timestamps</a></li>
-
-            </ul>
+            <div class="col-md-12">
+                <ul class="nav nav-tabs">
+                    <li{% if show_nodes == 'recent' %} class="active"{% endif %}><a
+                            href="{% url 'dashboard' %}">Recent</a>
+                    </li>
+                    <li{% if show_nodes == 'failed' %} class="active"{% endif %}><a href="?show=failed">Failed</a></li>
+                    <li{% if show_nodes == 'changed' %} class="active"{% endif %}><a href="?show=changed">Changed</a>
+                    </li>
+                    <li{% if show_nodes == 'pending' %} class="active"{% endif %}><a href="?show=pending">Pending</a>
+                    </li>
+                    <li{% if show_nodes == 'unreported' %} class="active"{% endif %}><a
+                            href="?show=unreported">Unreported</a></li>
+                    <li{% if show_nodes == 'failed_catalogs' %} class="active"{% endif %}><a
+                            href="?show=failed_catalogs">Missmatching
+                        Timestamps</a></li>
+                </ul>
+            </div>
         </div>
         <div class="row">
-            <table class="table table-condensed table-striped tablesorter">
-                <colgroup>
-                    <col span="1" style="width: 25%;">
-                    <col span="1" style="width: 15%;">
-                    <col span="1" style="width: 15%;">
-                    <col span="1" style="width: 15%;">
-                    <col span="1" style="width: 5%;">
-                    <col span="1" style="width: 5%;">
-                    <col span="1" style="width: 5%;">
-                    <col span="1" style="width: 5%;">
-                </colgroup>
-                <thead>
-                <tr>
-                    <th>Certname</th>
-                    <th>Latest Catalog</th>
-                    <th>Latest Report</th>
-                    <th>Latest Facts</th>
-                    <th>Success</th>
-                    <th>Noop</th>
-                    <th>Failure</th>
-                    <th>Skipped</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% if node_list %}
-                    {% for node in node_list %}
-                        <tr>
-                            <td><a href="{% url 'reports' node.0 %}">{{ node.0 }}</a></td>
-                            <td>{{ node.1|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
-                            <td>{{ node.2|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
-                            <td>{{ node.3|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
-                            <td style="text-align: center"><p style="margin-bottom: 0"
-                                                              class="bg-success img-rounded">
-                                <strong>{{ node.4 }}</strong></p></td>
-                            <td style="text-align: center"><p style="margin-bottom: 0"
-                                                              class="bg-info img-rounded">
-                                <strong>{{ node.5 }}</strong></p></td>
-                            <td style="text-align: center"><p style="margin-bottom: 0"
-                                                              class="bg-danger img-rounded">
-                                <strong>{{ node.6 }}</strong></p></td>
-                            <td style="text-align: center"><p style="margin-bottom: 0"
-                                                              class="bg-warning img-rounded">
-                                <strong>{{ node.7 }}</strong></p></td>
-                        </tr>
-                    {% endfor %}
-                {% else %}
+            <div class="col-md-12">
+                <table class="table table-condensed tablesorter">
+                    <colgroup>
+                        <col span="1" style="width: 25%;">
+                        <col span="1" style="width: 15%;">
+                        <col span="1" style="width: 15%;">
+                        <col span="1" style="width: 15%;">
+                        <col span="1" style="width: 5%;">
+                        <col span="1" style="width: 5%;">
+                        <col span="1" style="width: 5%;">
+                        <col span="1" style="width: 5%;">
+                    </colgroup>
+                    <thead>
                     <tr>
-                        <td colspan="8">No nodes were found for this query.</td>
+                        <th>Certname</th>
+                        <th>Latest Catalog</th>
+                        <th>Latest Report</th>
+                        <th>Latest Facts</th>
+                        <th>Success</th>
+                        <th>Noop</th>
+                        <th>Failure</th>
+                        <th>Skipped</th>
                     </tr>
-                {% endif %}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                    {% if node_list %}
+                        {% for node in node_list %}
+                            <tr>
+                                <td><a href="{% url 'reports' node.0 %}">{{ node.0 }}</a></td>
+                                <td>{{ node.1|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
+                                <td>{{ node.2|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
+                                <td>{{ node.3|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
+                                <td style="text-align: center"><p style="margin-bottom: 0"
+                                                                  class="bg-success img-rounded">
+                                    <strong>{{ node.4 }}</strong></p></td>
+                                <td style="text-align: center"><p style="margin-bottom: 0"
+                                                                  class="bg-info img-rounded">
+                                    <strong>{{ node.5 }}</strong></p></td>
+                                <td style="text-align: center"><p style="margin-bottom: 0"
+                                                                  class="bg-danger img-rounded">
+                                    <strong>{{ node.6 }}</strong></p></td>
+                                <td style="text-align: center"><p style="margin-bottom: 0"
+                                                                  class="bg-warning img-rounded">
+                                    <strong>{{ node.7 }}</strong></p></td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="8">No nodes were found for this query.</td>
+                        </tr>
+                    {% endif %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 {% endblock %}

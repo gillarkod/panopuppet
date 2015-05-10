@@ -42,16 +42,17 @@ def json_to_datetime(date):
 
 
 def is_unreported(node_report_timestamp, unreported=2):
-    try:
-        if node_report_timestamp is None:
-            return True
-        last_report = json_to_datetime(node_report_timestamp)
-        last_report = last_report.replace(tzinfo=None)
-        now = datetime.datetime.utcnow()
-        unreported_border = now - datetime.timedelta(hours=unreported)
-        if last_report < unreported_border:
-            return True
-    except AttributeError:
+    # If node has no report timestamp
+    # it has probably failed so return True.
+    if node_report_timestamp is None:
+        return True
+    if type(unreported) not in [float, int]:
+        raise ValueError("unreported input parameter must be integer.")
+    last_report = json_to_datetime(node_report_timestamp)
+    last_report = last_report.replace(tzinfo=None)
+    now = datetime.datetime.utcnow()
+    unreported_border = now - datetime.timedelta(hours=unreported)
+    if last_report < unreported_border:
         return True
     return False
 
