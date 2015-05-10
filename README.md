@@ -59,9 +59,6 @@ This was written for a multi-tenant site across several datacenters.
 * I have seen some issues with the querybuilder and the usage of comparison operators. If you have stringify_facts enabled
 you may not be able to use the less/less or equal/greater/greater or equal operators since its not possible to
 compare string values "123" with "124". You will only be able to use the equal operator for these values.
-* PanoPuppet is still under development so there are still some missing cosmetic/helpful features. One of which for
-query-builder is that the filter you queried for will dissapear after the search. This is something that will be fixed
-later but the release of the code comes now so that you can test the new features.
 
 ### About the code
 
