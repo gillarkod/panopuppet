@@ -82,7 +82,9 @@
                     placeholder: 'Type, Name'
                 }
             ],
+            {% if request.GET.search %}
             rules: rules
+            {% endif %}
         });
     </script>
     <script>
