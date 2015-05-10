@@ -31,7 +31,7 @@ def query_to_rules(query):
     allowed_equality_operators = ['=', '>', '>=', '<', '<=', '~']
     search_equality_operators = {
         '=': 'equal',
-        '~': 'regex'
+        '~': 'regex_match'
     }
     subq_operators = {
         '=': 'puppet_equal',
@@ -39,7 +39,7 @@ def query_to_rules(query):
         '<=': 'puppet_le',
         '>': 'puppet_g',
         '>=': 'puppet_ge',
-        '~': 'puppet_regex',
+        '~': 'puppet_re_match',
     }
 
     def read_query(data):
