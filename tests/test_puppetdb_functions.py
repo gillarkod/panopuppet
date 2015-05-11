@@ -150,3 +150,16 @@ class CreatePuppetdbQueries(TestCase):
     def test_query_with_string(self):
         content = "string value"
         self.assertRaises(TypeError, mk_puppetdb_query, params=content)
+
+    def test_query_with_list(self):
+        content = ['test1', 'test2']
+        self.assertRaises(TypeError, mk_puppetdb_query, params=content)
+
+    def test_query_with_integer(self):
+        content = 1
+        self.assertRaises(TypeError, mk_puppetdb_query, params=content)
+
+    def test_query_with_empty_dict(self):
+        content = {}
+        expected_results = {}
+        self.assertEquals(content, expected_results)
