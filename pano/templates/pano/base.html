@@ -6,7 +6,7 @@
     <title>PanoPuppet</title>
     {% load staticfiles %}
     <!-- jQuery library -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="{% static 'pano/js/jquery.1.11.1.min.js' %}"></script>
     <!-- Latest compiled Bootstrap JavaScript -->
     <script src="{% static 'pano/js/bootstrap.min.js' %}"></script>
     <link rel="stylesheet" href="{% static 'pano/css/bootstrap.min.css' %}">
@@ -20,58 +20,65 @@
 {% load tz %}
 
 <div class="container-fluid">
-    <div class="col-md-1">
-    </div>
-    <div class="col-md-10">
-        <nav class="navbar navbar-default">
-            <div class="container-fluid">
-                <div class="navbar-header">
-                    <a class="navbar-brand" href="/">PanoPuppet</a>
+    <div class="row">
+        <div class="col-md-1">
+        </div>
+        <div class="col-md-10">
+            <nav class="navbar navbar-default">
+                <div class="container-fluid">
+                    <div class="navbar-header">
+                        <a class="navbar-brand" href="/">PanoPuppet</a>
+                    </div>
+                    <div>
+                        <ul class="nav navbar-nav">
+                            <li{% if "pano/dashboard" in request.path %} class="active"{% endif %}>
+                                <a href="{% url 'dashboard' %}">Dashboard</a>
+                            </li>
+                            <li{% if "pano/nodes" in request.path %} class="active"{% endif %}>
+                                <a href="{% url 'nodes' %}">Nodes</a>
+                            </li>
+                            <li {% if "pano/analytics" in request.path %}
+                                class="active"{% elif "pano/event_analytics" in request.path %} class="active"
+                                %}{% endif %} class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown"
+                                                                  href="#">Analytics<span class="caret"></span></a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="{% url 'event_analytics' %}">Events</a></li>
+                                    <li><a href="{% url 'analytics' %}">Run Times</a></li>
+                                </ul>
+                            </li>
+                            {% if certname %}
+                                <li{% if "pano/reports" in request.path %} class="active"{% endif %}>
+                                    <a href="{% url 'reports' certname %}">Reports</a>
+                                </li>
+                                <li{% if "pano/facts" in request.path %} class="active"{% endif %}>
+                                    <a href="{% url 'facts' certname %}">Facts</a>
+                                </li>
+                            {% endif %}
+                            {% if user.is_authenticated %}
+                                <li>
+                                    <a href="{% url 'logout' %}">Logout</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </div>
                 </div>
-                <div>
-                    <ul class="nav navbar-nav">
-                        <li{% if "pano/dashboard" in request.path %} class="active"{% endif %}>
-                            <a href="{% url 'dashboard' %}">Dashboard</a>
-                        </li>
-                        <li{% if "pano/nodes" in request.path %} class="active"{% endif %}>
-                            <a href="{% url 'nodes' %}">Nodes</a>
-                        </li>
-                    <li {% if "pano/analytics" in request.path %} class="active"{% elif "pano/event_analytics" in request.path %} class="active" %}{% endif %} class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">Analytics<span class="caret"></span></a>
-              <ul class="dropdown-menu">
-                <li><a href="{% url 'event_analytics' %}">Events</a></li>
-                <li><a href="{% url 'analytics' %}">Run Times</a></li>
-              </ul>
-            </li>
-                        {% if certname %}
-                            <li{% if "pano/reports" in request.path %} class="active"{% endif %}>
-                                <a href="{% url 'reports' certname %}">Reports</a>
-                            </li>
-                            <li{% if "pano/facts" in request.path %} class="active"{% endif %}>
-                                <a href="{% url 'facts' certname %}">Facts</a>
-                            </li>
-                        {% endif %}
-                        {% if user.is_authenticated %}
-                            <li>
-                                <a href="{% url 'logout' %}">Logout</a>
-                            </li>
-                        {% endif %}
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    </div>
-    <div class="col-md-1">
+            </nav>
+        </div>
+        <div class="col-md-1">
+        </div>
     </div>
 </div>
 
 <div class="container-fluid">
-    <div class="col-md-1">
-    </div>
-    <div class="col-md-10">
-        {% block content %}
-        {% endblock %}
-    </div>
-    <div class="col-md-1">
+    <div class="row">
+        <div class="col-md-1">
+        </div>
+        <div class="col-md-10">
+            {% block content %}
+            {% endblock %}
+        </div>
+        <div class="col-md-1">
+        </div>
     </div>
 </div>
 

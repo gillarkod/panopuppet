@@ -79,7 +79,7 @@ def index(request, certname=None):
         events_params = {
             'query':
                 {
-                    1: '["=","latest-report?",true]'
+                    1: '["and",["=","latest-report?",true],["in", "certname",["extract", "certname",["select-nodes",["null?","deactivated",true]]]]]'
                 },
             'summarize-by': 'certname',
         }
@@ -250,7 +250,7 @@ def nodes(request, certname=None):
         report_params = {
             'query':
                 {
-                    1: '["=","latest-report?",true]'
+                    1: '["and",["=","latest-report?",true],["in", "certname",["extract", "certname",["select-nodes",["null?","deactivated",true]]]]]'
                 },
             'summarize-by': 'certname',
         }
@@ -447,14 +447,14 @@ def analytics(request):
         events_class_params = {
             'query':
                 {
-                    1: '["=","latest-report?",true]'
+                    1: '["and",["=","latest-report?",true],["in", "certname",["extract", "certname",["select-nodes",["null?","deactivated",true]]]]]'
                 },
             'summarize-by': 'containing-class',
         }
         events_resource_params = {
             'query':
                 {
-                    1: '["=","latest-report?",true]'
+                    1: '["and",["=","latest-report?",true],["in", "certname",["extract", "certname",["select-nodes",["null?","deactivated",true]]]]]'
                 },
             'summarize-by': 'resource',
         }
