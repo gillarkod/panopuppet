@@ -149,4 +149,4 @@ class CreatePuppetdbQueries(TestCase):
 
     def test_query_with_string(self):
         content = "string value"
-        self.assertRaises(AttributeError, getattr, mk_puppetdb_query, content)
+        self.assertRaises(TypeError, mk_puppetdb_query, params=content)
