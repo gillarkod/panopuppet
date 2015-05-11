@@ -146,3 +146,7 @@ class CreatePuppetdbQueries(TestCase):
         }
         results = mk_puppetdb_query(content)
         self.assertEqual(expected_results, results)
+
+    def test_query_with_string(self):
+        content = "string value"
+        self.assertRaises(AttributeError, getattr, mk_puppetdb_query, content)

@@ -113,9 +113,16 @@ curl -X GET http://localhost:8080/v3/facts --data-urlencode 'order-by=[
         if 'operator' in q_dict:
             query += '["and", '
 
-        for key, value in q_dict.items():
-            if type(key) is int:
-                query += value + ','
+        i = 0
+        if len(q_dict) > 1:
+            while i < len(q_dict) - 1:
+                query += q_dict[i+1] + ','
+                i +=1
+
+        elif len(q_dict) == 1:
+            query += q_dict[1] + ','
+
+
         # remove the last comma
         query = query.rstrip(',')
         # add the closing bracket if there was an operator
