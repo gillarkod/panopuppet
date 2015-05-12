@@ -140,7 +140,6 @@ def index(request, certname=None):
         # All available events for the latest puppet reports
         event_list = puppetdb_results['event-counts']
         node_list = puppetdb_results['nodes']
-        print(event_list)
 
         failed_list, changed_list, unreported_list, mismatch_list, pending_list = dictstatus(all_nodes_list,
                                                                                              event_list,
