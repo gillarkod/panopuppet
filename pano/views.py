@@ -463,7 +463,7 @@ def analytics(request):
         events_status_params = {
             'query':
                 {
-                    1: '["=","latest-report?",true]'
+                    1: '["and",["=","latest-report?",true],["in", "certname",["extract", "certname",["select-nodes",["null?","deactivated",true]]]]]'
                 },
             'summarize-by': 'resource',
         }
@@ -481,16 +481,19 @@ def analytics(request):
             'events_class_list': {
                 'id': 'events_class_list',
                 'path': '/event-counts',
+                'api_version': 'v4',
                 'params': events_class_params,
             },
             'events_resource_list': {
                 'id': 'events_resource_list',
                 'path': '/event-counts',
+                'api_version': 'v4',
                 'params': events_resource_params,
             },
             'events_status_list': {
                 'id': 'events_status_list',
                 'path': '/aggregate-event-counts',
+                'api_version': 'v4',
                 'params': events_status_params,
             },
             'reports_run_avg': {
