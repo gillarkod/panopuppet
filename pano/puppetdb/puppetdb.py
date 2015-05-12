@@ -113,9 +113,16 @@ curl -X GET http://localhost:8080/v3/facts --data-urlencode 'order-by=[
         if 'operator' in q_dict:
             query += '["and", '
 
-        for key, value in q_dict.items():
-            if type(key) is int:
-                query += value + ','
+        i = 0
+        if len(q_dict) > 1:
+            while i < len(q_dict) - 1:
+                query += q_dict[i+1] + ','
+                i += 1
+
+        elif len(q_dict) == 1:
+            query += q_dict[1] + ','
+
+
         # remove the last comma
         query = query.rstrip(',')
         # add the closing bracket if there was an operator
@@ -151,18 +158,21 @@ curl -X GET http://localhost:8080/v3/facts --data-urlencode 'order-by=[
                                                                      ob_dict['query-field']['field'])
         return ob_query
 
-    query_dict = {}
-    if 'query' in params:
-        query_dict['query'] = query_build(params['query'])
-    if 'summarize-by' in params:
-        query_dict['summarize-by'] = params.get('summarize-by', 'certname')
-    if 'limit' in params:
-        query_dict['limit'] = params.get('limit', 10)
-    if 'offset' in params:
-        query_dict['offset'] = params.get('offset', 10)
-    if 'include-total' in params:
-        query_dict['include-total'] = params.get('include-total', 'true')
-    if 'order-by' in params:
-        query_dict['order-by'] = order_by_build(params['order-by'])
+    if type(params) is dict:
+        query_dict = {}
+        if 'query' in params:
+            query_dict['query'] = query_build(params['query'])
+        if 'summarize-by' in params:
+            query_dict['summarize-by'] = params.get('summarize-by', 'certname')
+        if 'limit' in params:
+            query_dict['limit'] = params.get('limit', 10)
+        if 'offset' in params:
+            query_dict['offset'] = params.get('offset', 10)
+        if 'include-total' in params:
+            query_dict['include-total'] = params.get('include-total', 'true')
+        if 'order-by' in params:
+            query_dict['order-by'] = order_by_build(params['order-by'])
+    else:
+        raise TypeError('mk_puppetdb_query only accept dict() as input.')
 
     return query_dict
