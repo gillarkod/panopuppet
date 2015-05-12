@@ -196,7 +196,7 @@ def index(request, certname=None):
 
 @login_required
 @cache_page(CACHE_TIME)
-def nodes(request, certname=None):
+def nodes(request):
     if request.method == 'POST':
         request.session['django_timezone'] = request.POST['timezone']
         return redirect(request.POST['return_url'])
@@ -313,7 +313,6 @@ def nodes(request, certname=None):
         """
         context = {
             'node_list': merged_list,
-            'q_certname': certname,
             'timezones': pytz.common_timezones,
             'c_r_limit': request.GET.get('limits', 50),
             'r_sfield': valid_sort_fields,
