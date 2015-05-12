@@ -17,6 +17,7 @@ from pano.methods import events
 import csv
 from django.http import StreamingHttpResponse
 
+
 def logout_view(request):
     logout(request)
     return HttpResponseRedirect("/pano/dashboard")
@@ -64,9 +65,11 @@ class Echo(object):
     """An object that implements just the write method of the file-like
     interface.
     """
+
     def write(self, value):
         """Write the value by returning it, instead of storing in a buffer."""
         return value
+
 
 @login_required
 @cache_page(CACHE_TIME)
@@ -420,13 +423,15 @@ def reports(request, certname=None):
             if event['subject']['title'] == report['certname']:
                 found_report = True
                 # hashid, certname, environment, time start, time end, success, noop, failure, pending
-                report_status.append([report['hash'], report['certname'], report['environment'], report['start-time'], report['end-time'],
-                           event['successes'], event['noops'], event['failures'], event['skips']])
+                report_status.append([report['hash'], report['certname'], report['environment'], report['start-time'],
+                                      report['end-time'],
+                                      event['successes'], event['noops'], event['failures'], event['skips']])
                 break
         if found_report is False:
-            report_status.append([report['hash'], report['certname'], report['environment'], report['start-time'], report['end-time'],
-                           0, 0, 0, 0])
-    report_status =sort_tables(report_status, order=True, col=3)
+            report_status.append(
+                [report['hash'], report['certname'], report['environment'], report['start-time'], report['end-time'],
+                 0, 0, 0, 0])
+    report_status = sort_tables(report_status, order=True, col=3)
     context = {
         'timezones': pytz.common_timezones,
         'certname': certname,
