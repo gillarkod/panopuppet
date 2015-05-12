@@ -5,7 +5,6 @@ from django.test import TestCase
 from pano.puppetdb.pdbutils import is_unreported, json_to_datetime
 
 
-# date = (datetime.utcnow() - timedelta(hours=3)).strftime('%Y-%m-%dT%H:%M:%S.%fZ')
 class CheckIfUnreported(TestCase):
     def test_none_date(self):
         """
