@@ -94,6 +94,7 @@ You also get a quick link to the latest report if there are any events available
 
 #### Nodes Search
 ![Nodes Search Results](screenshots/pp_nodesearch.png)
+![Nodes Search Results](screenshots/pp_nodesearch2.png)
 
 #### Nodes Reports
 Lists each report available for this node, also urlifys the hash id for the
