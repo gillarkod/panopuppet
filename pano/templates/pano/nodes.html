@@ -65,6 +65,14 @@
                     placeholder: 'host.example.com'
                 },
                 {
+                    id: 'report-environment',
+                    label: 'Environment',
+                    type: 'string',
+                    description: 'Search for nodes in puppet environment',
+                    operators: ['equal', 'regex_match'],
+                    placeholder: 'production'
+                },
+                {
                     id: 'facts',
                     label: 'Fact',
                     type: 'string',
