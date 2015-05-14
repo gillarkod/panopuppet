@@ -3,7 +3,8 @@ __author__ = 'etaklar'
 from pano.puppetdb.pdbutils import json_to_datetime, is_unreported
 from pano.settings import PUPPET_RUN_INTERVAL
 from datetime import timedelta
-
+from django.template import defaultfilters as filters
+from django.utils.timezone import localtime
 
 def sort_table(table, col=0, order=False):
     return sorted(table, reverse=order, key=lambda field: field[col])
@@ -112,9 +113,9 @@ def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_st
                 if get_status == "all":
                     merged_list.append((
                         node['certname'],
-                        node['catalog-timestamp'] or '',
-                        node['report-timestamp'] or '',
-                        node['facts-timestamp'] or '',
+                        filters.date(localtime(json_to_datetime(node['catalog-timestamp'])), 'Y-m-d H:i:s') or '',
+                        filters.date(localtime(json_to_datetime(node['report-timestamp'])), 'Y-m-d H:i:s') or '',
+                        filters.date(localtime(json_to_datetime(node['facts-timestamp'])), 'Y-m-d H:i:s') or '',
                         status['successes'],
                         status['noops'],
                         status['failures'],
@@ -125,9 +126,9 @@ def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_st
                     if status['failures'] > 0:
                         failed_list.append((
                             node['certname'],
-                            node['catalog-timestamp'] or '',
-                            node['report-timestamp'] or '',
-                            node['facts-timestamp'] or '',
+                            filters.date(localtime(json_to_datetime(node['catalog-timestamp'])), 'Y-m-d H:i:s') or '',
+                            filters.date(localtime(json_to_datetime(node['report-timestamp'])), 'Y-m-d H:i:s') or '',
+                            filters.date(localtime(json_to_datetime(node['facts-timestamp'])), 'Y-m-d H:i:s') or '',
                             status['successes'],
                             status['noops'],
                             status['failures'],
@@ -138,9 +139,9 @@ def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_st
                                             catalog_timestamp=node.get('catalog-timestamp', None)):
                         mismatch_list.append((
                             node['certname'],
-                            node['catalog-timestamp'] or '',
-                            node['report-timestamp'] or '',
-                            node['facts-timestamp'] or '',
+                            filters.date(localtime(json_to_datetime(node['catalog-timestamp'])), 'Y-m-d H:i:s') or '',
+                            filters.date(localtime(json_to_datetime(node['report-timestamp'])), 'Y-m-d H:i:s') or '',
+                            filters.date(localtime(json_to_datetime(node['facts-timestamp'])), 'Y-m-d H:i:s') or '',
                             status['successes'],
                             status['noops'],
                             status['failures'],
@@ -150,9 +151,9 @@ def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_st
                     if is_unreported(node['report-timestamp']):
                         unreported_list.append((
                             node['certname'],
-                            node['catalog-timestamp'] or '',
-                            node['report-timestamp'] or '',
-                            node['facts-timestamp'] or '',
+                            filters.date(localtime(json_to_datetime(node['catalog-timestamp'])), 'Y-m-d H:i:s') or '',
+                            filters.date(localtime(json_to_datetime(node['report-timestamp'])), 'Y-m-d H:i:s') or '',
+                            filters.date(localtime(json_to_datetime(node['facts-timestamp'])), 'Y-m-d H:i:s') or '',
                             status['successes'],
                             status['noops'],
                             status['failures'],
@@ -165,9 +166,9 @@ def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_st
                             and status['skips'] == 0:
                         pending_list.append((
                             node['certname'],
-                            node['catalog-timestamp'] or '',
-                            node['report-timestamp'] or '',
-                            node['facts-timestamp'] or '',
+                            filters.date(localtime(json_to_datetime(node['catalog-timestamp'])), 'Y-m-d H:i:s') or '',
+                            filters.date(localtime(json_to_datetime(node['report-timestamp'])), 'Y-m-d H:i:s') or '',
+                            filters.date(localtime(json_to_datetime(node['facts-timestamp'])), 'Y-m-d H:i:s') or '',
                             status['successes'],
                             status['noops'],
                             status['failures'],
@@ -176,9 +177,9 @@ def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_st
                     # The node was found in the events list so it has to have changed
                     changed_list.append((
                         node['certname'],
-                        node['catalog-timestamp'] or '',
-                        node['report-timestamp'] or '',
-                        node['facts-timestamp'] or '',
+                        filters.date(localtime(json_to_datetime(node['catalog-timestamp'])), 'Y-m-d H:i:s') or '',
+                        filters.date(localtime(json_to_datetime(node['report-timestamp'])), 'Y-m-d H:i:s') or '',
+                        filters.date(localtime(json_to_datetime(node['facts-timestamp'])), 'Y-m-d H:i:s') or '',
                         status['successes'],
                         status['noops'],
                         status['failures'],
@@ -190,9 +191,9 @@ def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_st
             if get_status == "all":
                 merged_list.append((
                     node['certname'],
-                    node['catalog-timestamp'] or '',
-                    node['report-timestamp'] or '',
-                    node['facts-timestamp'] or '',
+                    filters.date(localtime(json_to_datetime(node['catalog-timestamp'])), 'Y-m-d H:i:s') or '',
+                    filters.date(localtime(json_to_datetime(node['report-timestamp'])), 'Y-m-d H:i:s') or '',
+                    filters.date(localtime(json_to_datetime(node['facts-timestamp'])), 'Y-m-d H:i:s') or '',
                     0,
                     0,
                     0,
@@ -203,9 +204,9 @@ def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_st
                 if is_unreported(node['report-timestamp']):
                     unreported_list.append((
                         node['certname'],
-                        node['catalog-timestamp'] or '',
-                        node['report-timestamp'] or '',
-                        node['facts-timestamp'] or '',
+                        filters.date(localtime(json_to_datetime(node['catalog-timestamp'])), 'Y-m-d H:i:s') or '',
+                        filters.date(localtime(json_to_datetime(node['report-timestamp'])), 'Y-m-d H:i:s') or '',
+                        filters.date(localtime(json_to_datetime(node['facts-timestamp'])), 'Y-m-d H:i:s') or '',
                         0,
                         0,
                         0,
@@ -216,9 +217,9 @@ def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_st
                                         catalog_timestamp=node.get('catalog-timestamp', None)):
                     mismatch_list.append((
                         node['certname'],
-                        node['catalog-timestamp'] or '',
-                        node['report-timestamp'] or '',
-                        node['facts-timestamp'] or '',
+                        filters.date(localtime(json_to_datetime(node['catalog-timestamp'])), 'Y-m-d H:i:s') or '',
+                        filters.date(localtime(json_to_datetime(node['report-timestamp'])), 'Y-m-d H:i:s') or '',
+                        filters.date(localtime(json_to_datetime(node['facts-timestamp'])), 'Y-m-d H:i:s') or '',
                         0,
                         0,
                         0,

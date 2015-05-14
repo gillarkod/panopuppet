@@ -134,9 +134,9 @@
                         {% for node in node_list %}
                             <tr>
                                 <td><a href="{% url 'reports' node.0 %}">{{ node.0 }}</a></td>
-                                <td>{{ node.1|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
-                                <td>{{ node.2|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
-                                <td>{{ node.3|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
+                                <td>{{ node.1 }}</td>
+                                <td>{{ node.2 }}</td>
+                                <td>{{ node.3 }}</td>
                                 <td style="text-align: center"><p style="margin-bottom: 0"
                                                                   class="bg-success img-rounded">
                                     <strong>{{ node.4 }}</strong></p></td>

@@ -8,10 +8,14 @@
     <script src="{% static 'pano/js/query-builder.min.js' %}"></script>
     <script src="{% static 'pano/js/bootbox.min.js' %}"></script>
     <link rel="stylesheet" href="{% static 'pano/css/query-filter.min.css' %}">
+    <script>
+        $(document).ready(function () {
+            refresh_data();
+        });
+    </script>
 {% endblock %}
 
 {% block content %}
-    {% csrf_token %}
     <div class="row">
         <div class="col-md-12">
             <div class="panel-group" id="filters_accordion" role="tablist" aria-multiselectable="true">
@@ -29,11 +33,11 @@
                         <div class="panel-body">
                             <div id="builder-nodes"></div>
                             <div class="btn-group">
-                                <form id="searchform" action="{% url 'nodes' %}" method="get">
+                                <form id="searchform">
                                     <input type="hidden" id="search" name="search" value=""/>
-                                    <input type="hidden" id="dl_csv" name="dl_csv" value="false"/>
                                 </form>
-                                <button class="btn btn-primary search-puppet" data-target="nodes">Search</button>
+                                <button id="searchbutton" class="btn btn-primary search-puppet" data-target="nodes">Search</button>
+                                <button class="btn btn-primary search-refresh" data-target="nodes">Refresh</button>
                                 <button class="btn btn-primary search-clear" data-target="nodes">Reset</button>
                                 <button class="btn btn-primary parse-puppet" data-target="nodes">Generate</button>
                             </div>
@@ -43,6 +47,103 @@
             </div>
         </div>
     </div>
+    <script>
+        function refresh_data(obj) {
+            var backgroundTask   = $.Deferred();
+            var url = '../api/nodes/';
+            if (obj) {
+                if ($(obj).attr('href')) {
+                    var params = $(obj).attr('href');
+                    url = "../api/nodes/" + params;
+                }
+                else if ($(obj).attr('id') == 'searchform') {
+                    $("form#searchform :input").each(function () {
+                        var params = $(this).val(); // This is the jquery object of the input
+                        url = "../api/nodes/?search=" + params;
+                    });
+                }
+                else if ($(obj).attr('id') == 'limits') {
+                    var limits = $('#limits').find(":selected").val();
+                    url = "../api/nodes/?limits=" + limits;
+                }
+            }
+            $.get(url, function (json) {
+                var response = $(jQuery.parseJSON(json));
+                var nodes = response[0]['nodeList'];
+                var data = '';
+                var num_nodes = nodes.length;
+                if (num_nodes === 0) {
+                    data = '<tr><td colspan="8">No nodes matching your query.</td></tr>';
+                }
+                else {
+                     //('certname', 'latestCatalog', 'latestReport', 'latestFacts', 'success', 'noop', 'failure', 'skipped'),
+                    nodes.forEach(function (node) {
+                        data += '<tr>';
+                        //Certname
+                        data += '<td><a href="../reports/' + node[0] + '">' + node[0] + '</a></td>';
+                        //latest catalog
+                        data += '<td>' + node[1] + '</td>';
+                        //latest report
+                        if (node[4] > 0 || node[5] > 0 || node[6] > 0 ||node[7] > 0 ) {
+                            data += '<td><a href="../reports/' + node[0] + '?latest=true&report_timestamp=' + node[2] + '">' + node[2] + '</a></td>';
+                        } else {
+                            data += '<td>' + node[2] + '</td>';
+                        }
+                        //latest facts
+                        data += '<td>' + node[3] + '</td>';
+                        //failed events
+                        data += '<td style="text-align: center"><p style="margin-bottom: 0" class="bg-success img-rounded"><strong>' + node[4] + '</strong></p></td>';
+                        //skipped events
+                        data += '<td style="text-align: center"><p style="margin-bottom: 0" class="bg-info img-rounded"><strong>' + node[5] + '</strong></p></td>';
+                        //successful events
+                        data += '<td style="text-align: center"><p style="margin-bottom: 0" class="bg-danger img-rounded"><strong>' + node[6] + '</strong></p></td>';
+                        //noop events
+                        data += '<td style="text-align: center"><p style="margin-bottom: 0" class="bg-warning img-rounded"><strong>' + node[7] + '</strong></p></td>';
+                    });
+                }
+                // update table with the new json data to the table body
+                $("table tbody").html(data);
+                $('#nodePaneTitle').html('Query Results - Number of results: ' + response[0]['total_nodes']);
+
+                // update glyphicons
+                var sortfield = ['certname', 'latestReport', 'latestCatalog', 'latestFacts', 'success', 'failure', 'noop', 'skipped'];
+
+                sortfield.forEach(function (field) {
+                    var fieldHeader = $('#' + field + '-header');
+                    var fieldLink = $('#' + field + '-link');
+                    $(fieldHeader).find('span').removeAttr('class');
+                    // if field is active
+                    if (response[0]['c_r_sfield'] == field) {
+                        var url = '?sortfield=' + field + '&sortfieldby=' + response[0]['c_r_sfieldby_o'];
+                        if (response[0]['c_r_sfieldby'] == 'desc') {
+                            $(fieldHeader).find('span').removeClass('glyphicon glyphicon-chevron-up');
+                            $(fieldHeader).find('span').addClass('glyphicon glyphicon-chevron-down');
+                            $(fieldLink).attr('href', url);
+                        }
+                        else if (response[0]['c_r_sfieldby'] == 'asc') {
+                            $(fieldHeader).find('span').removeClass('glyphicon glyphicon-chevron-down');
+                            $(fieldHeader).find('span').addClass('glyphicon glyphicon-chevron-up');
+                            $(fieldLink).prop('href', url);
+                        }
+                      // if field is not the active sort field
+                    }
+                });
+                // update pager buttons TODO: concat if there is lots of pages.
+                var pager_buttons = '';
+                for (var i = 1; i <= response[0]['tot_pages'].length; i++) {
+                    if (response[0]['c_r_page'] === i){
+                        pager_buttons += '<li class="active"><a onclick="refresh_data(this); return false;" href="?page=' + i + '">' + i + '</a></li>';
+                    }
+                    else{
+                        pager_buttons += '<li><a onclick="refresh_data(this); return false;" href="?page=' + i + '">' + i + '</a></li>';
+                    }
+                }
+                $('#footPager').html(pager_buttons);
+            });
+            backgroundTask.resolve();
+            return backgroundTask;
+        }
+    </script>
     <script>
         {% if request.session.search %}
             {% with request.session.search|query_to_rules as rules %}
@@ -96,6 +197,10 @@
         });
     </script>
     <script>
+        // refresh table
+        $('.search-refresh').on('click', function () {
+            refresh_data();
+        });
         // get rules
         $('.parse-puppet').on('click', function () {
             var res = $('#builder-' + $(this).data('target')).queryBuilder('getPuppet');
@@ -106,91 +211,73 @@
                 });
             }
         });
-        // send the query
+        // send the query refresh_data(this).done(refresh_data(this))
         $('.search-puppet').on('click', function () {
             var res = $('#builder-' + $(this).data('target')).queryBuilder('getPuppet');
             if (!$.isEmptyObject(res)) {
                 $('#search').val(res);
-                $('#searchform').submit();
+                refresh_data(document.getElementById('searchform')).done(refresh_data(document.getElementById('searchform')));
+                return false;
             }
         });
         // clear the query
         $('.search-clear').on('click', function () {
             $('#search').val("clear_rules");
-            $('#searchform').submit();
+            $('#builder-nodes').queryBuilder('reset');
+            refresh_data(document.getElementById('searchform')).done(refresh_data(document.getElementById('searchform')));
+            return false;
         });
     </script>
     <div class="row">
         <div class="col-md-12">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h1 class="panel-title">Nodes - Total nodes: {{ total_nodes }}</h1>
+                    <h1 id="nodePaneTitle" class="panel-title"></h1>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-condensed table-striped">
                         <thead>
                         <tr>
-                            <th><a href="?sortfield=certname&{% if request.session.search %}search={{ request.session.search }}{% endif %}&sortfieldby={% if request.GET.sortfield == 'certname' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">Certname<span class="glyphicon{% if c_r_sfieldby == 'asc' and c_r_sfield == 'certname' %}glyphicon-chevron-up{% elif c_r_sfieldby == 'desc' and c_r_sfield == 'certname' %}glyphicon-chevron-down{% endif %}"></span></a></th>
-                            <th><a href="?sortfield=latestCatalog&{% if request.session.search %}search={{ request.session.search }}{% endif %}&sortfieldby={% if request.GET.sortfield == 'latestCatalog' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">Latest Catalog<span class="glyphicon{% if c_r_sfieldby == 'asc' and c_r_sfield == 'latestCatalog' %}glyphicon-chevron-up{% elif c_r_sfieldby == 'desc' and c_r_sfield == 'latestCatalog' %}glyphicon-chevron-down{% endif %}"></span></a></th>
-                            <th><a href="?sortfield=latestReport&{% if request.session.search %}search={{ request.session.search }}{% endif %}&sortfieldby={% if request.GET.sortfield == 'latestReport' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">Latest Report<span class="glyphicon{% if c_r_sfieldby == 'asc' and c_r_sfield == 'latestReport' %}glyphicon-chevron-up{% elif c_r_sfieldby == 'desc' and c_r_sfield == 'latestReport' %}glyphicon-chevron-down{% endif %}"></span></a></th>
-                            <th><a href="?sortfield=latestFacts&{% if request.session.search %}search={{ request.session.search }}{% endif %}&sortfieldby={% if request.GET.sortfield == 'latestFacts' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">Latest Facts<span class="glyphicon{% if c_r_sfieldby == 'asc' and c_r_sfield == 'latestFacts' %}glyphicon-chevron-up{% elif c_r_sfieldby == 'desc' and c_r_sfield == 'latestFacts' %}glyphicon-chevron-down{% endif %}"></span></a></th>
-                            <th><a href="?sortfield=success&{% if request.session.search %}search={{ request.session.search }}{% endif %}&sortfieldby={% if request.GET.sortfield == 'success' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">Success<span class="glyphicon {% if c_r_sfieldby == 'asc' and c_r_sfield == 'success' %}glyphicon-chevron-up{% elif c_r_sfieldby == 'desc' and c_r_sfield == 'success' %}glyphicon-chevron-down{% endif %}"></span></a></th>
-                            <th><a href="?sortfield=noop&{% if request.session.search %}search={{ request.session.search }}{% endif %}&sortfieldby={% if request.GET.sortfield == 'noop' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">Noop<span class="glyphicon{% if c_r_sfieldby == 'asc' and c_r_sfield == 'noop' %}glyphicon-chevron-up{% elif c_r_sfieldby == 'desc' and c_r_sfield == 'noop' %}glyphicon-chevron-down{% endif %}"></span></a></th>
-                            <th><a href="?sortfield=failure&{% if request.session.search %}search={{ request.session.search }}{% endif %}&sortfieldby={% if request.GET.sortfield == 'failure' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">Failure<span class="glyphicon{% if c_r_sfieldby == 'asc' and c_r_sfield == 'failure' %}glyphicon-chevron-up{% elif c_r_sfieldby == 'desc' and c_r_sfield == 'failure' %}glyphicon-chevron-down{% endif %}"></span></a></th>
-                            <th><a href="?sortfield=skipped&{% if request.session.search %}search={{ request.session.search }}{% endif %}&sortfieldby={% if request.GET.sortfield == 'skipped' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">Skipped<span class="glyphicon{% if c_r_sfieldby == 'asc' and c_r_sfield == 'skipped' %}glyphicon-chevron-up{% elif c_r_sfieldby == 'desc' and c_r_sfield == 'skipped' %}glyphicon-chevron-down{% endif %}"></span></a></th>
+                            <th id="certname-header">
+                                <a id="certname-link" onclick="refresh_data(this).done(refresh_data(this)); return false;" href="?sortfield=certname">Certname <span class="glyphicon glyphicon"></span></a>
+                            </th>
+                            <th id="latestCatalog-header">
+                                <a id="latestCatalog-link" onclick="refresh_data(this).done(refresh_data(this)); return false;" href="?sortfield=latestCatalog">Catalog Timestamp <span class="glyphicon"></span></a>
+                            </th>
+                            <th id="latestReport-header">
+                                <a id="latestReport-link" onclick="refresh_data(this).done(refresh_data(this)); return false;" href="?sortfield=latestReport">Report Timestamp <span class="glyphicon"></span></a>
+                            </th>
+                            <th id="latestFacts-header">
+                                <a id="latestFacts-link" onclick="refresh_data(this).done(refresh_data(this)); return false;" href="?sortfield=latestFacts">Facts Timestamp <span class="glyphicon"></span></a>
+                            </th>
+                            <th id="success-header">
+                                <a id="success-link" onclick="refresh_data(this).done(refresh_data(this)); return false;    " href="?sortfield=success">Successes <span class="glyphicon"></span></a>
+                            </th>
+                            <th id="noop-header">
+                                <a id="noop-link" onclick="refresh_data(this).done(refresh_data(this)); return false;" href="?sortfield=noop">Noops <span class="glyphicon"></span></a>
+                            </th>
+                            <th id="failure-header">
+                                <a id="failure-link" onclick="refresh_data(this).done(refresh_data(this)); return false;" href="?sortfield=failure">Failures <span class="glyphicon"></span></a>
+                            </th>
+                            <th id="skipped-header">
+                                <a id="skipped-link" onclick="refresh_data(this).done(refresh_data(this)); return false;" href="?sortfield=skipped">Skipped <span class="glyphicon"></span></a>
+                            </th>
                         </tr>
                         </thead>
                         <tbody>
-                        {% if node_list %}
-                            {% for node in node_list %}
-                                <tr>
-                                    <td><a href="{% url 'reports' node.0 %}">{{ node.0 }}</a></td>
-                                    <td>{{ node.1|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
-                                    <td>{% if node.4 or node.5 or node.6 or node.7 %}
-                                        <a href="{% url 'reports' node.0 %}?latest=true&report_timestamp={{ node.2 }}">
-                                            {{ node.2|json_to_datetime|date:'Y-m-d H:i:s' }}
-                                        </a>
-                                    {% else %}
-                                        {{ node.2|json_to_datetime|date:'Y-m-d H:i:s' }}
-                                    {% endif %}
-                                    </td>
-                                    <td>{{ node.3|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
-                                    <td style="text-align: center"><p style="margin-bottom: 0"
-                                                                      class="bg-success img-rounded">
-                                        <strong>{{ node.4 }}</strong></p></td>
-                                    <td style="text-align: center"><p style="margin-bottom: 0"
-                                                                      class="bg-info img-rounded">
-                                        <strong>{{ node.5 }}</strong></p></td>
-                                    <td style="text-align: center"><p style="margin-bottom: 0"
-                                                                      class="bg-danger img-rounded">
-                                        <strong>{{ node.6 }}</strong></p></td>
-                                    <td style="text-align: center"><p style="margin-bottom: 0"
-                                                                      class="bg-warning img-rounded">
-                                        <strong>{{ node.7 }}</strong></p></td>
-                                </tr>
-                            {% endfor %}
-                        {% else %}
-                            <tr>
-                                <td colspan="8">No nodes were found in puppetdb.</td>
-                            </tr>
-                        {% endif %}
                         </tbody>
                         <tfoot>
                         <tr>
                             <td colspan="8"><strong>Download as: </strong>
-                                <a href="?{% if request.session.search %}search={{ request.session.search }}{% endif %}&dl_csv=true">CSV</a>
+                                <a href="../api/nodes/?dl_csv=true" download>CSV</a>
                             </td>
                         </tr>
                         </tfoot>
                     </table>
                 </div>
                 <div class="panel-footer">
-                    <ul class="pagination pagination-sm" style="margin:0;">
-                        {% for page in tot_pages %}
-                            <li {% if node_list.number == page %}class="active"{% endif %}>
-                                <a href="?page={{ page }}&{% if request.session.search %}search={{ request.session.search }}{% endif %}&sortfield={{ c_r_sfield }}&sortfieldby={{ c_r_sfieldby }}&limits={{ c_r_limit }}">{{ page }}</a>
-                            </li>
-                        {% endfor %}
+                    <ul id="footPager" class="pagination pagination-sm" style="margin:0;">
+                        <li><a onclick="refresh_data(this).done(refresh_data(this)); return false;" href="?page="></a></li>
                     </ul>
                 </div>
             </div>
@@ -200,15 +287,13 @@
         <div class="col-md-4">
         </div>
         <div class="col-md-8" align="right">
-            <form action="{% url 'nodes' %}" method="GET">
-                {% csrf_token %}
+            <form>
             <span class="dropdown-header">Page Size:<br>
                 <label for="req_limit">
-                    <select name="limits" onchange="this.form.submit()">
+                    <select id="limits" onchange="refresh_data(this).done(refresh_data(this)); return false;">
                         {% mkrange 50 3050 50 as limitrange %}
                         {% for range in limitrange %}
-                            <option value="{{ range }}"{% ifequal range|add:"0" c_r_limit|add:"0" %}
-                                    selected="selected"{% endifequal %}>{{ range }}</option>
+                            <option value="{{ range }}">{{ range }}</option>
                         {% endfor %}
                     </select>
                 </label>
