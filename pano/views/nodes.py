@@ -22,14 +22,24 @@ def nodes(request):
         return redirect(request.POST['return_url'])
     else:
         try:
-            limits = int(request.GET.get('limits', 50))
-            if limits <= 0:
-                limits = 50
+            # Add limits to session
+            if request.GET.get('limits', False):
+                if request.session['limits'] != int(request.GET.get('limits', 50)):
+                    request.session['limits'] = int(request.GET.get('limits', 50))
+                if request.session['limits'] <= 0:
+                    request.session['limits'] = 50
+
             sort_field = str(request.GET.get('sortfield', 'latestReport'))
             sort_field_order = str(request.GET.get('sortfieldby', 'desc'))
             page_num = int(request.GET.get('page', 1))
+
             # Search parameters takes a valid puppetdb query string
-            search_node = request.GET.get('search', None)
+            if request.GET.get('search', False):
+                if request.GET.get('search') == "clear_rules":
+                    request.session['search'] = ''
+                else:
+                    request.session['search'] = request.GET.get('search')
+
             # If user requested to download csv formatted file. Default value is False
             dl_csv = request.GET.get('dl_csv', False)
             if dl_csv == 'true':
@@ -39,11 +49,11 @@ def nodes(request):
         except:
             return HttpResponseBadRequest('Oh no! Your filters were invalid.')
 
-        if search_node is not None:
+        if request.session['search'] is not None:
             node_params = {
                 'query':
                     {
-                        1: search_node
+                        1: request.session['search']
                     },
             }
         else:
@@ -115,7 +125,9 @@ def nodes(request):
                                                  content_type="text/csv")
                 response['Content-Disposition'] = 'attachment; filename="puppetdata-%s.csv"' % (datetime.datetime.now())
                 return response
-        paginator = Paginator(merged_list, limits)
+
+        len_nodes_results = len(merged_list)
+        paginator = Paginator(merged_list, request.session['limits'])
 
         try:
             merged_list = paginator.page(page_num)
@@ -131,15 +143,17 @@ def nodes(request):
         c_r_* = current req
         r_s* = requests available
         """
+
         context = {
             'node_list': merged_list,
             'timezones': pytz.common_timezones,
-            'c_r_limit': request.GET.get('limits', 50),
+            'c_r_limit': request.session['limits'],
             'r_sfield': valid_sort_fields,
             'c_r_sfield': sort_field,
             'r_sfieldby': ['asc', 'desc'],
             'c_r_sfieldby': sort_field_order,
             'c_r_sfieldby_o': sort_field_order_opposite,
+            'total_nodes': len_nodes_results,
             'tot_pages': paginator.page_range,
         }
         return render(request, 'pano/nodes.html', context)

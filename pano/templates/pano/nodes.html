@@ -15,7 +15,7 @@
     <div class="row">
         <div class="col-md-12">
             <div class="panel-group" id="filters_accordion" role="tablist" aria-multiselectable="true">
-                <div class="panel panel-primary">
+                <div class="panel panel-default">
                     <div role="tab" class="panel-heading" id="headingFilter">
                         <h4 class="panel-title">
                             <a data-toggle="collapse" data-parent="#filters_accordion" href="#collapseFilter"
@@ -34,6 +34,7 @@
                                     <input type="hidden" id="dl_csv" name="dl_csv" value="false"/>
                                 </form>
                                 <button class="btn btn-primary search-puppet" data-target="nodes">Search</button>
+                                <button class="btn btn-primary search-clear" data-target="nodes">Clear</button>
                                 <button class="btn btn-primary parse-puppet" data-target="nodes">Generate</button>
                             </div>
                         </div>
@@ -43,10 +44,10 @@
         </div>
     </div>
     <script>
-        {% if request.GET.search %}
-            {% with request.GET.search|query_to_rules as rules %}
+        {% if request.session.search %}
+            {% with request.session.search|query_to_rules as rules %}
                 {% autoescape off %}
-                var rules ={{ rules }};
+                    var rules ={{ rules }};
                 {% endautoescape %}
             {% endwith %}
         {% endif %}
@@ -85,12 +86,12 @@
                     label: 'Resource',
                     type: 'string',
                     description: 'The resource type should be entered into the first text field (i.e "Package") and the resource title should be in the second tex field (i.e "Puppet")',
-                    operators: ['puppet_equal', 'puppet_nequal','puppet_g', 'puppet_ge', 'puppet_l', 'puppet_le', 'puppet_re_match'],
+                    operators: ['puppet_equal', 'puppet_nequal', 'puppet_g', 'puppet_ge', 'puppet_l', 'puppet_le', 'puppet_re_match'],
                     placeholder: 'Type, Name'
                 }
             ],
-            {% if request.GET.search %}
-            rules: rules
+            {% if request.session.search %}
+                rules: rules
             {% endif %}
         });
     </script>
@@ -105,6 +106,7 @@
                 });
             }
         });
+        // send the query
         $('.search-puppet').on('click', function () {
             var res = $('#builder-' + $(this).data('target')).queryBuilder('getPuppet');
             if (!$.isEmptyObject(res)) {
@@ -112,74 +114,86 @@
                 $('#searchform').submit();
             }
         });
+        // clear the query
+        $('.search-clear').on('click', function () {
+            $('#search').val("clear_rules");
+            $('#searchform').submit();
+        });
     </script>
     <div class="row">
         <div class="col-md-12">
-            <table class="table table-condensed table-striped">
-                <thead>
-                <tr>
-                    <th><a href="?sortfield=certname&{% if request.GET.search %}search={{ request.GET.search }}{% endif %}&sortfieldby={% if request.GET.sortfield == 'certname' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">Certname<span class="glyphicon{% if c_r_sfieldby == 'asc' and c_r_sfield == 'certname' %}glyphicon-chevron-up{% elif c_r_sfieldby == 'desc' and c_r_sfield == 'certname' %}glyphicon-chevron-down{% endif %}"></span></a></th>
-                    <th><a href="?sortfield=latestCatalog&{% if request.GET.search %}search={{ request.GET.search }}{% endif %}&sortfieldby={% if request.GET.sortfield == 'latestCatalog' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">Latest Catalog<span class="glyphicon{% if c_r_sfieldby == 'asc' and c_r_sfield == 'latestCatalog' %}glyphicon-chevron-up{% elif c_r_sfieldby == 'desc' and c_r_sfield == 'latestCatalog' %}glyphicon-chevron-down{% endif %}"></span></a></th>
-                    <th><a href="?sortfield=latestReport&{% if request.GET.search %}search={{ request.GET.search }}{% endif %}&sortfieldby={% if request.GET.sortfield == 'latestReport' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">Latest Report<span class="glyphicon{% if c_r_sfieldby == 'asc' and c_r_sfield == 'latestReport' %}glyphicon-chevron-up{% elif c_r_sfieldby == 'desc' and c_r_sfield == 'latestReport' %}glyphicon-chevron-down{% endif %}"></span></a></th>
-                    <th><a href="?sortfield=latestFacts&{% if request.GET.search %}search={{ request.GET.search }}{% endif %}&sortfieldby={% if request.GET.sortfield == 'latestFacts' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">Latest Facts<span class="glyphicon{% if c_r_sfieldby == 'asc' and c_r_sfield == 'latestFacts' %}glyphicon-chevron-up{% elif c_r_sfieldby == 'desc' and c_r_sfield == 'latestFacts' %}glyphicon-chevron-down{% endif %}"></span></a></th>
-                    <th><a href="?sortfield=success&{% if request.GET.search %}search={{ request.GET.search }}{% endif %}&sortfieldby={% if request.GET.sortfield == 'success' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">Success<span class="glyphicon {% if c_r_sfieldby == 'asc' and c_r_sfield == 'success' %}glyphicon-chevron-up{% elif c_r_sfieldby == 'desc' and c_r_sfield == 'success' %}glyphicon-chevron-down{% endif %}"></span></a></th>
-                    <th><a href="?sortfield=noop&{% if request.GET.search %}search={{ request.GET.search }}{% endif %}&sortfieldby={% if request.GET.sortfield == 'noop' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">Noop<span class="glyphicon{% if c_r_sfieldby == 'asc' and c_r_sfield == 'noop' %}glyphicon-chevron-up{% elif c_r_sfieldby == 'desc' and c_r_sfield == 'noop' %}glyphicon-chevron-down{% endif %}"></span></a></th>
-                    <th><a href="?sortfield=failure&{% if request.GET.search %}search={{ request.GET.search }}{% endif %}&sortfieldby={% if request.GET.sortfield == 'failure' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">Failure<span class="glyphicon{% if c_r_sfieldby == 'asc' and c_r_sfield == 'failure' %}glyphicon-chevron-up{% elif c_r_sfieldby == 'desc' and c_r_sfield == 'failure' %}glyphicon-chevron-down{% endif %}"></span></a></th>
-                    <th><a href="?sortfield=skipped&{% if request.GET.search %}search={{ request.GET.search }}{% endif %}&sortfieldby={% if request.GET.sortfield == 'skipped' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">Skipped<span class="glyphicon{% if c_r_sfieldby == 'asc' and c_r_sfield == 'skipped' %}glyphicon-chevron-up{% elif c_r_sfieldby == 'desc' and c_r_sfield == 'skipped' %}glyphicon-chevron-down{% endif %}"></span></a></th>
-                </tr>
-                </thead>
-                <tbody>
-                {% if node_list %}
-                    {% for node in node_list %}
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h1 class="panel-title">Nodes - Total nodes: {{ total_nodes }}</h1>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-condensed table-striped">
+                        <thead>
                         <tr>
-                            <td><a href="{% url 'reports' node.0 %}">{{ node.0 }}</a></td>
-                            <td>{{ node.1|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
-                            <td>{% if node.4 or node.5 or node.6 or node.7 %}
-                                <a href="{% url 'reports' node.0 %}?latest=true&report_timestamp={{ node.2 }}">
-                                    {{ node.2|json_to_datetime|date:'Y-m-d H:i:s' }}
-                                </a>
-                            {% else %}
-                                {{ node.2|json_to_datetime|date:'Y-m-d H:i:s' }}
-                            {% endif %}
-                            </td>
-                            <td>{{ node.3|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
-                            <td style="text-align: center"><p style="margin-bottom: 0"
-                                                              class="bg-success img-rounded">
-                                <strong>{{ node.4 }}</strong></p></td>
-                            <td style="text-align: center"><p style="margin-bottom: 0"
-                                                              class="bg-info img-rounded">
-                                <strong>{{ node.5 }}</strong></p></td>
-                            <td style="text-align: center"><p style="margin-bottom: 0"
-                                                              class="bg-danger img-rounded">
-                                <strong>{{ node.6 }}</strong></p></td>
-                            <td style="text-align: center"><p style="margin-bottom: 0"
-                                                              class="bg-warning img-rounded">
-                                <strong>{{ node.7 }}</strong></p></td>
+                            <th><a href="?sortfield=certname&{% if request.session.search %}search={{ request.session.search }}{% endif %}&sortfieldby={% if request.GET.sortfield == 'certname' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">Certname<span class="glyphicon{% if c_r_sfieldby == 'asc' and c_r_sfield == 'certname' %}glyphicon-chevron-up{% elif c_r_sfieldby == 'desc' and c_r_sfield == 'certname' %}glyphicon-chevron-down{% endif %}"></span></a></th>
+                            <th><a href="?sortfield=latestCatalog&{% if request.session.search %}search={{ request.session.search }}{% endif %}&sortfieldby={% if request.GET.sortfield == 'latestCatalog' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">Latest Catalog<span class="glyphicon{% if c_r_sfieldby == 'asc' and c_r_sfield == 'latestCatalog' %}glyphicon-chevron-up{% elif c_r_sfieldby == 'desc' and c_r_sfield == 'latestCatalog' %}glyphicon-chevron-down{% endif %}"></span></a></th>
+                            <th><a href="?sortfield=latestReport&{% if request.session.search %}search={{ request.session.search }}{% endif %}&sortfieldby={% if request.GET.sortfield == 'latestReport' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">Latest Report<span class="glyphicon{% if c_r_sfieldby == 'asc' and c_r_sfield == 'latestReport' %}glyphicon-chevron-up{% elif c_r_sfieldby == 'desc' and c_r_sfield == 'latestReport' %}glyphicon-chevron-down{% endif %}"></span></a></th>
+                            <th><a href="?sortfield=latestFacts&{% if request.session.search %}search={{ request.session.search }}{% endif %}&sortfieldby={% if request.GET.sortfield == 'latestFacts' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">Latest Facts<span class="glyphicon{% if c_r_sfieldby == 'asc' and c_r_sfield == 'latestFacts' %}glyphicon-chevron-up{% elif c_r_sfieldby == 'desc' and c_r_sfield == 'latestFacts' %}glyphicon-chevron-down{% endif %}"></span></a></th>
+                            <th><a href="?sortfield=success&{% if request.session.search %}search={{ request.session.search }}{% endif %}&sortfieldby={% if request.GET.sortfield == 'success' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">Success<span class="glyphicon {% if c_r_sfieldby == 'asc' and c_r_sfield == 'success' %}glyphicon-chevron-up{% elif c_r_sfieldby == 'desc' and c_r_sfield == 'success' %}glyphicon-chevron-down{% endif %}"></span></a></th>
+                            <th><a href="?sortfield=noop&{% if request.session.search %}search={{ request.session.search }}{% endif %}&sortfieldby={% if request.GET.sortfield == 'noop' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">Noop<span class="glyphicon{% if c_r_sfieldby == 'asc' and c_r_sfield == 'noop' %}glyphicon-chevron-up{% elif c_r_sfieldby == 'desc' and c_r_sfield == 'noop' %}glyphicon-chevron-down{% endif %}"></span></a></th>
+                            <th><a href="?sortfield=failure&{% if request.session.search %}search={{ request.session.search }}{% endif %}&sortfieldby={% if request.GET.sortfield == 'failure' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">Failure<span class="glyphicon{% if c_r_sfieldby == 'asc' and c_r_sfield == 'failure' %}glyphicon-chevron-up{% elif c_r_sfieldby == 'desc' and c_r_sfield == 'failure' %}glyphicon-chevron-down{% endif %}"></span></a></th>
+                            <th><a href="?sortfield=skipped&{% if request.session.search %}search={{ request.session.search }}{% endif %}&sortfieldby={% if request.GET.sortfield == 'skipped' %}{{ c_r_sfieldby_o }}{% else %}{{ c_r_sfieldby }}{% endif %}&limits={{ c_r_limit }}">Skipped<span class="glyphicon{% if c_r_sfieldby == 'asc' and c_r_sfield == 'skipped' %}glyphicon-chevron-up{% elif c_r_sfieldby == 'desc' and c_r_sfield == 'skipped' %}glyphicon-chevron-down{% endif %}"></span></a></th>
                         </tr>
-                    {% endfor %}
-                {% else %}
-                    <tr>
-                        <td colspan="8">No nodes were found in puppetdb.</td>
-                    </tr>
-                {% endif %}
-                </tbody>
-                <tfoot>
-                <tr>
-                    <td colspan="8"><strong>Download as: </strong><a href="?{% if request.GET.search %}search={{ request.GET.search }}{% endif %}&dl_csv=true">CSV</a></td>
-                </tr>
-                <tr>
-                    <td colspan="8">
-                        <ul class="pagination pagination-sm">
-                            {% for page in tot_pages %}
-                                <li {% if node_list.number == page %}class="active"{% endif %}><a
-                                        href="?page={{ page }}&{% if request.GET.search %}search={{ request.GET.search }}{% endif %}&sortfield={{ c_r_sfield }}&sortfieldby={{ c_r_sfieldby }}&limits={{ c_r_limit }}">{{ page }}</a>
-                                </li>
+                        </thead>
+                        <tbody>
+                        {% if node_list %}
+                            {% for node in node_list %}
+                                <tr>
+                                    <td><a href="{% url 'reports' node.0 %}">{{ node.0 }}</a></td>
+                                    <td>{{ node.1|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
+                                    <td>{% if node.4 or node.5 or node.6 or node.7 %}
+                                        <a href="{% url 'reports' node.0 %}?latest=true&report_timestamp={{ node.2 }}">
+                                            {{ node.2|json_to_datetime|date:'Y-m-d H:i:s' }}
+                                        </a>
+                                    {% else %}
+                                        {{ node.2|json_to_datetime|date:'Y-m-d H:i:s' }}
+                                    {% endif %}
+                                    </td>
+                                    <td>{{ node.3|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
+                                    <td style="text-align: center"><p style="margin-bottom: 0"
+                                                                      class="bg-success img-rounded">
+                                        <strong>{{ node.4 }}</strong></p></td>
+                                    <td style="text-align: center"><p style="margin-bottom: 0"
+                                                                      class="bg-info img-rounded">
+                                        <strong>{{ node.5 }}</strong></p></td>
+                                    <td style="text-align: center"><p style="margin-bottom: 0"
+                                                                      class="bg-danger img-rounded">
+                                        <strong>{{ node.6 }}</strong></p></td>
+                                    <td style="text-align: center"><p style="margin-bottom: 0"
+                                                                      class="bg-warning img-rounded">
+                                        <strong>{{ node.7 }}</strong></p></td>
+                                </tr>
                             {% endfor %}
-                        </ul>
-                    </td>
-                </tr>
-                </tfoot>
-            </table>
+                        {% else %}
+                            <tr>
+                                <td colspan="8">No nodes were found in puppetdb.</td>
+                            </tr>
+                        {% endif %}
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                            <td colspan="8"><strong>Download as: </strong>
+                                <a href="?{% if request.session.search %}search={{ request.session.search }}{% endif %}&dl_csv=true">CSV</a>
+                            </td>
+                        </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                <div class="panel-footer">
+                    <ul class="pagination pagination-sm" style="margin:0;">
+                        {% for page in tot_pages %}
+                            <li {% if node_list.number == page %}class="active"{% endif %}>
+                                <a href="?page={{ page }}&{% if request.session.search %}search={{ request.session.search }}{% endif %}&sortfield={{ c_r_sfield }}&sortfieldby={{ c_r_sfieldby }}&limits={{ c_r_limit }}">{{ page }}</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
     <div class="row">
