@@ -21,31 +21,79 @@ def nodes(request):
         request.session['django_timezone'] = request.POST['timezone']
         return redirect(request.POST['return_url'])
     else:
+        valid_sort_fields = (
+            'certname',
+            'latestCatalog',
+            'latestReport',
+            'latestFacts',
+            'success',
+            'noop',
+            'failure',
+            'skipped')
         try:
-            # Add limits to session
-            if request.GET.get('limits', False):
-                if request.session['limits'] != int(request.GET.get('limits', 50)):
-                    request.session['limits'] = int(request.GET.get('limits', 50))
-                if request.session['limits'] <= 0:
-                    request.session['limits'] = 50
-
-            sort_field = str(request.GET.get('sortfield', 'latestReport'))
-            sort_field_order = str(request.GET.get('sortfieldby', 'desc'))
-            page_num = int(request.GET.get('page', 1))
-
-            # Search parameters takes a valid puppetdb query string
-            if request.GET.get('search', False):
-                if request.GET.get('search') == "clear_rules":
-                    request.session['search'] = ''
-                else:
-                    request.session['search'] = request.GET.get('search')
-
             # If user requested to download csv formatted file. Default value is False
             dl_csv = request.GET.get('dl_csv', False)
             if dl_csv == 'true':
                 dl_csv = True
             else:
                 dl_csv = False
+            # Add limits to session
+            if request.GET.get('limits', False):
+                if request.session['limits'] != int(request.GET.get('limits', 50)):
+                    request.session['limits'] = int(request.GET.get('limits', 50))
+                if request.session['limits'] <= 0:
+                    request.session['limits'] = 50
+            else:
+                if 'limits' not in request.session:
+                    request.session['limits'] = 50
+
+
+            # Cur Page Number
+            if request.GET.get('page', False):
+                if request.session['page'] != int(request.GET.get('page', 1)):
+                    request.session['page'] = int(request.GET.get('page', 1))
+                if request.session['page'] <= 0:
+                    request.session['page'] = 1
+            else:
+                if 'page' not in request.session:
+                    request.session['page'] = 1
+
+            # Cur sort field
+            if request.GET.get('sortfield', False):
+                if request.session['sortfield'] != request.GET.get('sortfield'):
+                    request.session['sortfield'] = request.GET.get('sortfield')
+                if request.session['sortfield'] not in valid_sort_fields:
+                    request.session['sortfield'] = 'latestReport'
+            else:
+                if 'sortfield' not in request.session:
+                    request.session['sortfield'] = 'latestReport'
+
+            # Cur sort order
+            if request.GET.get('sortfieldby', False):
+                avail_sortorder = ['asc', 'desc']
+                if request.session['sortfieldby'] != request.GET.get('sortfieldby'):
+                    request.session['sortfieldby'] = request.GET.get('sortfieldby')
+                if request.session['sortfieldby'] not in avail_sortorder:
+                    request.session['sortfieldby'] = 'desc'
+            else:
+                if 'sortfieldby' not in request.session:
+                    request.session['sortfieldby'] = 'desc'
+            # Search parameters takes a valid puppetdb query string
+            if request.GET.get('search', False):
+                if 'search' in request.session and (request.session['search'] == request.GET.get('search')):
+                    pass
+                else:
+                    if request.GET.get('search') == 'clear_rules':
+                        request.session['sortfield'] = 'latestReport'
+                        request.session['sortfieldby'] = 'desc'
+                        request.session['page'] = 1
+                        request.session['search'] = None
+                    else:
+                        request.session['page'] = 1
+                        request.session['search'] = request.GET.get('search')
+            else:
+                if 'search' not in request.session:
+                    request.session['search'] = None
         except:
             return HttpResponseBadRequest('Oh no! Your filters were invalid.')
 
@@ -92,13 +140,13 @@ def nodes(request):
                                        params=puppetdb.mk_puppetdb_query(
                                            report_params),
                                        )
-        if sort_field_order == 'desc':
+        if request.session['sortfieldby'] == 'desc':
             merged_list = dictstatus(
-                node_list, report_list, sortby=sort_field, asc=True)
+                node_list, report_list, sortby=request.session['sortfield'], asc=True)
             sort_field_order_opposite = 'asc'
         else:
             merged_list = dictstatus(
-                node_list, report_list, sortby=sort_field, asc=False)
+                node_list, report_list, sortby=request.session['sortfield'], asc=False)
             sort_field_order_opposite = 'desc'
 
         if dl_csv is True:
@@ -130,7 +178,7 @@ def nodes(request):
         paginator = Paginator(merged_list, request.session['limits'])
 
         try:
-            merged_list = paginator.page(page_num)
+            merged_list = paginator.page(request.session['page'])
         except PageNotAnInteger:
             # If page is not an integer, deliver first page.
             merged_list = paginator.page(1)
@@ -149,9 +197,9 @@ def nodes(request):
             'timezones': pytz.common_timezones,
             'c_r_limit': request.session['limits'],
             'r_sfield': valid_sort_fields,
-            'c_r_sfield': sort_field,
+            'c_r_sfield': request.session['sortfield'],
             'r_sfieldby': ['asc', 'desc'],
-            'c_r_sfieldby': sort_field_order,
+            'c_r_sfieldby': request.session['sortfieldby'],
             'c_r_sfieldby_o': sort_field_order_opposite,
             'total_nodes': len_nodes_results,
             'tot_pages': paginator.page_range,
