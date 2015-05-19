@@ -188,7 +188,7 @@
                     <ul class="pagination pagination-sm" style="margin:0;">
                         {% for page in tot_pages %}
                             <li {% if node_list.number == page %}class="active"{% endif %}>
-                                <a href="?page={{ page }}&{% if request.session.search %}search={{ request.session.search }}{% endif %}&sortfield={{ c_r_sfield }}&sortfieldby={{ c_r_sfieldby }}&limits={{ c_r_limit }}">{{ page }}</a>
+                                <a href="?page={{ page }}{% if request.session.search %}&search={{ request.session.search }}{% endif %}&sortfield={{ c_r_sfield }}&sortfieldby={{ c_r_sfieldby }}&limits={{ c_r_limit }}">{{ page }}</a>
                             </li>
                         {% endfor %}
                     </ul>
