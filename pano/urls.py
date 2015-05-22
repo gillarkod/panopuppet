@@ -8,6 +8,7 @@ from pano.views.nodes import nodes
 from pano.views.report_events import detailed_events
 from pano.views.reports import reports
 from pano.views.splash import splash
+from pano.views.api.node_data import nodes_json
 
 __author__ = 'etaklar'
 
@@ -29,4 +30,7 @@ urlpatterns = patterns('',
                        url(r'^eventanalytics/$', event_analytics, name='event_analytics'),
                        url(r'^eventanalytics/(?P<view>[\w]+)/$', event_analytics, name='event_analytics'),
                        url(r'^facts/(?P<certname>[\w\.-]+)/$', facts, name='facts'),
+
+                       # API URLS
+                       url(r'^api/nodes/$', nodes_json, name='api_nodes'),
                        )

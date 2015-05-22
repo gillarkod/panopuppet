@@ -3,7 +3,8 @@ __author__ = 'etaklar'
 from pano.puppetdb.pdbutils import json_to_datetime, is_unreported
 from pano.settings import PUPPET_RUN_INTERVAL
 from datetime import timedelta
-
+from django.template import defaultfilters as filters
+from django.utils.timezone import localtime
 
 def sort_table(table, col=0, order=False):
     return sorted(table, reverse=order, key=lambda field: field[col])
@@ -40,11 +41,11 @@ def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_st
         },
     ]
     """
-
     # The merged_list tuple should look like this.
     # (
     # ('certname', 'latestCatalog', 'latestReport', 'latestFacts', 'success', 'noop', 'failure', 'skipped'),
     # )
+
     def check_failed_compile(report_timestamp,
                              fact_timestamp,
                              catalog_timestamp,
@@ -81,13 +82,13 @@ def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_st
 
     sortables = {
         'certname': 0,
-        'latestCatalog': 1,
-        'latestReport': 2,
-        'latestFacts': 3,
-        'success': 4,
-        'noop': 5,
-        'failure': 6,
-        'skipped': 7,
+        'catalog-timestamp': 1,
+        'report-timestamp': 2,
+        'facts-timestamp': 3,
+        'successes': 4,
+        'noops': 5,
+        'failures': 6,
+        'skips': 7,
     }
 
     if sortby:
@@ -97,6 +98,8 @@ def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_st
     else:
         sortbycol = 2
 
+    # if sortbycol is 4, 5, 6 or 7 ( a different list creation method must be used.
+
     merged_list = []
     failed_list = []
     unreported_list = []
@@ -104,127 +107,78 @@ def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_st
     pending_list = []
     mismatch_list = []
 
-    for node in node_dict:
-        found_node = False
-        for status in status_dict:
-            if node['certname'] == status['subject']['title']:
-                found_node = True
-                if get_status == "all":
-                    merged_list.append((
-                        node['certname'],
-                        node['catalog-timestamp'] or '',
-                        node['report-timestamp'] or '',
-                        node['facts-timestamp'] or '',
-                        status['successes'],
-                        status['noops'],
-                        status['failures'],
-                        status['skips'],
-                    ))
-                else:
+    def append_list(n_data, s_data, m_list):
+        if type(n_data) is not dict or type(s_data) is not dict and type(m_list) is not list:
+            raise ValueError('Incorrect type given as input. Expects n_data, s_data as dict and m_list as list.')
+        m_list.append((
+            n_data['certname'],
+            filters.date(localtime(json_to_datetime(n_data['catalog-timestamp'])), 'Y-m-d H:i:s') if n_data['catalog-timestamp'] is not None else '',
+            filters.date(localtime(json_to_datetime(n_data['report-timestamp'])), 'Y-m-d H:i:s') if n_data['report-timestamp'] is not None else '',
+            filters.date(localtime(json_to_datetime(n_data['facts-timestamp'])), 'Y-m-d H:i:s') if n_data['facts-timestamp'] is not None else '',
+            s_data.get('successes', 0),
+            s_data.get('noops', 0),
+            s_data.get('failures', 0),
+            s_data.get('skips', 0),
+        ))
+        return m_list
+    # if sort field is certname or catalog/report/facts-timestamp then we will sort this way
+    # or if the get_status is set to "not_all" indicating that the dashboard wants info.
+    if get_status != 'all':
+        for node in node_dict:
+            found_node = False
+            for status in status_dict:
+                if node['certname'] == status['subject']['title']:
+                    found_node = True
                     # If the node has failures
                     if status['failures'] > 0:
-                        failed_list.append((
-                            node['certname'],
-                            node['catalog-timestamp'] or '',
-                            node['report-timestamp'] or '',
-                            node['facts-timestamp'] or '',
-                            status['successes'],
-                            status['noops'],
-                            status['failures'],
-                            status['skips'],
-                        ))
+                        failed_list = append_list(node, status, failed_list)
                     if check_failed_compile(report_timestamp=node.get('report-timestamp', None),
                                             fact_timestamp=node.get('facts-timestamp', None),
                                             catalog_timestamp=node.get('catalog-timestamp', None)):
-                        mismatch_list.append((
-                            node['certname'],
-                            node['catalog-timestamp'] or '',
-                            node['report-timestamp'] or '',
-                            node['facts-timestamp'] or '',
-                            status['successes'],
-                            status['noops'],
-                            status['failures'],
-                            status['skips'],
-                        ))
+                        mismatch_list = append_list(node, status, mismatch_list)
                     # If the node is unreported
                     if is_unreported(node['report-timestamp']):
-                        unreported_list.append((
-                            node['certname'],
-                            node['catalog-timestamp'] or '',
-                            node['report-timestamp'] or '',
-                            node['facts-timestamp'] or '',
-                            status['successes'],
-                            status['noops'],
-                            status['failures'],
-                            status['skips'],
-                        ))
+                        unreported_list = append_list(node, status, unreported_list)
                     # If the node has noops
                     if status['noops'] > 0 \
                             and status['successes'] == 0 \
                             and status['failures'] == 0 \
                             and status['skips'] == 0:
-                        pending_list.append((
-                            node['certname'],
-                            node['catalog-timestamp'] or '',
-                            node['report-timestamp'] or '',
-                            node['facts-timestamp'] or '',
-                            status['successes'],
-                            status['noops'],
-                            status['failures'],
-                            status['skips'],
-                        ))
+                        pending_list = append_list(node, status, pending_list)
                     # The node was found in the events list so it has to have changed
-                    changed_list.append((
-                        node['certname'],
-                        node['catalog-timestamp'] or '',
-                        node['report-timestamp'] or '',
-                        node['facts-timestamp'] or '',
-                        status['successes'],
-                        status['noops'],
-                        status['failures'],
-                        status['skips'],
-                    ))
+                    changed_list = append_list(node, status, changed_list)
                 # Found the node in events list so we can break this loop
-                break
-        if found_node is False:
-            if get_status == "all":
-                merged_list.append((
-                    node['certname'],
-                    node['catalog-timestamp'] or '',
-                    node['report-timestamp'] or '',
-                    node['facts-timestamp'] or '',
-                    0,
-                    0,
-                    0,
-                    0,
-                ))
-            else:
+                    break
+            if found_node is False:
                 # If the node is unreported
                 if is_unreported(node['report-timestamp']):
-                    unreported_list.append((
-                        node['certname'],
-                        node['catalog-timestamp'] or '',
-                        node['report-timestamp'] or '',
-                        node['facts-timestamp'] or '',
-                        0,
-                        0,
-                        0,
-                        0,
-                    ))
+                    unreported_list = append_list(node, dict(), unreported_list)
                 if check_failed_compile(report_timestamp=node.get('report-timestamp', None),
                                         fact_timestamp=node.get('facts-timestamp', None),
                                         catalog_timestamp=node.get('catalog-timestamp', None)):
-                    mismatch_list.append((
-                        node['certname'],
-                        node['catalog-timestamp'] or '',
-                        node['report-timestamp'] or '',
-                        node['facts-timestamp'] or '',
-                        0,
-                        0,
-                        0,
-                        0,
-                    ))
+                    mismatch_list = append_list(node, dict(), mismatch_list)
+    elif sortbycol <= 3 and get_status == 'all':
+        for node in node_dict:
+            found_node = False
+            for status in status_dict:
+                if node['certname'] == status['subject']['title']:
+                    found_node = True
+                    merged_list = append_list(node, status, merged_list)
+                    # Found the node in events list so we can break this loop
+                    break
+            if found_node is False:
+                merged_list = append_list(node, dict(), merged_list)
+    # Only used when orderby is a status field.
+    elif sortbycol >= 4 and get_status == 'all':
+        for status in status_dict:
+            found_node = False
+            for node in node_dict:
+                if node['certname'] == status['subject']['title']:
+                    found_node = True
+                    merged_list = append_list(node, status, merged_list)
+                    break
 
+    # Sort the lists if sort is True
     if sort and get_status == 'all':
         return sort_table(merged_list, order=asc, col=sortbycol)
     elif sort and get_status != 'all':
