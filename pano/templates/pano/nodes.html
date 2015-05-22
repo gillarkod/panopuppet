@@ -106,7 +106,7 @@
                 $('#nodePaneTitle').html('Query Results - Number of results: ' + response[0]['total_nodes']);
 
                 // update glyphicons
-                var sortfield = ['certname', 'latestReport', 'latestCatalog', 'latestFacts', 'success', 'failure', 'noop', 'skipped'];
+                var sortfield = ['certname', 'catalog-timestamp', 'facts-timestamp', 'report-timestamp', 'successes', 'failures', 'noops', 'skips'];
 
                 sortfield.forEach(function (field) {
                     var fieldHeader = $('#' + field + '-header');
@@ -130,7 +130,7 @@
                 });
                 // update pager buttons TODO: concat if there is lots of pages.
                 var pager_buttons = '';
-                for (var i = 1; i <= response[0]['tot_pages'].length; i++) {
+                for (var i = 1; i <= response[0]['tot_pages']; i++) {
                     if (response[0]['c_r_page'] === i){
                         pager_buttons += '<li class="active"><a onclick="refresh_data(this); return false;" href="?page=' + i + '">' + i + '</a></li>';
                     }
@@ -138,7 +138,10 @@
                         pager_buttons += '<li><a onclick="refresh_data(this); return false;" href="?page=' + i + '">' + i + '</a></li>';
                     }
                 }
+                // Set selected limits value
+                $("#limits").val(response[0]['c_r_limit']);
                 $('#footPager').html(pager_buttons);
+
             });
             backgroundTask.resolve();
             return backgroundTask;
@@ -216,7 +219,7 @@
             var res = $('#builder-' + $(this).data('target')).queryBuilder('getPuppet');
             if (!$.isEmptyObject(res)) {
                 $('#search').val(res);
-                refresh_data(document.getElementById('searchform')).done(refresh_data(document.getElementById('searchform')));
+                refresh_data(document.getElementById('searchform')).done();
                 return false;
             }
         });
@@ -224,7 +227,7 @@
         $('.search-clear').on('click', function () {
             $('#search').val("clear_rules");
             $('#builder-nodes').queryBuilder('reset');
-            refresh_data(document.getElementById('searchform')).done(refresh_data(document.getElementById('searchform')));
+            refresh_data(document.getElementById('searchform')).done();
             return false;
         });
     </script>
@@ -239,28 +242,28 @@
                         <thead>
                         <tr>
                             <th id="certname-header">
-                                <a id="certname-link" onclick="refresh_data(this).done(refresh_data(this)); return false;" href="?sortfield=certname">Certname <span class="glyphicon glyphicon"></span></a>
+                                <a id="certname-link" onclick="refresh_data(this).done(); return false;" href="?sortfield=certname">Certname <span class="glyphicon glyphicon"></span></a>
                             </th>
-                            <th id="latestCatalog-header">
-                                <a id="latestCatalog-link" onclick="refresh_data(this).done(refresh_data(this)); return false;" href="?sortfield=latestCatalog">Catalog Timestamp <span class="glyphicon"></span></a>
+                            <th id="catalog-timestamp-header">
+                                <a id="catalog-timestamp-link" onclick="refresh_data(this).done(); return false;" href="?sortfield=catalog-timestamp">Catalog Timestamp <span class="glyphicon"></span></a>
                             </th>
-                            <th id="latestReport-header">
-                                <a id="latestReport-link" onclick="refresh_data(this).done(refresh_data(this)); return false;" href="?sortfield=latestReport">Report Timestamp <span class="glyphicon"></span></a>
+                            <th id="report-timestamp-header">
+                                <a id="report-timestamp-link" onclick="refresh_data(this).done(); return false;" href="?sortfield=report-timestamp">Report Timestamp <span class="glyphicon"></span></a>
                             </th>
-                            <th id="latestFacts-header">
-                                <a id="latestFacts-link" onclick="refresh_data(this).done(refresh_data(this)); return false;" href="?sortfield=latestFacts">Facts Timestamp <span class="glyphicon"></span></a>
+                            <th id="facts-timestamp-header">
+                                <a id="facts-timestamp-link" onclick="refresh_data(this).done(); return false;" href="?sortfield=facts-timestamp">Facts Timestamp <span class="glyphicon"></span></a>
                             </th>
-                            <th id="success-header">
-                                <a id="success-link" onclick="refresh_data(this).done(refresh_data(this)); return false;    " href="?sortfield=success">Successes <span class="glyphicon"></span></a>
+                            <th id="successes-header">
+                                <a id="successes-link" onclick="refresh_data(this).done(); return false;    " href="?sortfield=successes">Successes <span class="glyphicon"></span></a>
                             </th>
-                            <th id="noop-header">
-                                <a id="noop-link" onclick="refresh_data(this).done(refresh_data(this)); return false;" href="?sortfield=noop">Noops <span class="glyphicon"></span></a>
+                            <th id="noops-header">
+                                <a id="noops-link" onclick="refresh_data(this).done(); return false;" href="?sortfield=noops">Noops <span class="glyphicon"></span></a>
                             </th>
-                            <th id="failure-header">
-                                <a id="failure-link" onclick="refresh_data(this).done(refresh_data(this)); return false;" href="?sortfield=failure">Failures <span class="glyphicon"></span></a>
+                            <th id="failures-header">
+                                <a id="failure-link" onclick="refresh_data(this).done(); return false;" href="?sortfield=failures">Failures <span class="glyphicon"></span></a>
                             </th>
-                            <th id="skipped-header">
-                                <a id="skipped-link" onclick="refresh_data(this).done(refresh_data(this)); return false;" href="?sortfield=skipped">Skipped <span class="glyphicon"></span></a>
+                            <th id="skips-header">
+                                <a id="skips-link" onclick="refresh_data(this).done(); return false;" href="?sortfield=skips">Skipped <span class="glyphicon"></span></a>
                             </th>
                         </tr>
                         </thead>
@@ -277,7 +280,7 @@
                 </div>
                 <div class="panel-footer">
                     <ul id="footPager" class="pagination pagination-sm" style="margin:0;">
-                        <li><a onclick="refresh_data(this).done(refresh_data(this)); return false;" href="?page="></a></li>
+                        <li><a onclick="refresh_data(this).done(); return false;" href="?page="></a></li>
                     </ul>
                 </div>
             </div>
@@ -290,7 +293,7 @@
             <form>
             <span class="dropdown-header">Page Size:<br>
                 <label for="req_limit">
-                    <select id="limits" onchange="refresh_data(this).done(refresh_data(this)); return false;">
+                    <select id="limits" onchange="refresh_data(this).done(); return false;">
                         {% mkrange 50 3050 50 as limitrange %}
                         {% for range in limitrange %}
                             <option value="{{ range }}">{{ range }}</option>

@@ -11,7 +11,6 @@ __author__ = 'etaklar'
 
 
 @login_required
-@cache_page(CACHE_TIME)
 def nodes(request):
     if request.method == 'POST':
         request.session['django_timezone'] = request.POST['timezone']
