@@ -81,14 +81,10 @@ class CreatePuppetdbQueries(TestCase):
                             'field': 'report_timestamp',
                             'order': 'desc',
                         },
-                    'query-field':
-                        {
-                            'field': 'name'
-                        },
                 }
         }
         expected_results = {
-            'order-by': '[{"field":"report_timestamp","order":"desc"},{"field":"name"}]'
+            'order-by': '[{"field":"report_timestamp","order":"desc"}]'
         }
         results = mk_puppetdb_query(content)
         self.assertEqual(expected_results, results)
@@ -106,14 +102,10 @@ class CreatePuppetdbQueries(TestCase):
                             'field': 'report_timestamp',
                             'order': 'desc',
                         },
-                    'query-field':
-                        {
-                            'field': 'name'
-                        },
                 }
         }
         expected_results = {
-            'order-by': '[{"field":"report_timestamp","order":"desc"},{"field":"name"}]',
+            'order-by': '[{"field":"report_timestamp","order":"desc"}]',
             'query': '["=","certname","hostname.example.com"]'
         }
         results = mk_puppetdb_query(content)
@@ -134,15 +126,11 @@ class CreatePuppetdbQueries(TestCase):
                             'field': 'report_timestamp',
                             'order': 'desc',
                         },
-                    'query-field':
-                        {
-                            'field': 'name'
-                        },
                 }
         }
         expected_results = {
             'query': '["and", ["=","certname","hostname1.example.com"],["=","certname","hostname2.example.com"]]',
-            'order-by': '[{"field":"report_timestamp","order":"desc"},{"field":"name"}]'
+            'order-by': '[{"field":"report_timestamp","order":"desc"}]'
         }
         results = mk_puppetdb_query(content)
         self.assertEqual(expected_results, results)
