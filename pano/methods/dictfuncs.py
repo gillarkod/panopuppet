@@ -67,18 +67,22 @@ def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_st
 
         # Report time, fact time and catalog time should all be run within (PUPPET_RUN_INTERVAL / 2)
         # minutes of each other
-
+        diffs = dict()
         # Time elapsed between fact time and catalog time
-        elapsed_catalog = catalog_time - fact_time
-        # Time elapsed between fact time and report time
-        elapsed_report = report_time - fact_time
+        diffs['catalog_fact'] = catalog_time - fact_time
+        diffs['fact_catalog'] = fact_time - catalog_time
 
-        if elapsed_catalog > timedelta(minutes=puppet_run_interval / 2):
-            return True
-        elif elapsed_report > timedelta(minutes=puppet_run_interval / 2):
-            return True
-        else:
-            return False
+        # Time elapsed between fact time and report time
+        diffs['report_fact'] = report_time - fact_time
+        diffs['fact_report'] = fact_time - report_time
+        # Time elapsed between report and catalog
+        diffs['report_catalog'] = report_time - catalog_time
+        diffs['catalog_report'] = catalog_time - report_time
+
+        for key, value in diffs.items():
+            if value > timedelta(minutes=puppet_run_interval / 2):
+                return True
+        return False
 
     sortables = {
         'certname': 0,
