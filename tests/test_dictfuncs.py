@@ -172,63 +172,183 @@ class MergeNodeEventData(TestCase):
                         'subject-type': 'certname',
                         'successes': 0}
                        ]
-        failed_list, changed_list, unreported_list, mismatch_list, pending_list = dictstatus(nodes_data,
+        failed_list, changed_list, unreported_list, missmatch_list, pending_list = dictstatus(nodes_data,
                                                                                              events_data,
                                                                                              sort=False,
                                                                                              get_status='notall')
         # ('certname', 'latestCatalog', 'latestReport', 'latestFacts', 'success', 'noop', 'failure', 'skipped')
-        failed_expected = [
-            ('failed-node.example.com',
-             filters.date(
-                 localtime(json_to_datetime(nodes_timestamps['failed-node']['catalog'])),
-                 'Y-m-d H:i:s'),
-             filters.date(
-                 localtime(json_to_datetime(nodes_timestamps['failed-node']['report'])),
-                 'Y-m-d H:i:s'),
-             filters.date(
-                 localtime(json_to_datetime(nodes_timestamps['failed-node']['facts'])),
-                 'Y-m-d H:i:s'),
-             5, 0, 20, 10),
-            ('missmatch-node1.example.com',
-             filters.date(
-                 localtime(json_to_datetime(nodes_timestamps['missmatch-node1']['catalog'])),
-                 'Y-m-d H:i:s'),
-             filters.date(
-                 localtime(json_to_datetime(nodes_timestamps['missmatch-node1']['report'])),
-                 'Y-m-d H:i:s'),
-             filters.date(
-                 localtime(json_to_datetime(nodes_timestamps['missmatch-node1']['facts'])),
-                 'Y-m-d H:i:s'),
-             5, 0, 20, 10)]
+        failed_expected = [(
+            'failed-node.example.com',
+            filters.date(
+                localtime(json_to_datetime(nodes_timestamps['failed-node']['catalog'])),
+                'Y-m-d H:i:s'),
+            filters.date(
+                localtime(json_to_datetime(nodes_timestamps['failed-node']['report'])),
+                'Y-m-d H:i:s'),
+            filters.date(
+                localtime(json_to_datetime(nodes_timestamps['failed-node']['facts'])),
+                'Y-m-d H:i:s'),
+            5, 0, 20, 10), (
+            'missmatch-node1.example.com',
+            filters.date(
+                localtime(json_to_datetime(nodes_timestamps['missmatch-node1']['catalog'])),
+                'Y-m-d H:i:s'),
+            filters.date(
+                localtime(json_to_datetime(nodes_timestamps['missmatch-node1']['report'])),
+                'Y-m-d H:i:s'),
+            filters.date(
+                localtime(json_to_datetime(nodes_timestamps['missmatch-node1']['facts'])),
+                'Y-m-d H:i:s'),
+            5, 0, 20, 10)]
 
-        changed_expected = [('failed-node.example.com', '2015-05-27 10:29:04', '2015-05-27 10:31:04',
-                             '2015-05-27 10:30:04', 5, 0, 20, 10), (
-                                'missmatch-node1.example.com', '2015-05-27 10:29:04', '2015-05-27 10:31:04',
-                                '2015-05-27 09:45:04', 5, 0, 20, 10), (
-                                'missmatch-node2.example.com', '2015-05-27 10:29:04', '2015-05-27 09:45:04',
-                                '2015-05-27 10:30:04', 25, 0, 0, 0), (
-                                'missmatch-node3.example.com', '2015-05-27 09:50:04', '2015-05-27 10:31:04',
-                                '2015-05-27 10:30:04', 0, 50, 0, 0), (
-                                'changed-node.example.com', '2015-05-27 10:29:04', '2015-05-27 10:31:04',
-                                '2015-05-27 10:30:04', 78, 0, 0, 0), (
-                                'pending-node.example.com', '2015-05-27 10:24:04', '2015-05-27 10:30:04',
-                                '2015-05-27 10:27:04', 0, 100, 0, 0)]
+        changed_expected = [(
+            'failed-node.example.com',
+            filters.date(
+                localtime(json_to_datetime(nodes_timestamps['failed-node']['catalog'])),
+                'Y-m-d H:i:s'),
+            filters.date(
+                localtime(json_to_datetime(nodes_timestamps['failed-node']['report'])),
+                'Y-m-d H:i:s'),
+            filters.date(
+                localtime(json_to_datetime(nodes_timestamps['failed-node']['facts'])),
+                'Y-m-d H:i:s'),
+            5, 0, 20, 10), (
+            'missmatch-node1.example.com',
+            filters.date(
+                localtime(json_to_datetime(nodes_timestamps['missmatch-node1']['catalog'])),
+                'Y-m-d H:i:s'),
+            filters.date(
+                localtime(json_to_datetime(nodes_timestamps['missmatch-node1']['report'])),
+                'Y-m-d H:i:s'),
+            filters.date(
+                localtime(json_to_datetime(nodes_timestamps['missmatch-node1']['facts'])),
+                'Y-m-d H:i:s'),
+            5, 0, 20, 10), (
+            'missmatch-node2.example.com',
+            filters.date(
+                localtime(json_to_datetime(nodes_timestamps['missmatch-node2']['catalog'])),
+                'Y-m-d H:i:s'),
+            filters.date(
+                localtime(json_to_datetime(nodes_timestamps['missmatch-node2']['report'])),
+                'Y-m-d H:i:s'),
+            filters.date(
+                localtime(json_to_datetime(nodes_timestamps['missmatch-node2']['facts'])),
+                'Y-m-d H:i:s'),
+            25, 0, 0, 0), (
+            'missmatch-node3.example.com',
+            filters.date(
+                localtime(json_to_datetime(nodes_timestamps['missmatch-node3']['catalog'])),
+                'Y-m-d H:i:s'),
+            filters.date(
+                localtime(json_to_datetime(nodes_timestamps['missmatch-node3']['report'])),
+                'Y-m-d H:i:s'),
+            filters.date(
+                localtime(json_to_datetime(nodes_timestamps['missmatch-node3']['facts'])),
+                'Y-m-d H:i:s'),
+            0, 50, 0, 0), (
+            'changed-node.example.com',
+            filters.date(
+                localtime(json_to_datetime(nodes_timestamps['changed-node']['catalog'])),
+                'Y-m-d H:i:s'),
+            filters.date(
+                localtime(json_to_datetime(nodes_timestamps['changed-node']['report'])),
+                'Y-m-d H:i:s'),
+            filters.date(
+                localtime(json_to_datetime(nodes_timestamps['changed-node']['facts'])),
+                'Y-m-d H:i:s'),
+            78, 0, 0, 0), (
+            'pending-node.example.com',
+            filters.date(
+                localtime(json_to_datetime(nodes_timestamps['pending-node']['catalog'])),
+                'Y-m-d H:i:s'),
+            filters.date(
+                localtime(json_to_datetime(nodes_timestamps['pending-node']['report'])),
+                'Y-m-d H:i:s'),
+            filters.date(
+                localtime(json_to_datetime(nodes_timestamps['pending-node']['facts'])),
+                'Y-m-d H:i:s'),
+            0, 100, 0, 0)]
 
-        unreported_expected = [('unreported-node.example.com', '2015-05-27 08:33:04', '2015-05-27 08:35:04',
-                                '2015-05-27 08:34:04', 0, 0, 0, 0)]
+        unreported_expected = [(
+            'unreported-node.example.com',
+            filters.date(
+                localtime(json_to_datetime(nodes_timestamps['unreported-node']['catalog'])),
+                'Y-m-d H:i:s'),
+            filters.date(
+                localtime(json_to_datetime(nodes_timestamps['unreported-node']['report'])),
+                'Y-m-d H:i:s'),
+            filters.date(
+                localtime(json_to_datetime(nodes_timestamps['unreported-node']['facts'])),
+                'Y-m-d H:i:s'),
+            0, 0, 0, 0)]
 
-        missmatch_expected = [('missmatch-node1.example.com', '2015-05-27 10:29:04', '2015-05-27 10:31:04',
-                               '2015-05-27 09:45:04', 5, 0, 20, 10), (
-                                  'missmatch-node2.example.com', '2015-05-27 10:29:04', '2015-05-27 09:45:04',
-                                  '2015-05-27 10:30:04', 25, 0, 0, 0), (
-                                  'missmatch-node3.example.com', '2015-05-27 09:50:04', '2015-05-27 10:31:04',
-                                  '2015-05-27 10:30:04', 0, 50, 0, 0)]
+        missmatch_expected = [(
+            'missmatch-node1.example.com',
+            filters.date(
+                localtime(json_to_datetime(nodes_timestamps['missmatch-node1']['catalog'])),
+                'Y-m-d H:i:s'),
+            filters.date(
+                localtime(json_to_datetime(nodes_timestamps['missmatch-node1']['report'])),
+                'Y-m-d H:i:s'),
+            filters.date(
+                localtime(json_to_datetime(nodes_timestamps['missmatch-node1']['facts'])),
+                'Y-m-d H:i:s'),
+            5, 0, 20, 10), (
+            'missmatch-node2.example.com',
+            filters.date(
+                localtime(json_to_datetime(nodes_timestamps['missmatch-node2']['catalog'])),
+                'Y-m-d H:i:s'),
+            filters.date(
+                localtime(json_to_datetime(nodes_timestamps['missmatch-node2']['report'])),
+                'Y-m-d H:i:s'),
+            filters.date(
+                localtime(json_to_datetime(nodes_timestamps['missmatch-node2']['facts'])),
+                'Y-m-d H:i:s'),
+            25, 0, 0, 0), (
+            'missmatch-node3.example.com',
+            filters.date(
+                localtime(json_to_datetime(nodes_timestamps['missmatch-node3']['catalog'])),
+                'Y-m-d H:i:s'),
+            filters.date(
+                localtime(json_to_datetime(nodes_timestamps['missmatch-node3']['report'])),
+                'Y-m-d H:i:s'),
+            filters.date(
+                localtime(json_to_datetime(nodes_timestamps['missmatch-node3']['facts'])),
+                'Y-m-d H:i:s'),
+            0, 50, 0, 0)]
 
-        pending_expected = [('missmatch-node3.example.com', '2015-05-27 09:50:04', '2015-05-27 10:31:04',
-                             '2015-05-27 10:30:04', 0, 50, 0, 0), (
-                                'pending-node.example.com', '2015-05-27 10:24:04', '2015-05-27 10:30:04',
-                                '2015-05-27 10:27:04', 0, 100, 0, 0)]
-
+        pending_expected = [(
+            'missmatch-node3.example.com',
+            filters.date(
+                localtime(json_to_datetime(nodes_timestamps['missmatch-node3']['catalog'])),
+                'Y-m-d H:i:s'),
+            filters.date(
+                localtime(json_to_datetime(nodes_timestamps['missmatch-node3']['report'])),
+                'Y-m-d H:i:s'),
+            filters.date(
+                localtime(json_to_datetime(nodes_timestamps['missmatch-node3']['facts'])),
+                'Y-m-d H:i:s'),
+            0, 50, 0, 0), (
+            'pending-node.example.com',
+            filters.date(
+                localtime(json_to_datetime(nodes_timestamps['pending-node']['catalog'])),
+                'Y-m-d H:i:s'),
+            filters.date(
+                localtime(json_to_datetime(nodes_timestamps['pending-node']['report'])),
+                'Y-m-d H:i:s'),
+            filters.date(
+                localtime(json_to_datetime(nodes_timestamps['pending-node']['facts'])),
+                'Y-m-d H:i:s'),
+            0, 100, 0, 0)]
+        # failed_list, changed_list, unreported_list, mismatch_list, pending_list
         if failed_list != failed_expected:
             self.fail(msg='Failed list does not match expectations.')
-        self.assertEqual("", "")
+        if changed_list != changed_expected:
+            self.fail(msg='Changed list does not match expectations.')
+        if unreported_list != unreported_expected:
+            self.fail(msg='Unreported list does not match expectations.')
+        if missmatch_list != missmatch_expected:
+            self.fail(msg='Missmatching list does not match expectations.')
+        if pending_list != pending_expected:
+            self.fail(msg='Pending list does not match expectations.')
+        self.assertTrue(True)
