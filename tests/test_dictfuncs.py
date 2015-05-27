@@ -3,90 +3,136 @@ __author__ = 'etaklar'
 from django.test import TestCase
 from datetime import datetime, timedelta
 from pano.methods.dictfuncs import dictstatus
+from django.template import defaultfilters as filters
+from django.utils.timezone import localtime
+from pano.puppetdb.pdbutils import json_to_datetime
 
 
 class MergeNodeEventData(TestCase):
     def test_node_event_data_merged(self):
+        nodes_timestamps = {
+            'failed-node': {
+                'catalog': ((datetime.utcnow() - timedelta(minutes=11)).strftime('%Y-%m-%dT%H:%M:%S.%fZ')),
+                'facts': ((datetime.utcnow() - timedelta(minutes=10)).strftime('%Y-%m-%dT%H:%M:%S.%fZ')),
+                'report': ((datetime.utcnow() - timedelta(minutes=9)).strftime('%Y-%m-%dT%H:%M:%S.%fZ'))
+            },
+            'missmatch-node1': {
+                'catalog': ((datetime.utcnow() - timedelta(minutes=11)).strftime('%Y-%m-%dT%H:%M:%S.%fZ')),
+                'facts': ((datetime.utcnow() - timedelta(minutes=55)).strftime('%Y-%m-%dT%H:%M:%S.%fZ')),
+                'report': ((datetime.utcnow() - timedelta(minutes=9)).strftime('%Y-%m-%dT%H:%M:%S.%fZ'))
+            },
+            'missmatch-node2': {
+                'catalog': ((datetime.utcnow() - timedelta(minutes=11)).strftime('%Y-%m-%dT%H:%M:%S.%fZ')),
+                'facts': ((datetime.utcnow() - timedelta(minutes=10)).strftime('%Y-%m-%dT%H:%M:%S.%fZ')),
+                'report': ((datetime.utcnow() - timedelta(minutes=55)).strftime('%Y-%m-%dT%H:%M:%S.%fZ'))
+            },
+            'missmatch-node3': {
+                'catalog': ((datetime.utcnow() - timedelta(minutes=50)).strftime('%Y-%m-%dT%H:%M:%S.%fZ')),
+                'facts': ((datetime.utcnow() - timedelta(minutes=10)).strftime('%Y-%m-%dT%H:%M:%S.%fZ')),
+                'report': ((datetime.utcnow() - timedelta(minutes=9)).strftime('%Y-%m-%dT%H:%M:%S.%fZ'))
+            },
+            'unreported-node': {
+                'catalog': ((datetime.utcnow() - timedelta(minutes=127)).strftime('%Y-%m-%dT%H:%M:%S.%fZ')),
+                'facts': ((datetime.utcnow() - timedelta(minutes=126)).strftime('%Y-%m-%dT%H:%M:%S.%fZ')),
+                'report': ((datetime.utcnow() - timedelta(minutes=125)).strftime('%Y-%m-%dT%H:%M:%S.%fZ'))
+            },
+            'changed-node': {
+                'catalog': ((datetime.utcnow() - timedelta(minutes=11)).strftime('%Y-%m-%dT%H:%M:%S.%fZ')),
+                'facts': ((datetime.utcnow() - timedelta(minutes=10)).strftime('%Y-%m-%dT%H:%M:%S.%fZ')),
+                'report': ((datetime.utcnow() - timedelta(minutes=9)).strftime('%Y-%m-%dT%H:%M:%S.%fZ'))
+            },
+            'unchanged-node': {
+                'catalog': ((datetime.utcnow() - timedelta(minutes=25)).strftime('%Y-%m-%dT%H:%M:%S.%fZ')),
+                'facts': ((datetime.utcnow() - timedelta(minutes=24)).strftime('%Y-%m-%dT%H:%M:%S.%fZ')),
+                'report': ((datetime.utcnow() - timedelta(minutes=23)).strftime('%Y-%m-%dT%H:%M:%S.%fZ'))
+            },
+            'pending-node': {
+                'catalog': ((datetime.utcnow() - timedelta(minutes=16)).strftime('%Y-%m-%dT%H:%M:%S.%fZ')),
+                'facts': ((datetime.utcnow() - timedelta(minutes=13)).strftime('%Y-%m-%dT%H:%M:%S.%fZ')),
+                'report': ((datetime.utcnow() - timedelta(minutes=10)).strftime('%Y-%m-%dT%H:%M:%S.%fZ'))
+            },
+        }
+
         nodes_data = [
             {
                 'catalog-environment': 'production',
-                'catalog-timestamp': ((datetime.utcnow() - timedelta(minutes=11)).strftime('%Y-%m-%dT%H:%M:%S.%fZ')),
+                'catalog-timestamp': nodes_timestamps['failed-node']['catalog'],
                 'certname': 'failed-node.example.com',
                 'deactivated': None,
                 'facts-environment': 'production',
-                'facts-timestamp': ((datetime.utcnow() - timedelta(minutes=10)).strftime('%Y-%m-%dT%H:%M:%S.%fZ')),
+                'facts-timestamp': nodes_timestamps['failed-node']['facts'],
                 'report-environment': 'production',
-                'report-timestamp': ((datetime.utcnow() - timedelta(minutes=9)).strftime('%Y-%m-%dT%H:%M:%S.%fZ'))
+                'report-timestamp': nodes_timestamps['failed-node']['report']
             },
             {
                 'catalog-environment': 'production',
-                'catalog-timestamp': ((datetime.utcnow() - timedelta(minutes=11)).strftime('%Y-%m-%dT%H:%M:%S.%fZ')),
+                'catalog-timestamp': nodes_timestamps['missmatch-node1']['catalog'],
                 'certname': 'missmatch-node1.example.com',
                 'deactivated': None,
                 'facts-environment': 'production',
-                'facts-timestamp': ((datetime.utcnow() - timedelta(minutes=55)).strftime('%Y-%m-%dT%H:%M:%S.%fZ')),
+                'facts-timestamp': nodes_timestamps['missmatch-node1']['facts'],
                 'report-environment': 'production',
-                'report-timestamp': ((datetime.utcnow() - timedelta(minutes=9)).strftime('%Y-%m-%dT%H:%M:%S.%fZ'))
+                'report-timestamp': nodes_timestamps['missmatch-node1']['report']
             },
             {
                 'catalog-environment': 'production',
-                'catalog-timestamp': ((datetime.utcnow() - timedelta(minutes=11)).strftime('%Y-%m-%dT%H:%M:%S.%fZ')),
+                'catalog-timestamp': nodes_timestamps['missmatch-node2']['catalog'],
                 'certname': 'missmatch-node2.example.com',
                 'deactivated': None,
                 'facts-environment': 'production',
-                'facts-timestamp': ((datetime.utcnow() - timedelta(minutes=10)).strftime('%Y-%m-%dT%H:%M:%S.%fZ')),
+                'facts-timestamp': nodes_timestamps['missmatch-node2']['facts'],
                 'report-environment': 'production',
-                'report-timestamp': ((datetime.utcnow() - timedelta(minutes=55)).strftime('%Y-%m-%dT%H:%M:%S.%fZ'))
+                'report-timestamp': nodes_timestamps['missmatch-node2']['report']
             },
             {
                 'catalog-environment': 'production',
-                'catalog-timestamp': ((datetime.utcnow() - timedelta(minutes=50)).strftime('%Y-%m-%dT%H:%M:%S.%fZ')),
+                'catalog-timestamp': nodes_timestamps['missmatch-node3']['catalog'],
                 'certname': 'missmatch-node3.example.com',
                 'deactivated': None,
                 'facts-environment': 'production',
-                'facts-timestamp': ((datetime.utcnow() - timedelta(minutes=10)).strftime('%Y-%m-%dT%H:%M:%S.%fZ')),
+                'facts-timestamp': nodes_timestamps['missmatch-node3']['facts'],
                 'report-environment': 'production',
-                'report-timestamp': ((datetime.utcnow() - timedelta(minutes=9)).strftime('%Y-%m-%dT%H:%M:%S.%fZ'))
+                'report-timestamp': nodes_timestamps['missmatch-node3']['report']
             },
             {
                 'catalog-environment': 'production',
-                'catalog-timestamp': ((datetime.utcnow() - timedelta(minutes=127)).strftime('%Y-%m-%dT%H:%M:%S.%fZ')),
+                'catalog-timestamp': nodes_timestamps['unreported-node']['catalog'],
                 'certname': 'unreported-node.example.com',
                 'deactivated': None,
                 'facts-environment': 'production',
-                'facts-timestamp': ((datetime.utcnow() - timedelta(minutes=126)).strftime('%Y-%m-%dT%H:%M:%S.%fZ')),
+                'facts-timestamp': nodes_timestamps['unreported-node']['facts'],
                 'report-environment': 'production',
-                'report-timestamp': ((datetime.utcnow() - timedelta(minutes=125)).strftime('%Y-%m-%dT%H:%M:%S.%fZ'))
+                'report-timestamp': nodes_timestamps['unreported-node']['report']
             },
             {
                 'catalog-environment': 'production',
-                'catalog-timestamp': ((datetime.utcnow() - timedelta(minutes=11)).strftime('%Y-%m-%dT%H:%M:%S.%fZ')),
+                'catalog-timestamp': nodes_timestamps['changed-node']['catalog'],
                 'certname': 'changed-node.example.com',
                 'deactivated': None,
                 'facts-environment': 'production',
-                'facts-timestamp': ((datetime.utcnow() - timedelta(minutes=10)).strftime('%Y-%m-%dT%H:%M:%S.%fZ')),
+                'facts-timestamp': nodes_timestamps['changed-node']['facts'],
                 'report-environment': 'production',
-                'report-timestamp': ((datetime.utcnow() - timedelta(minutes=9)).strftime('%Y-%m-%dT%H:%M:%S.%fZ'))
+                'report-timestamp': nodes_timestamps['changed-node']['report']
             },
             {
                 'catalog-environment': 'production',
-                'catalog-timestamp': ((datetime.utcnow() - timedelta(minutes=25)).strftime('%Y-%m-%dT%H:%M:%S.%fZ')),
+                'catalog-timestamp': nodes_timestamps['unchanged-node']['catalog'],
                 'certname': 'unchanged-node.example.com',
                 'deactivated': None,
                 'facts-environment': 'production',
-                'facts-timestamp': ((datetime.utcnow() - timedelta(minutes=24)).strftime('%Y-%m-%dT%H:%M:%S.%fZ')),
+                'facts-timestamp': nodes_timestamps['unchanged-node']['facts'],
                 'report-environment': 'production',
-                'report-timestamp': ((datetime.utcnow() - timedelta(minutes=23)).strftime('%Y-%m-%dT%H:%M:%S.%fZ'))
+                'report-timestamp': nodes_timestamps['unchanged-node']['report'],
             },
             {
                 'catalog-environment': 'production',
-                'catalog-timestamp': ((datetime.utcnow() - timedelta(minutes=16)).strftime('%Y-%m-%dT%H:%M:%S.%fZ')),
+                'catalog-timestamp': nodes_timestamps['pending-node']['catalog'],
                 'certname': 'pending-node.example.com',
                 'deactivated': None,
                 'facts-environment': 'production',
-                'facts-timestamp': ((datetime.utcnow() - timedelta(minutes=13)).strftime('%Y-%m-%dT%H:%M:%S.%fZ')),
+                'facts-timestamp': nodes_timestamps['pending-node']['facts'],
                 'report-environment': 'production',
-                'report-timestamp': ((datetime.utcnow() - timedelta(minutes=10)).strftime('%Y-%m-%dT%H:%M:%S.%fZ'))
+                'report-timestamp': nodes_timestamps['pending-node']['report'],
             }]
 
         events_data = [{'failures': 0,
@@ -130,15 +176,59 @@ class MergeNodeEventData(TestCase):
                                                                                              events_data,
                                                                                              sort=False,
                                                                                              get_status='notall')
-        from pprint import pprint as print
-        print("---failed")
-        print(failed_list)
-        print("---changed")
-        print(changed_list)
-        print("---unreported")
-        print(unreported_list)
-        print("---missmatch")
-        print(mismatch_list)
-        print("---pending")
-        print(pending_list)
+        # ('certname', 'latestCatalog', 'latestReport', 'latestFacts', 'success', 'noop', 'failure', 'skipped')
+        failed_expected = [
+            ('failed-node.example.com',
+             filters.date(
+                 localtime(json_to_datetime(nodes_timestamps['failed-node']['catalog'])),
+                 'Y-m-d H:i:s'),
+             filters.date(
+                 localtime(json_to_datetime(nodes_timestamps['failed-node']['report'])),
+                 'Y-m-d H:i:s'),
+             filters.date(
+                 localtime(json_to_datetime(nodes_timestamps['failed-node']['facts'])),
+                 'Y-m-d H:i:s'),
+             5, 0, 20, 10),
+            ('missmatch-node1.example.com',
+             filters.date(
+                 localtime(json_to_datetime(nodes_timestamps['missmatch-node1']['catalog'])),
+                 'Y-m-d H:i:s'),
+             filters.date(
+                 localtime(json_to_datetime(nodes_timestamps['missmatch-node1']['report'])),
+                 'Y-m-d H:i:s'),
+             filters.date(
+                 localtime(json_to_datetime(nodes_timestamps['missmatch-node1']['facts'])),
+                 'Y-m-d H:i:s'),
+             5, 0, 20, 10)]
+
+        changed_expected = [('failed-node.example.com', '2015-05-27 10:29:04', '2015-05-27 10:31:04',
+                             '2015-05-27 10:30:04', 5, 0, 20, 10), (
+                                'missmatch-node1.example.com', '2015-05-27 10:29:04', '2015-05-27 10:31:04',
+                                '2015-05-27 09:45:04', 5, 0, 20, 10), (
+                                'missmatch-node2.example.com', '2015-05-27 10:29:04', '2015-05-27 09:45:04',
+                                '2015-05-27 10:30:04', 25, 0, 0, 0), (
+                                'missmatch-node3.example.com', '2015-05-27 09:50:04', '2015-05-27 10:31:04',
+                                '2015-05-27 10:30:04', 0, 50, 0, 0), (
+                                'changed-node.example.com', '2015-05-27 10:29:04', '2015-05-27 10:31:04',
+                                '2015-05-27 10:30:04', 78, 0, 0, 0), (
+                                'pending-node.example.com', '2015-05-27 10:24:04', '2015-05-27 10:30:04',
+                                '2015-05-27 10:27:04', 0, 100, 0, 0)]
+
+        unreported_expected = [('unreported-node.example.com', '2015-05-27 08:33:04', '2015-05-27 08:35:04',
+                                '2015-05-27 08:34:04', 0, 0, 0, 0)]
+
+        missmatch_expected = [('missmatch-node1.example.com', '2015-05-27 10:29:04', '2015-05-27 10:31:04',
+                               '2015-05-27 09:45:04', 5, 0, 20, 10), (
+                                  'missmatch-node2.example.com', '2015-05-27 10:29:04', '2015-05-27 09:45:04',
+                                  '2015-05-27 10:30:04', 25, 0, 0, 0), (
+                                  'missmatch-node3.example.com', '2015-05-27 09:50:04', '2015-05-27 10:31:04',
+                                  '2015-05-27 10:30:04', 0, 50, 0, 0)]
+
+        pending_expected = [('missmatch-node3.example.com', '2015-05-27 09:50:04', '2015-05-27 10:31:04',
+                             '2015-05-27 10:30:04', 0, 50, 0, 0), (
+                                'pending-node.example.com', '2015-05-27 10:24:04', '2015-05-27 10:30:04',
+                                '2015-05-27 10:27:04', 0, 100, 0, 0)]
+
+        if failed_list != failed_expected:
+            self.fail(msg='Failed list does not match expectations.')
         self.assertEqual("", "")
