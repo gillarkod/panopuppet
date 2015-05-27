@@ -112,16 +112,14 @@ curl -X GET http://localhost:8080/v3/facts --data-urlencode 'order-by=[
         query = ''
         if 'operator' in q_dict:
             query += '["and", '
-
         i = 0
         if len(q_dict) > 1:
             while i < len(q_dict) - 1:
-                query += q_dict[i+1] + ','
+                query += q_dict[i + 1] + ','
                 i += 1
 
         elif len(q_dict) == 1:
             query += q_dict[1] + ','
-
 
         # remove the last comma
         query = query.rstrip(',')
@@ -146,16 +144,13 @@ curl -X GET http://localhost:8080/v3/facts --data-urlencode 'order-by=[
     """
 
     def order_by_build(ob_dict):
-        # 'order-by=[{"field": "value", "order": "desc"}, {"field": "name"}]'
-        if 'order-field' not in ob_dict or 'query-field' not in ob_dict:
+        # 'order-by=[{"field": "value", "order": "desc"}]'
+        if 'order-field' not in ob_dict:
             return None
         if 'field' not in ob_dict['order-field'] or 'order' not in ob_dict['order-field']:
             return None
-        elif 'field' not in ob_dict['query-field']:
-            return None
-        ob_query = '[{"field":"%s","order":"%s"},{"field":"%s"}]' % (ob_dict['order-field']['field'],
-                                                                     ob_dict['order-field']['order'],
-                                                                     ob_dict['query-field']['field'])
+        ob_query = '[{"field":"%s","order":"%s"}]' % (ob_dict['order-field']['field'],
+                                                      ob_dict['order-field']['order'])
         return ob_query
 
     if type(params) is dict:

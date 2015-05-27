@@ -66,6 +66,11 @@ def query_to_rules(query):
                 contents['id'] = 'facts'
             elif subq_filter[2][2][0] == "select-resources":
                 contents['id'] = 'resources'
+            elif subq_filter[2][2][0] == "select-nodes":
+                contents['id'] = subq_filter[2][2][1][1]
+                contents['operator'] = search_equality_operators[subq_filter[2][2][1][0]]
+                contents['value'].append(subq_filter[2][2][1][2])
+                return contents
             # Value 1
             contents['value'].append(subq_filter[2][2][1][1][2])
             # Value 2
@@ -73,8 +78,6 @@ def query_to_rules(query):
             # Operator
             contents['operator'] = subq_operators[subq_filter[2][2][1][2][0]]
             return contents
-
-
 
         i = 0
         while i < len(data):
@@ -94,9 +97,11 @@ def query_to_rules(query):
                     rules['rules'].append(subquery(data[i]))
             i += 1
         return rules
-
-    pdb_query = json.loads(query)
-    pdb_parsed = read_query(pdb_query)
+    try:
+        pdb_query = json.loads(query)
+        pdb_parsed = read_query(pdb_query)
+    except:
+        pdb_parsed = None
     return json.dumps(pdb_parsed)
 
 

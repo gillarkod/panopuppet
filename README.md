@@ -11,18 +11,35 @@ to verify functionality, I am working on creating tests for verification.
 
 Thank you for taking your time to try PanoPuppet.
 
-## Requirements
-PuppetDB requires at least PuppetDB 2.0 or higher
-Puppetv3
+**Table of Contents**
 
-### Notes about puppetv4
-* Puppetv4 has changed the endpoints for the filebucket and fileserver so you will not be able to view files
+- [PanoPuppet](#panopuppet)
+- [Features](#features)
+- [Requirements](#requirements)
+- [Notes about puppetv4](#notes-about-puppetv4)
+- [Future plans](#future-plans)
+- [Introduction](#introduction)
+- [Issues](#issues)
+  - [QueryBuilder](#querybuilder)
+  - [About the code](#about-the-code)
+- [Screenshots](#screenshots)
+  - [Login Page](#login-page)
+  - [Dashboard - Recent Tab is the default view](#dashboard---recent-tab-is-the-default-view)
+  - [Nodes View](#nodes-view)
+  - [Nodes Search](#nodes-search)
+  - [Nodes Reports](#nodes-reports)
+  - [Nodes Report Events](#nodes-report-events)
+  - [Node Report Events Execution Times](#node-report-events-execution-times)
+  - [Latest Run Graphs](#latest-run-graphs)
+  - [Events Analytics](#events-analytics)
+- [Installation](#installation)
+  - [Problems with python-ldap python 3 fork.](#problems-with-python-ldap-python-3-fork)
+  - [RHEL/CentOS 6](#rhelcentos-6)
+- [Upgrading](#upgrading)
+- [Available branches](#available-branches)
+- [Development Server](#development-server)
 
-It also assumes that you store puppet run reports in PuppetDB
-To be able to use Filebucket and Fileserver features and file diffs
-you will need to have puppet masters filebucket and fileserver enabled.
-
-## Features
+# Features
 * Fast and easy to use
 * Uses PuppetDB API to retrieve information
 * Filebucket and Fileserver support
@@ -34,12 +51,24 @@ you will need to have puppet masters filebucket and fileserver enabled.
 * Search nodes by facts and subqueries (Query Builder)
 * Export data to CSV
 
-## Future plans
+# Requirements
+PuppetDB requires at least PuppetDB 2.0 or higher
+Puppetv3
+python3
+install requirements listed in requirements.txt
+Recommended to use virtualenv (+ virtualenvwrapper)
+
+# Notes about puppetv4
+* Puppetv4 has changed the endpoints for the filebucket and fileserver so you will not be able to view files
+
+It also assumes that you store puppet run reports in PuppetDB
+To be able to use Filebucket and Fileserver features and file diffs
+you will need to have puppet masters filebucket and fileserver enabled.
+
+# Future plans
 * Docker image to quickly install a panopuppet dashboard
 
-
-### Introduction
-
+# Introduction
 PanoPuppet, Panorama Puppet or PP is a web frontend that interfaces with PuppetDB
 and gives you a panorama view over your puppet environment(s). Its coded using Python3
 using the Django Framework for the web interface and requests library to interface with
@@ -54,13 +83,13 @@ have over 20k puppetized nodes you need something fast.
 
 This was written for a multi-tenant site across several datacenters.
 
-### Issues
-####QueryBuilder
+# Issues
+##QueryBuilder
 * I have seen some issues with the querybuilder and the usage of comparison operators. If you have stringify_facts enabled
 you may not be able to use the less/less or equal/greater/greater or equal operators since its not possible to
 compare string values "123" with "124". You will only be able to use the equal operator for these values.
 
-### About the code
+## About the code
 
 I am not a developer really so most of my code could look like it came out of a
 rats den. I have followed the PEP8 standards for coding. The comments might be sparse,
@@ -68,15 +97,11 @@ sorry for that.
 
 Code has been relatively fixed and optimized even though i'm sure there is much more I can do.
 
-#### Thanks go to...
-
-* [pypuppetdb](https://github.com/puppet-community/pypuppetdb) - Solved some issues which I got stuck at
-
-### Screenshots
-#### Login Page
+# Screenshots
+## Login Page
 ![Login Page](screenshots/pp_login.png)
 
-#### Dashboard - Recent Tab is the default view
+## Dashboard - Recent Tab is the default view
 Here you get a quick view over your puppet environment, it shows a summary over
 the failed, changed, pending and unreported nodes.
 There also is another interesting value you get, the "Missmatching Timestamps"
@@ -87,31 +112,32 @@ within a few minutes of the latest facts timestamp its quite accurate to assume
 that the compilation has failed.
 ![Dashboard](screenshots/pp_dashboard.png)
 
-#### Nodes View
+## Nodes View
 Here you see all the nodes in paginated iew. You can sort the data by any column.
 You also get a quick link to the latest report if there are any events available.
 ![Nodes View](screenshots/pp_nodespage.png)
 
-#### Nodes Search
+## Nodes Search
 ![Nodes Search Results](screenshots/pp_nodesearch.png)
+![Nodes Search Results](screenshots/pp_nodesearch2.png)
 
-#### Nodes Reports
+## Nodes Reports
 Lists each report available for this node, also urlifys the hash id for the
 report there are any events linked to it.
 ![Node Reports View](screenshots/pp_nodes_reports.png)
 
-#### Nodes Report Events
+## Nodes Report Events
 You can see detailed information for each report event.
 If you have the feature activated you can even get files from the Filebucket,
 PuppetDB resource and Fileserver. If both files are available you will be
 able to get a diff between the files.
 ![Node Report Events View](screenshots/pp_node_report_events.png)
 
-#### Node Report Events Execution Times
+## Node Report Events Execution Times
 This graph shows the 10 highest execution times for the puppet run.
 ![Node Report Events Execution Times](screenshots/pp_report_events_execution_times.png)
 
-#### Latest Run Graphs
+## Latest Run Graphs
 Information and events for the latest puppet runs are analyzed and graphs are
 drawn to show information about the (up to 100 last runs if available) showing
 the puppet run times and a baseline value as the average run time.
@@ -119,7 +145,7 @@ It also shows a breakdown over the percentage of classes changed for
 the latest puppet runs and percentages over failed, successs and pending
 ![Latest Run Analytics](screenshots/pp_latestrun_graphs.png)
 
-#### Events Analytics
+## Events Analytics
 The events analyzer lets you quickly see which class, resource, type and node
 is failing in your environment. If you have 1000 nodes failing, you can quickly
 identify and see if the class "ntp" is failing for all 1000 nodes.
@@ -127,23 +153,16 @@ identify and see if the class "ntp" is failing for all 1000 nodes.
 ![Latest Events Analytics](screenshots/pp_events_analytics_successfull_resources.png)
 ![Latest Events Analytics](screenshots/pp_events_analytics_successfull_resources_detailed.png)
 
-### Requirements
 
-Requires python3
-install requirements listed in requirements.txt
-Recommended to use virtualenv (+ virtualenvwrapper)
+# Installation
 
-
-#### Problems with python-ldap python 3 fork.
+## Problems with python-ldap python 3 fork.
 I had some issues installing python-ldap using the python3 fork on a RHEL6 server
 Here are some of the issues I had...
- * missing dependencies - yum install python-devel openldap-devel cyrus-sasl-devel
- * GCC not compiling the python-ldap module... Follow instructions here... http://bugs.python.org/issue21121
+* missing dependencies - yum install python-devel openldap-devel cyrus-sasl-devel
+* GCC not compiling the python-ldap module... Follow instructions here... http://bugs.python.org/issue21121
 
-
-### Installation
-
-#### RHEL/CentOS 6
+## RHEL/CentOS 6
 ```
 This installation "guide" assumes that panopuppet has been extracted to /srv/repo
 mkdir -p /srv/repo
@@ -256,15 +275,11 @@ You are able to create some other users in the admin page located at http://pano
 
 # Upgrading
 Upgrading PanoPuppet should be no harder than doing a git pull origin/master in the /srv/repo/panopuppet directory.
-But its recommended to run the collectstatic command again in case new css/javascripts have been added so that they
+But its recommended to run the `python manage.py collectstatic` command again in case new css/javascripts have been added so that they
 are served to your clients. Also make sure to read the config.yaml.example file and see if any new variables have been
 implemented!
 
-### Notes
-
-
-### Available branches
-
+# Available branches
 The master branch has a release which includes:
 * ldap authentication
 * caching
@@ -273,11 +288,5 @@ Upcoming branches:
 * no_auth
   * There will be no ldap authentication support included.
 
-#### Getting Started
-manage.py migrate
-
-#### Development Server - Django runserver...
-
-#### Apache
-
-apache + mod_wsgi is recommended for django in production.
+# Development Server 
+Django runserver...

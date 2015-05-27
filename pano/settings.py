@@ -1,6 +1,8 @@
 import yaml
+from puppet.settings import config_file
 
-with open("config.yaml", 'r') as ymlfile:
+# Load config file for panopuppet
+with open(config_file, 'r') as ymlfile:
     cfg = yaml.load(ymlfile)
 
 # PuppetDB Settings

@@ -7,7 +7,7 @@
     {% load static %}
     <!-- table sorter stuff -->
     <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.20.1/css/theme.bootstrap.css">
+          href="{% static 'pano/tablesorter/theme.bootstrap.min.css' %}">
     <script src="{% static 'pano/tablesorter/jquery.tablesorter.min.js' %}"></script>
     <script src="{% static 'pano/tablesorter/jquery.tablesorter.widgets.min.js' %}"></script>
     <link href="{% static 'pano/css/c3.min.css' %}" rel="stylesheet" type="text/css">
@@ -89,7 +89,7 @@
     <div class="row">
         <div class="col-md-12">
             <h3>Events for {{ certname }} in {{ request.GET.envname }} environment</h3>
-            <h4>Report ID: {{ hashid }} @ {{ report_timestamp|json_to_datetime|date:'Y-m-d H:i:s' }}</h4>
+            <h4>Report ID: {{ hashid }} @ {{ report_timestamp }}</h4>
         </div>
     </div>
     <div class="row">
