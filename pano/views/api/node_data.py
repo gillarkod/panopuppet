@@ -240,12 +240,10 @@ def nodes_json(request):
                                'Skipped']
                 if include_facts is not False:
                     merged_list_facts = []
-                    for fact in include_facts.split(','):
-                        csv_headers.append(fact)
-
-                    # Get facts for each fact, send all the data to the threads
                     facts = {}
                     for fact in include_facts.split(','):
+                        fact = fact.strip()
+                        csv_headers.append(fact)
                         facts_params = facts_params = {
                             'query':
                                 {

@@ -118,6 +118,7 @@ def generate_csv(jobs, threads=6):
             # Convert tuple to list
             t_node = list(t_node)
             for fact in t_include_facts:
+                fact = fact.strip()
                 if t_node[0] in t_facts[fact]:
                     t_node.append(t_facts[fact][t_node[0]]['value'])
                 else:
