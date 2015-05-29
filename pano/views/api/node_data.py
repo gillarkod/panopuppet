@@ -12,6 +12,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 
 from pano.views import Echo
 from pano.methods.dictfuncs import dictstatus as dictstatus
+from pano.puppetdb.pdbutils import generate_csv
 from pano.puppetdb import puppetdb
 
 
@@ -127,8 +128,9 @@ def nodes_json(request):
                         'order': sort_field_order,
                     },
             }
-            node_params['limit'] = request.session['limits']
-            node_params['offset'] = request.session['offset']
+            if dl_csv is False:
+                node_params['limit'] = request.session['limits']
+                node_params['offset'] = request.session['offset']
             node_params['include-total'] = 'true'
         else:
             node_params['order-by'] = {
@@ -179,10 +181,13 @@ def nodes_json(request):
                         'order': sort_field_order,
                     }
             }
-            report_params['limit'] = request.session['limits']
             report_params['include-total'] = 'true'
-            report_params['offset'] = request.session['offset']
-            report_list, report_headers = puppetdb.api_get(path='event-counts',
+            # Don't limit results if its CSV
+            if dl_csv is False:
+                report_params['limit'] = request.session['limits']
+                report_params['offset'] = request.session['offset']
+
+            report_list, report_headers = puppetdb.api_get(path='/event-counts',
                                                            params=puppetdb.mk_puppetdb_query(
                                                                report_params),
                                                            api_version='v4',
@@ -224,14 +229,54 @@ def nodes_json(request):
                 # Generate a sequence of rows. The range is based on the maximum number of
                 # rows that can be handled by a single sheet in most spreadsheet
                 # applications.
-                csv_headers = ('Certname',
+                include_facts = request.GET.get('include_facts', False)
+                csv_headers = ['Certname',
                                'Latest Catalog',
                                'Latest Report',
                                'Latest Facts',
                                'Success',
                                'Noop',
                                'Failure',
-                               'Skipped')
+                               'Skipped']
+                if include_facts is not False:
+                    merged_list_facts = []
+                    for fact in include_facts.split(','):
+                        csv_headers.append(fact)
+
+                    # Get facts for each fact, send all the data to the threads
+                    facts = {}
+                    for fact in include_facts.split(','):
+                        facts_params = facts_params = {
+                            'query':
+                                {
+                                    1: '["=","name","' + fact + '"]'
+                                },
+                        }
+                        fact_list = puppetdb.api_get(path='facts',
+                                                     params=puppetdb.mk_puppetdb_query(
+                                                         facts_params),
+                                                     api_version='v4',
+                                                     )
+                        # Populate the facts dict with the facts we have retrieved
+                        # Convert the fact list into a fact dict!
+                        facts[fact] = {item['certname']: item for item in fact_list}
+                    i = 1
+                    jobs = {}
+                    for node in merged_list:
+                        jobs[i] = {
+                            'id': i,
+                            'include_facts': include_facts.split(','),
+                            'node': node,
+                            'facts': facts,
+                        }
+                        i += 1
+
+                    csv_results = generate_csv(jobs)
+                    merged_list = []
+                    i = 1
+                    while i <= len(csv_results):
+                        merged_list.append(csv_results[i])
+                        i += 1
 
                 merged_list.insert(0, csv_headers)
                 rows = merged_list

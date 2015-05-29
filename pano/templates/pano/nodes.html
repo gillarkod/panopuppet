@@ -36,7 +36,9 @@
                                 <form id="searchform">
                                     <input type="hidden" id="search" name="search" value=""/>
                                 </form>
-                                <button id="searchbutton" class="btn btn-primary search-puppet" data-target="nodes">Search</button>
+                                <button id="searchbutton" class="btn btn-primary search-puppet" data-target="nodes">
+                                    Search
+                                </button>
                                 <button class="btn btn-primary search-refresh" data-target="nodes">Refresh</button>
                                 <button class="btn btn-primary search-clear" data-target="nodes">Reset</button>
                                 <button class="btn btn-primary parse-puppet" data-target="nodes">Generate</button>
@@ -49,7 +51,7 @@
     </div>
     <script>
         function refresh_data(obj) {
-            var backgroundTask   = $.Deferred();
+            var backgroundTask = $.Deferred();
             var url = '../api/nodes/';
             if (obj) {
                 if ($(obj).attr('href')) {
@@ -76,7 +78,7 @@
                     data = '<tr><td colspan="8">No nodes matching your query.</td></tr>';
                 }
                 else {
-                     //('certname', 'latestCatalog', 'latestReport', 'latestFacts', 'success', 'noop', 'failure', 'skipped'),
+                    //('certname', 'latestCatalog', 'latestReport', 'latestFacts', 'success', 'noop', 'failure', 'skipped'),
                     nodes.forEach(function (node) {
                         data += '<tr>';
                         //Certname
@@ -84,7 +86,7 @@
                         //latest catalog
                         data += '<td>' + node[1] + '</td>';
                         //latest report
-                        if (node[4] > 0 || node[5] > 0 || node[6] > 0 ||node[7] > 0 ) {
+                        if (node[4] > 0 || node[5] > 0 || node[6] > 0 || node[7] > 0) {
                             data += '<td><a href="../reports/' + node[0] + '?latest=true&report_timestamp=' + node[2] + '">' + node[2] + '</a></td>';
                         } else {
                             data += '<td>' + node[2] + '</td>';
@@ -125,16 +127,16 @@
                             $(fieldHeader).find('span').addClass('glyphicon glyphicon-chevron-up');
                             $(fieldLink).prop('href', url);
                         }
-                      // if field is not the active sort field
+                        // if field is not the active sort field
                     }
                 });
                 // update pager buttons TODO: concat if there is lots of pages.
                 var pager_buttons = '';
                 for (var i = 1; i <= response[0]['tot_pages']; i++) {
-                    if (response[0]['c_r_page'] === i){
+                    if (response[0]['c_r_page'] === i) {
                         pager_buttons += '<li class="active"><a onclick="refresh_data(this); return false;" href="?page=' + i + '">' + i + '</a></li>';
                     }
-                    else{
+                    else {
                         pager_buttons += '<li><a onclick="refresh_data(this); return false;" href="?page=' + i + '">' + i + '</a></li>';
                     }
                 }
@@ -230,6 +232,12 @@
             refresh_data(document.getElementById('searchform')).done();
             return false;
         });
+        function csv_facts() {
+            var facts = $('#include_facts').val();
+            var url = "../api/nodes/?dl_csv=true&include_facts=" + facts;
+            $('#csvfacts').prop('href', url);
+            return false;
+        }
     </script>
     <div class="row">
         <div class="col-md-12">
@@ -242,28 +250,37 @@
                         <thead>
                         <tr>
                             <th id="certname-header">
-                                <a id="certname-link" onclick="refresh_data(this).done(); return false;" href="?sortfield=certname">Certname <span class="glyphicon glyphicon"></span></a>
+                                <a id="certname-link" onclick="refresh_data(this).done(); return false;"
+                                   href="?sortfield=certname">Certname <span class="glyphicon glyphicon"></span></a>
                             </th>
                             <th id="catalog-timestamp-header">
-                                <a id="catalog-timestamp-link" onclick="refresh_data(this).done(); return false;" href="?sortfield=catalog-timestamp">Catalog Timestamp <span class="glyphicon"></span></a>
+                                <a id="catalog-timestamp-link" onclick="refresh_data(this).done(); return false;"
+                                   href="?sortfield=catalog-timestamp">Catalog Timestamp <span class="glyphicon"></span></a>
                             </th>
                             <th id="report-timestamp-header">
-                                <a id="report-timestamp-link" onclick="refresh_data(this).done(); return false;" href="?sortfield=report-timestamp">Report Timestamp <span class="glyphicon"></span></a>
+                                <a id="report-timestamp-link" onclick="refresh_data(this).done(); return false;"
+                                   href="?sortfield=report-timestamp">Report Timestamp <span
+                                        class="glyphicon"></span></a>
                             </th>
                             <th id="facts-timestamp-header">
-                                <a id="facts-timestamp-link" onclick="refresh_data(this).done(); return false;" href="?sortfield=facts-timestamp">Facts Timestamp <span class="glyphicon"></span></a>
+                                <a id="facts-timestamp-link" onclick="refresh_data(this).done(); return false;"
+                                   href="?sortfield=facts-timestamp">Facts Timestamp <span class="glyphicon"></span></a>
                             </th>
                             <th id="successes-header">
-                                <a id="successes-link" onclick="refresh_data(this).done(); return false;    " href="?sortfield=successes">Successes <span class="glyphicon"></span></a>
+                                <a id="successes-link" onclick="refresh_data(this).done(); return false;    "
+                                   href="?sortfield=successes">Successes <span class="glyphicon"></span></a>
                             </th>
                             <th id="noops-header">
-                                <a id="noops-link" onclick="refresh_data(this).done(); return false;" href="?sortfield=noops">Noops <span class="glyphicon"></span></a>
+                                <a id="noops-link" onclick="refresh_data(this).done(); return false;"
+                                   href="?sortfield=noops">Noops <span class="glyphicon"></span></a>
                             </th>
                             <th id="failures-header">
-                                <a id="failure-link" onclick="refresh_data(this).done(); return false;" href="?sortfield=failures">Failures <span class="glyphicon"></span></a>
+                                <a id="failure-link" onclick="refresh_data(this).done(); return false;"
+                                   href="?sortfield=failures">Failures <span class="glyphicon"></span></a>
                             </th>
                             <th id="skips-header">
-                                <a id="skips-link" onclick="refresh_data(this).done(); return false;" href="?sortfield=skips">Skipped <span class="glyphicon"></span></a>
+                                <a id="skips-link" onclick="refresh_data(this).done(); return false;"
+                                   href="?sortfield=skips">Skipped <span class="glyphicon"></span></a>
                             </th>
                         </tr>
                         </thead>
@@ -271,8 +288,13 @@
                         </tbody>
                         <tfoot>
                         <tr>
-                            <td colspan="8"><strong>Download as: </strong>
-                                <a href="../api/nodes/?dl_csv=true" download>CSV</a>
+                            <td colspan="1"><strong>Download as: </strong>
+                                <a id="csv" href="../api/nodes/?dl_csv=true" download>CSV</a> | <a id="csvfacts"
+                                                                                                   onclick="csv_facts()" href="#"
+                                                                                                   download>CSV with
+                                    Facts</a> <input type="text" placeholder="profile,groups,kernel"
+                                                     class="form-control input-sm" id="include_facts"
+                                                     name="include_facts">
                             </td>
                         </tr>
                         </tfoot>
