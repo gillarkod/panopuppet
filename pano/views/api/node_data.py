@@ -214,16 +214,16 @@ def nodes_json(request):
             num_pages = num_pages_wodec
 
         if sort_field_order == 'desc':
-            merged_list = dictstatus(
+            rows = dictstatus(
                 node_list, report_list, sortby=sort_field, asc=True, sort=False)
             sort_field_order_opposite = 'asc'
         elif sort_field_order == 'asc':
-            merged_list = dictstatus(
+            rows = dictstatus(
                 node_list, report_list, sortby=sort_field, asc=False, sort=False)
             sort_field_order_opposite = 'desc'
 
         if dl_csv is True:
-            if merged_list is []:
+            if rows is []:
                 pass
             else:
                 # Generate a sequence of rows. The range is based on the maximum number of
@@ -242,8 +242,12 @@ def nodes_json(request):
                     merged_list_facts = []
                     facts = {}
                     for fact in include_facts.split(','):
+                        # Sanitize the fact input from the user
                         fact = fact.strip()
+                        # Add the fact name to the headers list
                         csv_headers.append(fact)
+
+                        # build the params for each fact.
                         facts_params = facts_params = {
                             'query':
                                 {
@@ -258,9 +262,13 @@ def nodes_json(request):
                         # Populate the facts dict with the facts we have retrieved
                         # Convert the fact list into a fact dict!
                         facts[fact] = {item['certname']: item for item in fact_list}
+
                     i = 1
                     jobs = {}
-                    for node in merged_list:
+                    # Add ID to each job so that it can be assembled in
+                    # the same order after we recieve the job results
+                    # We do this via jobs so that we can get faster results.
+                    for node in rows:
                         jobs[i] = {
                             'id': i,
                             'include_facts': include_facts.split(','),
@@ -270,14 +278,15 @@ def nodes_json(request):
                         i += 1
 
                     csv_results = generate_csv(jobs)
-                    merged_list = []
+                    rows = []
                     i = 1
+                    # with the job results we can now recreate merged_list
+                    # in the order we sent them.
                     while i <= len(csv_results):
-                        merged_list.append(csv_results[i])
+                        rows.append(csv_results[i])
                         i += 1
-
-                merged_list.insert(0, csv_headers)
-                rows = merged_list
+                # Insert the csv header to the top of the list.
+                rows.insert(0, csv_headers)
                 pseudo_buffer = Echo()
                 writer = csv.writer(pseudo_buffer)
                 response = StreamingHttpResponse((writer.writerow(row) for row in rows),
@@ -291,7 +300,7 @@ def nodes_json(request):
         r_s* = requests available
         """
         context = {
-            'nodeList': merged_list,
+            'nodeList': rows,
             'total_nodes': total_results,
             'c_r_page': page_num,
             'c_r_limit': request.session['limits'],
