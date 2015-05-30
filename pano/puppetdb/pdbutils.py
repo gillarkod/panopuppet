@@ -100,7 +100,6 @@ def run_puppetdb_jobs(jobs, threads=6):
 
 
 def generate_csv(jobs, threads=6):
-    import pprint
     if type(threads) != int:
         threads = 6
     if len(jobs) < threads:
