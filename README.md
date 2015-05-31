@@ -49,7 +49,7 @@ Thank you for taking your time to try PanoPuppet.
 * LDAP Authentication
 * Events Analyzer (Like Events Inspector from Puppet Enterprise)
 * Search nodes by facts and subqueries (Query Builder)
-* Export data to CSV
+* Export data to CSV with or without selected facts
 
 # Requirements
 PuppetDB requires at least PuppetDB 2.0 or higher
