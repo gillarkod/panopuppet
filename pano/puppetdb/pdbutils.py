@@ -97,3 +97,57 @@ def run_puppetdb_jobs(jobs, threads=6):
             break
 
     return job_results
+
+
+def generate_csv(jobs, threads=6):
+    if type(threads) != int:
+        threads = 6
+    if len(jobs) < threads:
+        threads = len(jobs)
+    jobs_q = queue.Queue()
+    out_q = queue.Queue()
+
+    def db_threaded_requests(i, q):
+        while True:
+            # Get the job
+            t_job = q.get()
+            # Start assigning variables from the data in the dict we received above.
+            t_id = t_job['id']
+            t_include_facts = t_job['include_facts']
+            t_node = t_job['node']
+            t_facts = t_job['facts']
+            # Convert tuple to list
+            t_node = list(t_node)
+            # End of assigning variables
+            # For each fact the user requested, locate the fact result for each node
+            # and append it to the t_node list.
+            # If the node does not have a value for the fact add an empty column.
+            for fact in t_include_facts:
+                fact = fact.strip()
+                if t_node[0] in t_facts[fact]:
+                    t_node.append(t_facts[fact][t_node[0]]['value'])
+                else:
+                    t_node.append('')
+            # package the above results and put into a dict with the key name corresponding to the ID.
+            t_result = dict()
+            t_result[t_id] = tuple(t_node)
+            out_q.put(t_result)
+            q.task_done()
+
+    for i in range(threads):
+        worker = Thread(target=db_threaded_requests, args=(i, jobs_q))
+        worker.setDaemon(True)
+        worker.start()
+
+    for job in jobs:
+        jobs_q.put(jobs[job])
+    jobs_q.join()
+    job_results = {}
+    while True:
+        try:
+            msg = (out_q.get_nowait())
+            job_results = dict(
+                list(job_results.items()) + list(msg.items()))
+        except queue.Empty:
+            break
+    return job_results
