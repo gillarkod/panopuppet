@@ -521,9 +521,6 @@ class MergeNodeEventData(TestCase):
                                  sort=False,
                                  get_status='all')
         # ('certname', 'latestCatalog', 'latestReport', 'latestFacts', 'success', 'noop', 'failure', 'skipped')
-        filters.date(
-                localtime(json_to_datetime(nodes_timestamps['failed-node']['catalog'])),
-                'Y-m-d H:i:s'),
         merged_expected = [('failed-node.example.com',
                             filters.date(localtime(json_to_datetime(nodes_timestamps['failed-node']['catalog'])),
                                          'Y-m-d H:i:s'),
