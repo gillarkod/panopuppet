@@ -1,10 +1,11 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 from django.views.decorators.cache import cache_page
-import pytz
 from pano.puppetdb import puppetdb
 from pano.puppetdb.pdbutils import json_to_datetime
 from pano.settings import CACHE_TIME
+from pano.puppetdb.puppetdb import set_server, get_server
+from pano.views.views import default_context
 
 __author__ = 'etaklar'
 
@@ -12,10 +13,16 @@ __author__ = 'etaklar'
 @login_required
 @cache_page(CACHE_TIME * 60)  # Cache for cache_time multiplied 60 because the report will never change...
 def detailed_events(request, certname=None, hashid=None):
+    context = default_context
+    if request.method == 'GET':
+        if 'source' in request.GET:
+            source = request.GET.get('source')
+            set_server(request, source)
     if request.method == 'POST':
         request.session['django_timezone'] = request.POST['timezone']
         return redirect(request.POST['return_url'])
     else:
+        source_url, source_certs, source_verify = get_server(request)
         report_timestamp = request.GET.get('report_timestamp')
         events_params = {
             'query':
@@ -32,11 +39,14 @@ def detailed_events(request, certname=None, hashid=None):
                     'query-field': {'field': 'certname'},
                 },
         }
-        events_list = puppetdb.api_get(path='/events',
-                                       api_version='v4',
-                                       params=puppetdb.mk_puppetdb_query(
-                                           events_params),
-                                       )
+        events_list = puppetdb.api_get(
+            api_url=source_url,
+            cert=source_certs,
+            verify=source_verify,
+            path='/events',
+            api_version='v4',
+            params=puppetdb.mk_puppetdb_query(events_params),
+        )
         single_event = ''
         environment = ''
 
@@ -72,14 +82,11 @@ def detailed_events(request, certname=None, hashid=None):
         else:
             events_list = False
 
-        context = {
-            'timezones': pytz.common_timezones,
-            'certname': certname,
-            'report_timestamp': report_timestamp,
-            'hashid': hashid,
-            'events_list': events_list,
-            'event_durations': sorted_events,
-            'environment': environment,
-        }
+        context['certname'] = certname
+        context['report_timestamp'] = report_timestamp
+        context['hashid'] = hashid
+        context['events_list'] = events_list
+        context['event_duration'] = sorted_events
+        context['environment'] = environment
 
         return render(request, 'pano/detailed_events.html', context)

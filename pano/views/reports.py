@@ -1,10 +1,11 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 from django.views.decorators.cache import cache_page
-import pytz
 from pano.methods.dictfuncs import sort_table as sort_tables
 from pano.puppetdb import puppetdb
 from pano.settings import CACHE_TIME
+from pano.puppetdb.puppetdb import set_server, get_server
+from pano.views.views import default_context
 
 __author__ = 'etaklar'
 
@@ -12,10 +13,15 @@ __author__ = 'etaklar'
 @login_required
 @cache_page(CACHE_TIME)
 def reports(request, certname=None):
+    context = default_context
+    if request.method == 'GET':
+        if 'source' in request.GET:
+            source = request.GET.get('source')
+            set_server(request, source)
     if request.method == 'POST':
         request.session['django_timezone'] = request.POST['timezone']
         return redirect(request.POST['return_url'])
-
+    source_url, source_certs, source_verify = get_server(request)
     # Redirects to the events page if GET param latest is true..
     if request.GET.get('latest', False):
         if request.GET.get('latest') == "true":
@@ -35,11 +41,14 @@ def reports(request, certname=None):
                     },
                 'limit': 1,
             }
-            latest_report = puppetdb.api_get(path='/reports',
-                                             api_version='v4',
-                                             params=puppetdb.mk_puppetdb_query(
-                                                 latest_report_params),
-                                             )
+            latest_report = puppetdb.api_get(
+                api_url=source_url,
+                cert=source_certs,
+                verify=source_verify,
+                path='/reports',
+                api_version='v4',
+                params=puppetdb.mk_puppetdb_query(latest_report_params),
+            )
             report_hash = ""
             for report in latest_report:
                 report_env = report['environment']
@@ -71,11 +80,15 @@ def reports(request, certname=None):
         'include-total': 'true',
         'offset': offset,
     }
-    reports_list, headers = puppetdb.api_get(path='/reports',
-                                             api_version='v4',
-                                             params=puppetdb.mk_puppetdb_query(
-                                                 reports_params),
-                                             )
+    reports_list, headers = puppetdb.api_get(
+        api_url=source_url,
+        cert=source_certs,
+        verify=source_verify,
+        path='/reports',
+        api_version='v4',
+        params=puppetdb.mk_puppetdb_query(
+            reports_params),
+    )
 
     # Work out the number of pages from the xrecords response
     xrecords = headers['X-Records']
@@ -115,12 +128,9 @@ def reports(request, certname=None):
                 [report['hash'], report['certname'], report['environment'], report['start-time'], report['end-time'],
                  0, 0, 0, 0])
     report_status = sort_tables(report_status, order=True, col=3)
-    context = {
-        'timezones': pytz.common_timezones,
-        'certname': certname,
-        'reports': report_status,
-        'curr_page': page_num,
-        'tot_pages': "{:.0f}".format(num_pages),
-    }
+    context['certname'] = certname
+    context['reports'] = report_status
+    context['curr_page'] = page_num
+    context['tot_pages'] = "{:.0f}".format(num_pages)
 
     return render(request, 'pano/reports.html', context)

@@ -54,6 +54,16 @@
                                     <a href="{% url 'facts' certname %}">Facts</a>
                                 </li>
                             {% endif %}
+                            <li class="dropdown">
+                                <a class="dropdown-toggle" data-toggle="dropdown"
+                                                                  href="#">PuppetDB<span class="caret"></span></a>
+                                <ul class="dropdown-menu">
+                                    {# for servers in list.... #}
+                                    {% for server in SOURCES %}
+                                        <li><a href="?source={{ server }}">{{ server }}</a></li>
+                                    {% endfor %}
+                                </ul>
+                            </li>
                             {% if user.is_authenticated %}
                                 <li>
                                     <a href="{% url 'logout' %}">Logout</a>
@@ -104,7 +114,8 @@
         </div>
     </div>
     <div align="center" class="row">
-        <span class="small"><strong><a target="_blank" href="https://github.com/propyless/panopuppet">Find PanoPuppet on Github!</a></strong></span>
+        <span class="small"><strong><a target="_blank" href="https://github.com/propyless/panopuppet">Find PanoPuppet on
+            Github!</a></strong></span>
     </div>
 </div>
 </body>

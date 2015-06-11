@@ -1,22 +1,27 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 from django.views.decorators.cache import cache_page
-import pytz
 from pano.methods.dictfuncs import dictstatus as dictstatus
 from pano.puppetdb.pdbutils import run_puppetdb_jobs
 from pano.settings import CACHE_TIME
-
+from pano.puppetdb.puppetdb import set_server, get_server
+from pano.views.views import default_context
 __author__ = 'etaklar'
 
 
 @login_required
 @cache_page(CACHE_TIME)
 def dashboard(request, certname=None):
+    context = default_context
+    if request.method == 'GET':
+        if 'source' in request.GET:
+            source = request.GET.get('source')
+            set_server(request, source)
     if request.method == 'POST':
         request.session['django_timezone'] = request.POST['timezone']
         return redirect(request.POST['url'])
     else:
-
+        source_url, source_certs, source_verify = get_server(request)
         events_params = {
             'query':
                 {
@@ -37,29 +42,47 @@ def dashboard(request, certname=None):
 
         jobs = {
             'population': {
+                'url': source_url,
+                'certs': source_certs,
+                'verify': source_verify,
                 'id': 'population',
                 'path': '/metrics/mbean/com.puppetlabs.puppetdb.query.population:type=default,name=num-nodes',
             },
             'tot_resource': {
+                'url': source_url,
+                'certs': source_certs,
+                'verify': source_verify,
                 'id': 'tot_resource',
                 'path': '/metrics/mbean/com.puppetlabs.puppetdb.query.population:type=default,name=num-resources',
             },
             'avg_resource': {
+                'url': source_url,
+                'certs': source_certs,
+                'verify': source_verify,
                 'id': 'avg_resource',
                 'path': '/metrics/mbean/com.puppetlabs.puppetdb.query.population:type=default,name=avg-resources-per-node',
             },
             'all_nodes': {
+                'url': source_url,
+                'certs': source_certs,
+                'verify': source_verify,
                 'api_version': 'v4',
                 'id': 'all_nodes',
                 'path': '/nodes',
             },
             'events': {
+                'url': source_url,
+                'certs': source_certs,
+                'verify': source_verify,
                 'id': 'event-counts',
                 'path': 'event-counts',
                 'api_version': 'v4',
                 'params': events_params,
             },
             'nodes': {
+                'url': source_url,
+                'certs': source_certs,
+                'verify': source_verify,
                 'api_version': 'v4',
                 'id': 'nodes',
                 'path': '/nodes',
@@ -115,18 +138,16 @@ def dashboard(request, certname=None):
         node_change_count = len(changed_list)
         node_off_timestamps_count = len(mismatch_list)
         node_pending_count = len(pending_list)
+        context['node_list'] = merged_nodes_list
+        context['certname'] = certname
+        context['show_nodes'] = dashboard_show
+        context['population'] = puppet_population['Value']
+        context['total_resource'] = total_resources['Value']
+        context['avg_resource'] = "{:.2f}".format(avg_resource_node['Value'])
+        context['failed_nodes'] = node_fail_count
+        context['changed_nodes'] = node_change_count
+        context['unreported_nodes'] = node_unreported_count
+        context['weird_timestamps'] = node_off_timestamps_count
+        context['pending_nodes'] = node_pending_count
 
-        context = {'node_list': merged_nodes_list,
-                   'certname': certname,
-                   'show_nodes': dashboard_show,
-                   'timezones': pytz.common_timezones,
-                   'population': puppet_population['Value'],
-                   'total_resource': total_resources['Value'],
-                   'avg_resource': "{:.2f}".format(avg_resource_node['Value']),
-                   'failed_nodes': node_fail_count,
-                   'changed_nodes': node_change_count,
-                   'unreported_nodes': node_unreported_count,
-                   'weird_timestamps': node_off_timestamps_count,
-                   'pending_nodes': node_pending_count,
-                   }
         return render(request, 'pano/index.html', context)
