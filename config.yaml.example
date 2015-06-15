@@ -8,14 +8,14 @@ sources:
     'PUPPETDB_HOST': 'http://puppetdb.production.example.com/'
     'PUPPETMASTER_CLIENTBUCKET_SHOW': true
     'PUPPETMASTER_FILESERVER_SHOW': true
-
+    # Filebucket configuraion for the PuppetDB Production
     'PUPPETMASTER_CLIENTBUCKET_SHOW': true
     'PUPPETMASTER_CLIENTBUCKET_HOST': 'https://puppetmaster.example.com:8140/'
     'PUPPETMASTER_CLIENTBUCKET_CERTIFICATES':
       - '/path/to/public.key'
       - '/path/to/private.key'
     'PUPPETMASTER_CLIENTBUCKET_VERIFY_SSL': '/path/to/ca.pem'
-
+    # Fileserver configuraion for the PuppetDB Production
     'PUPPETMASTER_FILESERVER_SHOW': true
     'PUPPETMASTER_FILESERVER_HOST': 'https://puppetmaster.example.com:8140/'
     'PUPPETMASTER_FILESERVER_CERTIFICATES':
@@ -29,9 +29,6 @@ sources:
     'PUPPETMASTER_CLIENTBUCKET_SHOW': false
     'PUPPETMASTER_FILESERVER_SHOW': false
     'PUPPET_RUN_INTERVAL': 30
-
-# Puppet Agent Run Interval
-PUPPET_RUN_INTERVAL: 30
 
 # Time to hold the cache for pages - specified in seconds
 CACHE_TIME: 60

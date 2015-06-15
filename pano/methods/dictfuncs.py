@@ -6,6 +6,8 @@ from datetime import timedelta
 from django.template import defaultfilters as filters
 from django.utils.timezone import localtime
 
+
+
 def sort_table(table, col=0, order=False):
     return sorted(table, reverse=order, key=lambda field: field[col])
 
@@ -58,6 +60,9 @@ def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_st
         Returns False if the compiled run has not failed
         Returns True if the compiled run has failed
         """
+
+
+
         if report_timestamp is None or catalog_timestamp is None or fact_timestamp is None:
             return True
         # check if the fact report is older than puppet_run_time by double the run time
