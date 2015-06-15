@@ -9,8 +9,8 @@ https://docs.djangoproject.com/en/1.7/howto/deployment/wsgi/
 
 import os
 import sys
-
 from puppet.settings import BASE_DIR
+
 if BASE_DIR not in sys.path:
     sys.path.insert(0, BASE_DIR)
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "puppet.settings")
