@@ -109,11 +109,12 @@ def reports(request, certname=None):
                 },
             'summarize-by': 'certname',
         }
-        eventcount_list = puppetdb.api_get(path='event-counts',
-                                           api_version='v4',
-                                           params=puppetdb.mk_puppetdb_query(
-                                               events_params),
-                                           )
+        eventcount_list = puppetdb.api_get(
+            path='event-counts',
+            api_url=source_url,
+            api_version='v4',
+            params=puppetdb.mk_puppetdb_query(events_params),
+        )
         # Make list of the results
         for event in eventcount_list:
             if event['subject']['title'] == report['certname']:
