@@ -6,8 +6,29 @@ with open(config_file, 'r') as ymlfile:
     cfg = yaml.load(ymlfile)
 
 if 'sources' not in cfg:
-    print("No sources in Config file. Can not load PanoPuppet.")
-    exit(1)
+    # Read old style config if sources is not found.
+    PUPPETDB_HOST = cfg.get('PUPPETDB_HOST', None)
+    PUPPETDB_CERTIFICATES = tuple(cfg.get('PUPPETDB_CERTIFICATES', [None, None]))
+    PUPPETDB_VERIFY_SSL = cfg.get('PUPPETDB_VERIFY_SSL', False)
+
+    # Clientbucket Settings
+    PUPPETMASTER_CLIENTBUCKET_SHOW = cfg.get('PUPPETMASTER_CLIENTBUCKET_SHOW', False)
+    PUPPETMASTER_CLIENTBUCKET_HOST = cfg.get('PUPPETMASTER_CLIENTBUCKET_HOST', None)
+    PUPPETMASTER_CLIENTBUCKET_CERTIFICATES = tuple(
+        cfg.get('PUPPETMASTER_CLIENTBUCKET_CERTIFICATES', [None, None]))
+    PUPPETMASTER_CLIENTBUCKET_VERIFY_SSL = cfg.get('PUPPETMASTER_CLIENTBUCKET_VERIFY_SSL', False)
+
+    # Fileserver Settings
+    PUPPETMASTER_FILESERVER_SHOW = cfg.get('PUPPETMASTER_FILESERVER_SHOW', False)
+    PUPPETMASTER_FILESERVER_HOST = cfg.get('PUPPETMASTER_FILESERVER_HOST', None)
+    PUPPETMASTER_FILESERVER_CERTIFICATES = tuple(cfg.get('PUPPETMASTER_FILESERVER_CERTIFICATES', [None, None]))
+    PUPPETMASTER_FILESERVER_VERIFY_SSL = cfg.get('PUPPETMASTER_FILESERVER_VERIFY_SSL', False)
+    # Puppet Agent Run Interval
+    PUPPET_RUN_INTERVAL = cfg.get('PUPPET_RUN_INTERVAL', 30)
+    AVAILABLE_SOURCES = [PUPPETDB_HOST]
+    if PUPPETDB_HOST is None:
+        print('Panopuppet sources not configured in config.')
+        exit(1)
 elif 'sources' in cfg:
     AVAILABLE_SOURCES = cfg['sources']
 
