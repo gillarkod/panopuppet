@@ -1,20 +1,26 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 from django.views.decorators.cache import cache_page
-import pytz
 from pano.puppetdb.pdbutils import run_puppetdb_jobs, json_to_datetime
 from pano.settings import CACHE_TIME
-
+from pano.puppetdb.puppetdb import set_server, get_server
+from pano.views.views import default_context
 __author__ = 'etaklar'
 
 
 @login_required
 @cache_page(CACHE_TIME)
 def analytics(request):
+    context = default_context
+    if request.method == 'GET':
+        if 'source' in request.GET:
+            source = request.GET.get('source')
+            set_server(request, source)
     if request.method == 'POST':
         request.session['django_timezone'] = request.POST['timezone']
         return redirect(request.POST['return_url'])
     else:
+        source_url, source_certs, source_verify = get_server(request)
         events_class_params = {
             'query':
                 {
@@ -48,24 +54,36 @@ def analytics(request):
         }
         jobs = {
             'events_class_list': {
+                'url': source_url,
+                'certs': source_certs,
+                'verify': source_verify,
                 'id': 'events_class_list',
                 'path': '/event-counts',
                 'api_version': 'v4',
                 'params': events_class_params,
             },
             'events_resource_list': {
+                'url': source_url,
+                'certs': source_certs,
+                'verify': source_verify,
                 'id': 'events_resource_list',
                 'path': '/event-counts',
                 'api_version': 'v4',
                 'params': events_resource_params,
             },
             'events_status_list': {
+                'url': source_url,
+                'certs': source_certs,
+                'verify': source_verify,
                 'id': 'events_status_list',
                 'path': '/aggregate-event-counts',
                 'api_version': 'v4',
                 'params': events_status_params,
             },
             'reports_run_avg': {
+                'url': source_url,
+                'certs': source_certs,
+                'verify': source_verify,
                 'id': 'reports_run_avg',
                 'path': '/reports',
                 'params': reports_runavg_params,
@@ -108,14 +126,11 @@ def analytics(request):
                 continue
             class_status_results.append((status, value))
 
-        context = {
-            'timezones': pytz.common_timezones,
-            'class_events': class_event_results,
-            'class_status': class_status_results,
-            'resource_events': class_resource_results,
-            'run_times': run_avg_times,
-            'run_num': num_runs_avg,
-            'run_avg': avg_run_time,
-        }
+        context['class_events'] = class_event_results
+        context['class_status'] = class_status_results
+        context['resource_events'] = class_resource_results
+        context['run_times'] = run_avg_times
+        context['run_num'] = num_runs_avg
+        context['run_avg'] = avg_run_time
 
         return render(request, 'pano/analytics/analytics.html', context)

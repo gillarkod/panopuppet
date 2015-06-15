@@ -6,11 +6,13 @@ from datetime import timedelta
 from django.template import defaultfilters as filters
 from django.utils.timezone import localtime
 
+
+
 def sort_table(table, col=0, order=False):
     return sorted(table, reverse=order, key=lambda field: field[col])
 
 
-def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_status="all"):
+def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_status="all", puppet_run_time=PUPPET_RUN_INTERVAL):
     """
     :param node_dict: dict
     :param status_dict: dict
@@ -49,7 +51,7 @@ def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_st
     def check_failed_compile(report_timestamp,
                              fact_timestamp,
                              catalog_timestamp,
-                             puppet_run_interval=PUPPET_RUN_INTERVAL):
+                             puppet_run_interval=puppet_run_time):
         """
         :param report_timestamp: str
         :param fact_timestamp: str
@@ -58,6 +60,9 @@ def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_st
         Returns False if the compiled run has not failed
         Returns True if the compiled run has failed
         """
+
+
+
         if report_timestamp is None or catalog_timestamp is None or fact_timestamp is None:
             return True
         # check if the fact report is older than puppet_run_time by double the run time

@@ -69,9 +69,15 @@ def run_puppetdb_jobs(jobs, threads=6):
         while True:
             t_job = q.get()
             t_path = t_job['path']
+            t_url = t_job.get('url')
+            t_certs = t_job.get('certs')
+            t_verify = t_job.get('verify')
             t_params = t_job.get('params', {})
             t_api_v = t_job.get('api_version', 'v3')
             results = puppetdb.api_get(
+                api_url=t_url,
+                verify=t_verify,
+                cert=t_certs,
                 path=t_path,
                 params=puppetdb.mk_puppetdb_query(t_params),
                 api_version=t_api_v,

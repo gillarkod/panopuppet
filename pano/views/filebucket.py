@@ -23,7 +23,8 @@ def filebucket(request):
 
     # If got md5_sum_from
     if certname and md5_sum_from and env and rtitle and rtype and file_status == 'from':
-        filebucket_file = get_filebucket(certname=certname, environment=env, rtitle=rtitle, rtype=rtype,
+        filebucket_file = get_filebucket(request=request, certname=certname, environment=env, rtitle=rtitle,
+                                         rtype=rtype,
                                          file_status=file_status,
                                          md5sum_from=md5_sum_from)
         if filebucket_file:
@@ -38,7 +39,8 @@ def filebucket(request):
             return HttpResponse('Could not find file with MD5 Hash: %s in filebucket.' % (md5_sum_from))
     # If got md5_sum_to
     elif certname and md5_sum_to and env and rtitle and rtype and file_status == 'to':
-        filebucket_file = get_filebucket(certname=certname, environment=env, rtitle=rtitle, rtype=rtype,
+        filebucket_file = get_filebucket(request=request, certname=certname, environment=env, rtitle=rtitle,
+                                         rtype=rtype,
                                          file_status=file_status,
                                          md5sum_to=md5_sum_to)
         if filebucket_file:
@@ -52,7 +54,8 @@ def filebucket(request):
         else:
             return HttpResponse('Could not find file with MD5 Hash: %s in filebucket.' % (md5_sum_from))
     elif certname and md5_sum_to and md5_sum_from and env and rtitle and rtype and file_status == 'both' and diff_files:
-        filebucket_file = get_filebucket(certname=certname, environment=env, rtitle=rtitle, rtype=rtype,
+        filebucket_file = get_filebucket(request=request, certname=certname, environment=env, rtitle=rtitle,
+                                         rtype=rtype,
                                          file_status=file_status,
                                          md5sum_to=md5_sum_to,
                                          md5sum_from=md5_sum_from,

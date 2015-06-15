@@ -17,10 +17,82 @@ api_get(path='/facts', params={'query': mk_puppetdb_query(test_params)}, verify=
 
 import urllib.parse as urlparse
 import json
-
 import requests
+from pano.settings import PUPPETDB_HOST, PUPPETDB_VERIFY_SSL, PUPPETDB_CERTIFICATES, AVAILABLE_SOURCES, \
+    PUPPETMASTER_CLIENTBUCKET_CERTIFICATES, PUPPETMASTER_CLIENTBUCKET_HOST, PUPPETMASTER_CLIENTBUCKET_SHOW, \
+    PUPPETMASTER_CLIENTBUCKET_VERIFY_SSL, PUPPETMASTER_FILESERVER_CERTIFICATES, PUPPETMASTER_FILESERVER_HOST, \
+    PUPPETMASTER_FILESERVER_SHOW, PUPPETMASTER_FILESERVER_VERIFY_SSL, PUPPET_RUN_INTERVAL
 
-from pano.settings import PUPPETDB_HOST, PUPPETDB_VERIFY_SSL, PUPPETDB_CERTIFICATES
+
+def get_server(request, type='puppetdb'):
+    """
+    :param request:
+    :return: three variables in order: url, url certificates, ssl verify, (show status)
+    """
+    if 'PUPPETDB_HOST' in request.session:
+        if type == 'puppetdb':
+            return \
+                request.session['PUPPETDB_HOST'], \
+                request.session['PUPPETDB_CERTIFICATES'], \
+                request.session['PUPPETDB_VERIFY_SSL']
+        elif type == 'filebucket':
+            return \
+                request.session['PUPPETMASTER_CLIENTBUCKET_HOST'], \
+                request.session['PUPPETMASTER_CLIENTBUCKET_CERTIFICATES'], \
+                request.session['PUPPETMASTER_CLIENTBUCKET_VERIFY_SSL'], \
+                request.session['PUPPETMASTER_CLIENTBUCKET_SHOW']
+        elif type == 'fileserver':
+            return \
+                request.session['PUPPETMASTER_FILESERVER_HOST'], \
+                request.session['PUPPETMASTER_FILESERVER_CERTIFICATES'], \
+                request.session['PUPPETMASTER_FILESERVER_VERIFY_SSL'], \
+                request.session['PUPPETMASTER_FILESERVER_SHOW']
+        elif type == 'run_time':
+            return request.session['PUPPET_RUN_INTERVAL']
+    else:
+        if type == 'puppetdb':
+            return PUPPETDB_HOST, PUPPETDB_CERTIFICATES, PUPPETDB_VERIFY_SSL
+        elif type == 'filebucket':
+            return \
+                PUPPETMASTER_CLIENTBUCKET_HOST, \
+                PUPPETMASTER_CLIENTBUCKET_CERTIFICATES, \
+                PUPPETMASTER_CLIENTBUCKET_VERIFY_SSL, \
+                PUPPETMASTER_CLIENTBUCKET_SHOW
+            pass
+        elif type == 'fileserver':
+            return \
+                PUPPETMASTER_FILESERVER_HOST, \
+                PUPPETMASTER_FILESERVER_CERTIFICATES, \
+                PUPPETMASTER_FILESERVER_VERIFY_SSL, \
+                PUPPETMASTER_FILESERVER_SHOW
+        elif type == 'run_time':
+            return PUPPET_RUN_INTERVAL
+
+
+def set_server(request, source):
+    if source in AVAILABLE_SOURCES:
+        if type(AVAILABLE_SOURCES) is dict:
+            source = AVAILABLE_SOURCES[source]
+        else:
+            return False
+    else:
+        return False
+    request.session['PUPPETDB_HOST'] = source.get('PUPPETDB_HOST', None)
+    request.session['PUPPETDB_CERTIFICATES'] = tuple(source.get('PUPPETDB_CERTIFICATES', [None, None]))
+    request.session['PUPPETDB_VERIFY_SSL'] = source.get('PUPPETDB_VERIFY_SSL', False)
+    # Clientbucket Settings
+    request.session['PUPPETMASTER_CLIENTBUCKET_SHOW'] = source.get('PUPPETMASTER_CLIENTBUCKET_SHOW', False)
+    request.session['PUPPETMASTER_CLIENTBUCKET_HOST'] = source.get('PUPPETMASTER_CLIENTBUCKET_HOST', None)
+    request.session['PUPPETMASTER_CLIENTBUCKET_CERTIFICATES'] = tuple(
+        source.get('PUPPETMASTER_CLIENTBUCKET_CERTIFICATES', [None, None]))
+    request.session['PUPPETMASTER_CLIENTBUCKET_VERIFY_SSL'] = source.get('PUPPETMASTER_CLIENTBUCKET_VERIFY_SSL', False)
+    # Fileserver Settings
+    request.session['PUPPETMASTER_FILESERVER_SHOW'] = source.get('PUPPETMASTER_FILESERVER_SHOW', False)
+    request.session['PUPPETMASTER_FILESERVER_HOST'] = source.get('PUPPETMASTER_FILESERVER_HOST', None)
+    request.session['PUPPETMASTER_FILESERVER_CERTIFICATES'] = tuple(
+        source.get('PUPPETMASTER_FILESERVER_CERTIFICATES', [None, None]))
+    request.session['PUPPETMASTER_FILESERVER_VERIFY_SSL'] = source.get('PUPPETMASTER_FILESERVER_VERIFY_SSL', False)
+    request.session['PUPPET_RUN_INTERVAL'] = source.get('PUPPET_RUN_INTERVAL', False)
 
 
 def api_get(api_url=PUPPETDB_HOST,
@@ -29,7 +101,8 @@ def api_get(api_url=PUPPETDB_HOST,
             method='get',
             params=None,
             verify=PUPPETDB_VERIFY_SSL,
-            cert=PUPPETDB_CERTIFICATES):
+            cert=PUPPETDB_CERTIFICATES
+            ):
     """
     Wrapper function for requests
     :param api_url: Base URL for requests
@@ -76,36 +149,36 @@ def mk_puppetdb_query(params):
     formats the dict into a query string for puppetdb
     :param params: dict
     :return: dict
-# Equal to: api_get(path='/facts/kernel', params={'query': '["=", "value", "Linux"]'}, verify=False)
-    params = {
-        'operator': '',
-        1:          '["=", "value", "Linux"]',
-    }
-# api_get(path='/facts', params={'query': '["and", ["=", "name", "kernel"], ["=", "value", "Linux"]]'}, verify=False)
-    params = {
-        'operator': 'and',
-        1:          '["=", "name", "kernel"]',
-        2:          '["=", "value", "Linux"]',
-    }
+    # Equal to: api_get(path='/facts/kernel', params={'query': '["=", "value", "Linux"]'}, verify=False)
+        params = {
+            'operator': '',
+            1:          '["=", "value", "Linux"]',
+        }
+    # api_get(path='/facts', params={'query': '["and", ["=", "name", "kernel"], ["=", "value", "Linux"]]'}, verify=False)
+        params = {
+            'operator': 'and',
+            1:          '["=", "name", "kernel"]',
+            2:          '["=", "value", "Linux"]',
+        }
 
-# api query with order-by
-curl -X GET http://localhost:8080/v3/facts --data-urlencode 'order-by=[{"field": "value", "order": "desc"}, {"field": "name"}]'
+    # api query with order-by
+    curl -X GET http://localhost:8080/v3/facts --data-urlencode 'order-by=[{"field": "value", "order": "desc"}, {"field": "name"}]'
 
-# api query with limit results
-encoded: /v3/events?query=%5B%22%3D%22%2C%20%22report%22%2C%20%2224da055646b8a6339580366d2dab2e272265b148%22%5D&limit=1
-decoded: /v3/events?query=["=", "report", "24da055646b8a6339580366d2dab2e272265b148"]&limit=1
+    # api query with limit results
+    encoded: /v3/events?query=%5B%22%3D%22%2C%20%22report%22%2C%20%2224da055646b8a6339580366d2dab2e272265b148%22%5D&limit=1
+    decoded: /v3/events?query=["=", "report", "24da055646b8a6339580366d2dab2e272265b148"]&limit=1
 
-# Api query with summarize-by
-v3/event-counts --data-urlencode query='["=","latest-report?",true]' --data-urlencode summarize-by='certname'
+    # Api query with summarize-by
+    v3/event-counts --data-urlencode query='["=","latest-report?",true]' --data-urlencode summarize-by='certname'
 
-# Api query with include-total
-curl -X GET http://localhost:8080/v3/facts --data-urlencode 'limit=5' --data-urlencode 'include-total=true'
+    # Api query with include-total
+    curl -X GET http://localhost:8080/v3/facts --data-urlencode 'limit=5' --data-urlencode 'include-total=true'
 
-# Api query with order-by
-curl -X GET http://localhost:8080/v3/facts --data-urlencode 'order-by=[
-                                                                        {"field": "value", "order": "desc"},
-                                                                        {"field": "name"}
-                                                                        ]'
+    # Api query with order-by
+    curl -X GET http://localhost:8080/v3/facts --data-urlencode 'order-by=[
+                                                                            {"field": "value", "order": "desc"},
+                                                                            {"field": "name"}
+                                                                            ]'
     """
 
     def query_build(q_dict):

@@ -14,15 +14,21 @@ from pano.views import Echo
 from pano.methods.dictfuncs import dictstatus as dictstatus
 from pano.puppetdb.pdbutils import generate_csv
 from pano.puppetdb import puppetdb
+from pano.puppetdb.puppetdb import set_server, get_server
 
 
 @ensure_csrf_cookie
 @login_required
 def nodes_json(request):
+    if request.method == 'GET':
+        if 'source' in request.GET:
+            source = request.GET.get('source')
+            set_server(request, source)
     if request.method == 'POST':
         request.session['django_timezone'] = request.POST['timezone']
         return redirect(request.POST['return_url'])
     else:
+        source_url, source_certs, source_verify = get_server(request)
         valid_sort_fields = (
             'certname',
             'catalog-timestamp',
@@ -142,17 +148,25 @@ def nodes_json(request):
             }
         node_sort_fields = ['certname', 'catalog-timestamp', 'report-timestamp', 'facts-timestamp']
         if sort_field in node_sort_fields:
-            node_list, node_headers = puppetdb.api_get(path='/nodes',
-                                                       api_version='v4',
-                                                       params=puppetdb.mk_puppetdb_query(
-                                                           node_params),
-                                                       )
+            node_list, node_headers = puppetdb.api_get(
+                api_url=source_url,
+                cert=source_certs,
+                verify=source_verify,
+                path='/nodes',
+                api_version='v4',
+                params=puppetdb.mk_puppetdb_query(
+                    node_params),
+            )
         else:
-            node_list = puppetdb.api_get(path='/nodes',
-                                         api_version='v4',
-                                         params=puppetdb.mk_puppetdb_query(
-                                             node_params),
-                                         )
+            node_list = puppetdb.api_get(
+                api_url=source_url,
+                cert=source_certs,
+                verify=source_verify,
+                path='/nodes',
+                api_version='v4',
+                params=puppetdb.mk_puppetdb_query(
+                    node_params),
+            )
 
         # Work out the number of pages from the xrecords response
         # return fields that you can sort by
@@ -187,17 +201,23 @@ def nodes_json(request):
                 report_params['limit'] = request.session['limits']
                 report_params['offset'] = request.session['offset']
 
-            report_list, report_headers = puppetdb.api_get(path='/event-counts',
-                                                           params=puppetdb.mk_puppetdb_query(
-                                                               report_params),
-                                                           api_version='v4',
-                                                           )
+            report_list, report_headers = puppetdb.api_get(
+                api_url=source_url,
+                cert=source_certs,
+                verify=source_verify,
+                path='/event-counts',
+                params=puppetdb.mk_puppetdb_query(report_params),
+                api_version='v4',
+            )
         else:
-            report_list = puppetdb.api_get(path='event-counts',
-                                           params=puppetdb.mk_puppetdb_query(
-                                               report_params),
-                                           api_version='v4',
-                                           )
+            report_list = puppetdb.api_get(
+                api_url=source_url,
+                cert=source_certs,
+                verify=source_verify,
+                path='event-counts',
+                params=puppetdb.mk_puppetdb_query(report_params),
+                api_version='v4',
+            )
         # number of results depending on sort field.
         if sort_field in status_sort_fields:
             xrecords = report_headers['X-Records']
@@ -254,11 +274,14 @@ def nodes_json(request):
                                     1: '["=","name","' + fact + '"]'
                                 },
                         }
-                        fact_list = puppetdb.api_get(path='facts',
-                                                     params=puppetdb.mk_puppetdb_query(
-                                                         facts_params),
-                                                     api_version='v4',
-                                                     )
+                        fact_list = puppetdb.api_get(
+                            api_url=source_url,
+                            cert=source_certs,
+                            verify=source_verify,
+                            path='facts',
+                            params=puppetdb.mk_puppetdb_query(facts_params),
+                            api_version='v4',
+                        )
                         # Populate the facts dict with the facts we have retrieved
                         # Convert the fact list into a fact dict!
                         facts[fact] = {item['certname']: item for item in fact_list}

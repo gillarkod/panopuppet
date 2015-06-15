@@ -4,6 +4,8 @@ from pano.puppetdb.puppetdb import api_get as pdb_api_get
 from pano.puppetdb.puppetdb import mk_puppetdb_query
 import queue
 from threading import Thread
+from pano.puppetdb.puppetdb import get_server
+
 
 def summary_of_events(events_hash):
     summary = {
@@ -31,6 +33,7 @@ def summary_of_events(events_hash):
         'types_skipped': {},
         'types_total': 0,
     }
+
     def sort_events(all_events, threads=2):
         if type(threads) != int:
             threads = 6
@@ -144,6 +147,7 @@ def summary_of_events(events_hash):
                 out_q.get_nowait()
             except queue.Empty:
                 break
+
     sort_events(events_hash)
     # count totals
     # Classes
@@ -162,7 +166,7 @@ def summary_of_events(events_hash):
     return summary
 
 
-def get_events_summary(timespan='latest'):
+def get_events_summary(request, timespan='latest'):
     if timespan == 'latest':
         events_params = {
             'query':
@@ -170,14 +174,20 @@ def get_events_summary(timespan='latest'):
                     1: '["and",["=","latest-report?",true],["in", "certname",["extract", "certname",["select-nodes",["null?","deactivated",true]]]]]'
                 },
         }
-    events = pdb_api_get(path='events/',
-                         api_version='v4',
-                         params=mk_puppetdb_query(events_params))
+    source_url, source_certs, source_verify = get_server(request)
+    events = pdb_api_get(
+        api_url=source_url,
+        cert=source_certs,
+        verify=source_verify,
+        path='events/',
+        api_version='v4',
+        params=mk_puppetdb_query(events_params))
     summary = summary_of_events(events)
     return summary
 
 
-def get_report(key, value):
+def get_report(key, value, request):
+    source_url, source_certs, source_verify = get_server(request)
     # If key is any of the below, all is good!
     allowed_keys = ['certname', 'resource-title', 'resource-type', 'containing-class']
     if key in allowed_keys:
@@ -194,8 +204,12 @@ def get_report(key, value):
                 2: '["=","latest-report?",true]'
             },
     }
-    results = pdb_api_get(path='events/',
-                          api_version='v4',
-                          params=mk_puppetdb_query(events_params),
-                          )
+    results = pdb_api_get(
+        api_url=source_url,
+        cert=source_certs,
+        verify=source_verify,
+        path='events/',
+        api_version='v4',
+        params=mk_puppetdb_query(events_params),
+    )
     return results
