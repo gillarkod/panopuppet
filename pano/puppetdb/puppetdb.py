@@ -18,19 +18,53 @@ api_get(path='/facts', params={'query': mk_puppetdb_query(test_params)}, verify=
 import urllib.parse as urlparse
 import json
 import requests
-from pano.settings import PUPPETDB_HOST, PUPPETDB_VERIFY_SSL, PUPPETDB_CERTIFICATES, AVAILABLE_SOURCES
+from pano.settings import PUPPETDB_HOST, PUPPETDB_VERIFY_SSL, PUPPETDB_CERTIFICATES, AVAILABLE_SOURCES, \
+    PUPPETMASTER_CLIENTBUCKET_CERTIFICATES, PUPPETMASTER_CLIENTBUCKET_HOST, PUPPETMASTER_CLIENTBUCKET_SHOW, \
+    PUPPETMASTER_CLIENTBUCKET_VERIFY_SSL, PUPPETMASTER_FILESERVER_CERTIFICATES, PUPPETMASTER_FILESERVER_HOST, \
+    PUPPETMASTER_FILESERVER_SHOW, PUPPETMASTER_FILESERVER_VERIFY_SSL
 
 
-def get_server(request):
+def get_server(request, type='puppetdb'):
     """
     :param request:
-    :return: three variables in order: url, url certificates, ssl verify
+    :return: three variables in order: url, url certificates, ssl verify, (show status)
     """
     if 'PUPPETDB_HOST' in request.session:
-        return request.session['PUPPETDB_HOST'], request.session['PUPPETDB_CERTIFICATES'], request.session[
-            'PUPPETDB_VERIFY_SSL']
+        if type == 'puppetdb':
+            return \
+                request.session['PUPPETDB_HOST'], \
+                request.session['PUPPETDB_CERTIFICATES'], \
+                request.session['PUPPETDB_VERIFY_SSL']
+        elif type == 'filebucket':
+            return \
+                request.session['PUPPETMASTER_CLIENTBUCKET_HOST'], \
+                request.session['PUPPETMASTER_CLIENTBUCKET_CERTIFICATES'], \
+                request.session['PUPPETMASTER_CLIENTBUCKET_VERIFY_SSL'], \
+                request.session['PUPPETMASTER_CLIENTBUCKET_SHOW']
+        elif type == 'fileserver':
+            return \
+                request.session['PUPPETMASTER_FILESERVER_HOST'], \
+                request.session['PUPPETMASTER_FILESERVER_CERTIFICATES'], \
+                request.session['PUPPETMASTER_FILESERVER_VERIFY_SSL'], \
+                request.session['PUPPETMASTER_FILESERVER_SHOW']
+            pass
     else:
-        return PUPPETDB_HOST, PUPPETDB_CERTIFICATES, PUPPETDB_VERIFY_SSL
+        if type == 'puppetdb':
+            return PUPPETDB_HOST, PUPPETDB_CERTIFICATES, PUPPETDB_VERIFY_SSL
+        elif type == 'filebucket':
+            return \
+                PUPPETMASTER_CLIENTBUCKET_HOST, \
+                PUPPETMASTER_CLIENTBUCKET_CERTIFICATES, \
+                PUPPETMASTER_CLIENTBUCKET_VERIFY_SSL, \
+                PUPPETMASTER_CLIENTBUCKET_SHOW
+            pass
+        elif type == 'fileserver':
+            return \
+                PUPPETMASTER_FILESERVER_HOST, \
+                PUPPETMASTER_FILESERVER_CERTIFICATES, \
+                PUPPETMASTER_FILESERVER_VERIFY_SSL, \
+                PUPPETMASTER_FILESERVER_SHOW
+            pass
 
 
 def set_server(request, source):
