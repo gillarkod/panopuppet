@@ -71,7 +71,10 @@ def get_server(request, type='puppetdb'):
 
 def set_server(request, source):
     if source in AVAILABLE_SOURCES:
-        source = AVAILABLE_SOURCES[source]
+        if type(AVAILABLE_SOURCES) is dict:
+            source = AVAILABLE_SOURCES[source]
+        else:
+            return False
     else:
         return False
     request.session['PUPPETDB_HOST'] = source.get('PUPPETDB_HOST', None)
