@@ -21,7 +21,7 @@ import requests
 from pano.settings import PUPPETDB_HOST, PUPPETDB_VERIFY_SSL, PUPPETDB_CERTIFICATES, AVAILABLE_SOURCES, \
     PUPPETMASTER_CLIENTBUCKET_CERTIFICATES, PUPPETMASTER_CLIENTBUCKET_HOST, PUPPETMASTER_CLIENTBUCKET_SHOW, \
     PUPPETMASTER_CLIENTBUCKET_VERIFY_SSL, PUPPETMASTER_FILESERVER_CERTIFICATES, PUPPETMASTER_FILESERVER_HOST, \
-    PUPPETMASTER_FILESERVER_SHOW, PUPPETMASTER_FILESERVER_VERIFY_SSL
+    PUPPETMASTER_FILESERVER_SHOW, PUPPETMASTER_FILESERVER_VERIFY_SSL, PUPPET_RUN_INTERVAL
 
 
 def get_server(request, type='puppetdb'):
@@ -47,7 +47,8 @@ def get_server(request, type='puppetdb'):
                 request.session['PUPPETMASTER_FILESERVER_CERTIFICATES'], \
                 request.session['PUPPETMASTER_FILESERVER_VERIFY_SSL'], \
                 request.session['PUPPETMASTER_FILESERVER_SHOW']
-            pass
+        elif type == 'run_time':
+            return request.session['PUPPET_RUN_INTERVAL']
     else:
         if type == 'puppetdb':
             return PUPPETDB_HOST, PUPPETDB_CERTIFICATES, PUPPETDB_VERIFY_SSL
@@ -64,7 +65,8 @@ def get_server(request, type='puppetdb'):
                 PUPPETMASTER_FILESERVER_CERTIFICATES, \
                 PUPPETMASTER_FILESERVER_VERIFY_SSL, \
                 PUPPETMASTER_FILESERVER_SHOW
-            pass
+        elif type == 'run_time':
+            return PUPPET_RUN_INTERVAL
 
 
 def set_server(request, source):
@@ -87,6 +89,7 @@ def set_server(request, source):
     request.session['PUPPETMASTER_FILESERVER_CERTIFICATES'] = tuple(
         source.get('PUPPETMASTER_FILESERVER_CERTIFICATES', [None, None]))
     request.session['PUPPETMASTER_FILESERVER_VERIFY_SSL'] = source.get('PUPPETMASTER_FILESERVER_VERIFY_SSL', False)
+    request.session['PUPPET_RUN_INTERVAL'] = source.get('PUPPET_RUN_INTERVAL', False)
 
 
 def api_get(api_url=PUPPETDB_HOST,

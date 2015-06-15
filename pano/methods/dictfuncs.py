@@ -12,7 +12,7 @@ def sort_table(table, col=0, order=False):
     return sorted(table, reverse=order, key=lambda field: field[col])
 
 
-def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_status="all"):
+def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_status="all", puppet_run_time=PUPPET_RUN_INTERVAL):
     """
     :param node_dict: dict
     :param status_dict: dict
@@ -51,7 +51,7 @@ def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_st
     def check_failed_compile(report_timestamp,
                              fact_timestamp,
                              catalog_timestamp,
-                             puppet_run_interval=PUPPET_RUN_INTERVAL):
+                             puppet_run_interval=puppet_run_time):
         """
         :param report_timestamp: str
         :param fact_timestamp: str

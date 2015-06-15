@@ -32,6 +32,8 @@ for source, data in AVAILABLE_SOURCES.items():
             PUPPETMASTER_FILESERVER_HOST = data.get('PUPPETMASTER_FILESERVER_HOST', None)
             PUPPETMASTER_FILESERVER_CERTIFICATES = tuple(data.get('PUPPETMASTER_FILESERVER_CERTIFICATES', [None, None]))
             PUPPETMASTER_FILESERVER_VERIFY_SSL = data.get('PUPPETMASTER_FILESERVER_VERIFY_SSL', False)
+            # Puppet Agent Run Interval
+            PUPPET_RUN_INTERVAL = cfg.get('PUPPET_RUN_INTERVAL', 30)
 
 # Set a puppetdb host is none was specified to be default.
 if found_default is False:
@@ -54,9 +56,8 @@ if found_default is False:
         puppetdb_source.get('PUPPETMASTER_FILESERVER_CERTIFICATES', [None, None]))
     PUPPETMASTER_FILESERVER_VERIFY_SSL = puppetdb_source.get('PUPPETMASTER_FILESERVER_VERIFY_SSL', False)
 
-
-# Puppet Agent Run Interval
-PUPPET_RUN_INTERVAL = cfg.get('PUPPET_RUN_INTERVAL', 30)
+    # Puppet Agent Run Interval
+    PUPPET_RUN_INTERVAL = cfg.get('PUPPET_RUN_INTERVAL', 30)
 
 if PUPPETDB_HOST is None:
     print('Can\'t run with no PuppetDB Host Set!')

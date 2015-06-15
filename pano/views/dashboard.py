@@ -22,6 +22,7 @@ def dashboard(request, certname=None):
         return redirect(request.POST['url'])
     else:
         source_url, source_certs, source_verify = get_server(request)
+        puppet_run_time = get_server(request, type='run_time')
         events_params = {
             'query':
                 {
@@ -109,7 +110,8 @@ def dashboard(request, certname=None):
                                                                                              event_list,
                                                                                              sort=True,
                                                                                              sortby='latestReport',
-                                                                                             get_status='notall')
+                                                                                             get_status='notall',
+                                                                                             puppet_run_time=puppet_run_time)
         pending_list = [x for x in pending_list if x not in unreported_list]
         changed_list = [x for x in changed_list if
                         x not in unreported_list and x not in failed_list and x not in pending_list]
@@ -118,7 +120,7 @@ def dashboard(request, certname=None):
 
         if dashboard_show == 'recent':
             merged_nodes_list = dictstatus(
-                node_list, event_list, sort=False, get_status="all")
+                node_list, event_list, sort=False, get_status="all", puppet_run_time=puppet_run_time)
         elif dashboard_show == 'failed':
             merged_nodes_list = failed_list
         elif dashboard_show == 'unreported':
@@ -131,7 +133,7 @@ def dashboard(request, certname=None):
             merged_nodes_list = pending_list
         else:
             merged_nodes_list = dictstatus(
-                node_list, event_list, sort=False, get_status="all")
+                node_list, event_list, sort=False, get_status="all", puppet_run_time=puppet_run_time)
 
         node_unreported_count = len(unreported_list)
         node_fail_count = len(failed_list)
