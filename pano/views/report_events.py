@@ -81,12 +81,11 @@ def detailed_events(request, certname=None, hashid=None):
                 sorted_events = sorted_events[:10]
         else:
             events_list = False
-
         context['certname'] = certname
         context['report_timestamp'] = report_timestamp
         context['hashid'] = hashid
         context['events_list'] = events_list
-        context['event_duration'] = sorted_events
+        context['event_durations'] = sorted_events
         context['environment'] = environment
 
         return render(request, 'pano/detailed_events.html', context)
