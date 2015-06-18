@@ -164,36 +164,91 @@
 
             filters: [
                 {
-                    id: 'certname',
-                    label: 'Certname',
+                    id: 'nodes',
+                    label: 'Nodes',
                     type: 'string',
                     description: 'Enter the FQDN for a node in Puppet.',
-                    operators: ['equal', 'regex_match'],
-                    placeholder: 'host.example.com'
-                },
-                {
-                    id: 'report-environment',
-                    label: 'Environment',
-                    type: 'string',
-                    description: 'Search for nodes in puppet environment',
-                    operators: ['equal', 'regex_match'],
-                    placeholder: 'production'
+                    operators: ['puppet_equal', 'puppet_re_match'],
+                    placeholder: 'host.example.com',
+                    input: function (rule, name) {
+                        var $container = rule.$el.find('.rule-value-container');
+                        return '\
+                        <select class="form-control" name="' + name + '_1"> \
+        <option value="None">-</option> \
+        <option value="&quot;certname&quot;">Certname</option> \
+        <option value="&quot;report-environment&quot;">Report Environment</option> \
+        <option value="&quot;catalog-environment&quot;">Catalog Environment</option> \
+        <option value="&quot;facts-environment&quot;">Facts Environment</option> \
+        <option value="&quot;report-timestamp&quot;">Report Timestamp Environment</option> \
+        <option value="&quot;catalog-timestamp&quot;">Catalog Timestamp</option> \
+        <option value="&quot;facts-timestamp&quot;">Facts Timestamp</option> \
+      </select>\
+      <input class="form-control" type="text" name="' + name + '_2">';
+                    },
+                    valueGetter: function (rule) {
+                        return [rule.$el.find('.rule-value-container [name$=_1]').val(), rule.$el.find('.rule-value-container [name$=_2]').val()];
+                    },
+                    valueSetter: function (rule, value) {
+                        if (rule.operator.nb_inputs > 0) {
+                            rule.$el.find('.rule-value-container [name$=_1]').val(value[0]).trigger('change');
+                            rule.$el.find('.rule-value-container [name$=_2]').val(value[1]).trigger('change');
+                        }
+                    }
                 },
                 {
                     id: 'facts',
                     label: 'Fact',
                     type: 'string',
-                    description: 'The fact name should be in the first text field and the fact value should be in the second text field.',
+                    description: 'Each fact query in the same GROUP will all be put in the same SUBQUERY.' +
+                    'If you wish to create a new subquery to the facts endpoint you must add a new group first.',
                     operators: ['puppet_equal', 'puppet_nequal', 'puppet_g', 'puppet_ge', 'puppet_l', 'puppet_le', 'puppet_re_match'],
-                    placeholder: 'Fact, Value'
+                    input: function (rule, name) {
+                        var $container = rule.$el.find('.rule-value-container');
+                        return '\
+                        <select class="form-control" name="' + name + '_1"> \
+        <option value="None">-</option> \
+        <option value="&quot;name&quot;">Name</option> \
+        <option value="&quot;value&quot;">Value</option> \
+      </select>\
+      <input class="form-control" type="text" name="' + name + '_2">';
+                    },
+                    valueGetter: function (rule) {
+                        return [rule.$el.find('.rule-value-container [name$=_1]').val(), rule.$el.find('.rule-value-container [name$=_2]').val()];
+                    },
+                    valueSetter: function (rule, value) {
+                        if (rule.operator.nb_inputs > 0) {
+                            rule.$el.find('.rule-value-container [name$=_1]').val(value[0]).trigger('change');
+                            rule.$el.find('.rule-value-container [name$=_2]').val(value[1]).trigger('change');
+                        }
+                    }
                 },
                 {
                     id: 'resources',
                     label: 'Resource',
                     type: 'string',
-                    description: 'The resource type should be entered into the first text field (i.e "Package") and the resource title should be in the second tex field (i.e "Puppet")',
+                    description: 'Each resource query in the same GROUP will all be put in the same SUBQUERY.' +
+                    'If you wish to create a new subquery to the resource endpoint you must add a new group first.',
                     operators: ['puppet_equal', 'puppet_nequal', 'puppet_g', 'puppet_ge', 'puppet_l', 'puppet_le', 'puppet_re_match'],
-                    placeholder: 'Type, Name'
+                    input: function (rule, name) {
+                        var $container = rule.$el.find('.rule-value-container');
+                        return '\
+                        <select class="form-control" name="' + name + '_1"> \
+                            <option value="None">-</option> \
+                            <option value="&quot;title&quot;">Title</option> \
+                            <option value="&quot;type&quot;">Type</option> \
+                            <option value="[&quot;parameter&quot;, &quot;content&quot;]">Parameter Content</option>\
+                        </select>\
+                        <input class="form-control" type="text" name="' + name + '_2">';
+                    },
+                    valueGetter: function (rule) {
+                        return [rule.$el.find('.rule-value-container [name$=_1]').val(), rule.$el.find('.rule-value-container [name$=_2]').val()];
+                    },
+                    valueSetter: function (rule, value) {
+                        if (rule.operator.nb_inputs > 0) {
+                            rule.$el.find('.rule-value-container [name$=_1]').val(value[0]).trigger('change');
+                            rule.$el.find('.rule-value-container [name$=_2]').val(value[1]).trigger('change');
+                        }
+                    }
                 }
             ],
             {% if request.session.search %}
@@ -290,7 +345,8 @@
                         <tr>
                             <td colspan="1"><strong>Download as: </strong>
                                 <a id="csv" href="../api/nodes/?dl_csv=true" download>CSV</a> | <a id="csvfacts"
-                                                                                                   onclick="csv_facts()" href="#"
+                                                                                                   onclick="csv_facts()"
+                                                                                                   href="#"
                                                                                                    download>CSV with
                                     Facts</a> <input type="text" placeholder="Example: osfamily,kernel,kernelversion"
                                                      class="form-control input-sm" id="include_facts"
