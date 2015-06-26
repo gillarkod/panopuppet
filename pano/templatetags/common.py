@@ -67,16 +67,13 @@ def query_to_rules(query):
             elif subq_filter[2][2][0] == "select-resources":
                 contents['id'] = 'resources'
             elif subq_filter[2][2][0] == "select-nodes":
-                contents['id'] = subq_filter[2][2][1][1]
-                contents['operator'] = search_equality_operators[subq_filter[2][2][1][0]]
-                contents['value'].append(subq_filter[2][2][1][2])
-                return contents
+                contents['id'] = 'nodes'
             # Value 1
-            contents['value'].append(subq_filter[2][2][1][1][2])
+            contents['value'].append('"' + subq_filter[2][2][1][1][1] + '"')
             # Value 2
-            contents['value'].append(subq_filter[2][2][1][2][2])
+            contents['value'].append(subq_filter[2][2][1][1][2])
             # Operator
-            contents['operator'] = subq_operators[subq_filter[2][2][1][2][0]]
+            contents['operator'] = subq_operators[subq_filter[2][2][1][1][0]]
             return contents
 
         i = 0
