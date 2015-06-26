@@ -91,8 +91,8 @@ compare string values "123" with "124". You will only be able to use the equal o
 * Some new changes implemented for the querybuilder has changed how it works.
 To use the Querybuilder you must now be aware that resource queries in the same GROUP are all applied to the same group.
 if you want to do two different resource queries you must add a new group and put in there.
-It provides more flexibility to the querybuilder since you are able to specifiy while equality operator you want for
-every "filter".
+It provides more flexibility to the querybuilder since you are able to specify which equality operator you want for
+each "filter".
 
 See the below examples:
 
