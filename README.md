@@ -88,11 +88,22 @@ This was written for a multi-tenant site across several datacenters.
 * I have seen some issues with the querybuilder and the usage of comparison operators. If you have stringify_facts enabled
 you may not be able to use the less/less or equal/greater/greater or equal operators since its not possible to
 compare string values "123" with "124". You will only be able to use the equal operator for these values.
+* Some new changes implemented for the querybuilder has changed how it works.
+To use the Querybuilder you must now be aware that resource queries in the same GROUP are all applied to the same group.
+if you want to do two different resource queries you must add a new group and put in there.
+It provides more flexibility to the querybuilder since you are able to specifiy while equality operator you want for
+every "filter".
+
+See the below examples:
+
+![Querybuilder Example Query 1](screenshots/querybuilder_example.png)
+
+![Querybuilder Example Query 2](screenshots/querybuilder_example2.png)
 
 ## About the code
-
-I am not a developer really so most of my code could look like it came out of a
-rats den. I have followed the PEP8 standards for coding. The comments might be sparse,
+I do not have a lot of experience developing and this is my first proper project,
+therefore I ask you to unclench your fists (butt cheeks) while reading my code.
+I have followed the PEP8 standards for coding but the comments might be sparse,
 sorry for that.
 
 Code has been relatively fixed and optimized even though i'm sure there is much more I can do.
