@@ -143,8 +143,12 @@
                 // Set selected limits value
                 $("#limits").val(response[0]['c_r_limit']);
                 $('#footPager').html(pager_buttons);
+            })
+                    .fail(function () {
+                        var data = '<tr><td colspan="8">Can not connect to PuppetDB.</td></tr>';
+                        $("table tbody").html(data);
+                    });
 
-            });
             backgroundTask.resolve();
             return backgroundTask;
         }
