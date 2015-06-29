@@ -16,5 +16,5 @@ def nodes(request):
     if request.method == 'POST':
         request.session['django_timezone'] = request.POST['timezone']
         return redirect(request.POST['return_url'])
-    else:
-        return render(request, 'pano/nodes.html', context)
+
+    return render(request, 'pano/nodes.html', context)

@@ -20,8 +20,8 @@ def event_analytics(request, view='summary'):
     if request.method == 'POST':
         request.session['django_timezone'] = request.POST['timezone']
         return redirect(request.POST['return_url'])
-    summary = events.get_events_summary(timespan='latest', request=request)
 
+    summary = events.get_events_summary(timespan='latest', request=request)
     context['summary'] = summary
     # Show Classes
     if request.GET.get('value', False):

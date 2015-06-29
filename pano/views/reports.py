@@ -21,6 +21,7 @@ def reports(request, certname=None):
     if request.method == 'POST':
         request.session['django_timezone'] = request.POST['timezone']
         return redirect(request.POST['return_url'])
+
     source_url, source_certs, source_verify = get_server(request)
     # Redirects to the events page if GET param latest is true..
     if request.GET.get('latest', False):

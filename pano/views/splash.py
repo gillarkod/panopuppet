@@ -2,6 +2,7 @@ from django.contrib.auth import authenticate, login
 from django.shortcuts import redirect, render
 from pano.puppetdb.puppetdb import set_server
 from pano.views.views import default_context
+
 __author__ = 'etaklar'
 
 
@@ -39,7 +40,7 @@ def splash(request):
                 context['nexturl'] = next_url
                 return render(request, 'pano/splash.html', context)
         return redirect('dashboard')
-    else:
-        user = request.user.username
-        context['username'] = user
-        return render(request, 'pano/splash.html', context)
+
+    user = request.user.username
+    context['username'] = user
+    return render(request, 'pano/splash.html', context)

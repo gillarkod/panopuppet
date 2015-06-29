@@ -67,7 +67,5 @@ def filebucket(request):
         }
 
         return render(request, 'pano/filebucket.html', context)
-
-
     else:
         return HttpResponse('No valid GET params was sent.')
