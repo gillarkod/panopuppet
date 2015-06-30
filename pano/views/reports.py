@@ -6,6 +6,9 @@ from pano.puppetdb import puppetdb
 from pano.settings import CACHE_TIME
 from pano.puppetdb.puppetdb import set_server, get_server
 from pano.views.views import default_context
+from pano.puppetdb.pdbutils import json_to_datetime
+from django.template import defaultfilters as filters
+from django.utils.timezone import localtime
 
 __author__ = 'etaklar'
 
@@ -145,9 +148,20 @@ def reports(request, certname=None):
                  0,
                  0,
                  report['status']])
+
     report_status = sort_tables(report_status, order=True, col=3)
+
+    # Get runtimes for the latest (25) runs.
+    report_runtimes = []
+    for report in report_status:
+        run_time = "{0:.0f}".format(
+            (json_to_datetime(report[4]) - json_to_datetime(report[3])).total_seconds())
+        report_timestamp = filters.date(localtime(json_to_datetime(report[3])), 'Y-m-d H:i:s')
+        report_runtimes.append([run_time, report_timestamp])
+
     context['certname'] = certname
     context['reports'] = report_status
+    context['report_runtimes'] = report_runtimes
     context['curr_page'] = page_num
     context['tot_pages'] = "{:.0f}".format(num_pages)
 

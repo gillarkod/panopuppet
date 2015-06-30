@@ -2,7 +2,13 @@
 
 {% load puppetdb_extras %}
 {% load common %}
+{% load static %}
 
+{% block head %}
+    <link href="{% static 'pano/css/c3.min.css' %}" rel="stylesheet" type="text/css">
+    <script src="{% static 'pano/js/c3.min.js' %}"></script>
+    <script src="{% static 'pano/js/d3.min.js' %}"></script>
+{% endblock %}
 
 {% block content %}
     <div class="row">
@@ -11,82 +17,134 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-md-6">
-            <h4>Report Run Times</h4>
+        <div class="col-md-8">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h1 class="panel-title">
+                        Report Run Times
+                    </h1>
+                </div>
+                <div class="panel-body">
+                    <div id="time_graph"></div>
+                </div>
+            </div>
         </div>
-        <div class="col-md-6">
-            <h4>Node Inventory</h4>
+        <div class="col-md-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h1 class="panel-title">
+                        Node Inventory
+                    </h1>
+                </div>
+            </div>
         </div>
     </div>
     <div class="row">
         <div class="col-md-12">
-            <h4>Reports for {{ certname }}</h4>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-12">
-            <table class="table table-condensed table-striped">
-                <thead>
-                <tr>
-                    <th>Hash</th>
-                    <th>Environment</th>
-                    <th>Start Time</th>
-                    <th>End Time</th>
-                    <th>Success</th>
-                    <th>Noop</th>
-                    <th>Failure</th>
-                    <th>Skipped</th>
-                </tr>
-                </thead>
-                <tbody>
-                {# List Format: hashid(0), certname(1), environment(2), time start(3), time end(4), success(5), noop(6), failure(7), pending(8), report status(9) #}
-                {% if reports %}
-                    {% for report in reports %}
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h1 class="panel-title">
+                        Reports
+                    </h1>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-condensed table-striped">
+                        <thead>
                         <tr>
-                            <td>
-                                {% ifequal report.9 "changed" %}<span class="glyphicon glyphicon-plus" style="color: #5cb85c"></span>{% endifequal %}
-                                {% ifequal report.9 "unchanged" %}<span class="glyphicon glyphicon-minus" style="color: #5bc0de"></span>{% endifequal %}
-                                {% ifequal report.9 "failed" %}<span class="glyphicon glyphicon-remove" style="color: #d9534f"></span>{% endifequal %}
-                                {% if report.5 or report.6 or report.7 or report.8 %}
-                                    <a href="{% url 'events' certname=report.1 hashid=report.0 %}?report_timestamp={{ report.3 }}&envname={{ report.2 }}">{{ report.0 }}</a>
-                                {% else %}
-                                    {{ report.0 }}
-                                {% endif %}
-                            </td>
-                            <td>{{ report.2 }}</td>
-                            <td>{{ report.3|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
-                            <td>{{ report.4|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
-                            <td style="text-align: center"><p style="margin-bottom: 0"
-                                                              class="bg-success img-rounded">
-                                <strong>{{ report.5 }}</strong></p></td>
-                            <td style="text-align: center"><p style="margin-bottom: 0"
-                                                              class="bg-info img-rounded">
-                                <strong>{{ report.6 }}</strong></p></td>
-                            <td style="text-align: center"><p style="margin-bottom: 0"
-                                                              class="bg-danger img-rounded">
-                                <strong>{{ report.7 }}</strong></p></td>
-                            <td style="text-align: center"><p style="margin-bottom: 0"
-                                                              class="bg-warning img-rounded">
-                                <strong>{{ report.8 }}</strong></p></td>
+                            <th>Hash</th>
+                            <th>Environment</th>
+                            <th>Start Time</th>
+                            <th>End Time</th>
+                            <th>Success</th>
+                            <th>Noop</th>
+                            <th>Failure</th>
+                            <th>Skipped</th>
                         </tr>
-                    {% endfor %}
-                {% else %}
-                    <p>No reports were found in puppetdb for <strong>{{ certname }}</strong></p>
-                {% endif %}
-                </tbody>
-                <tfoot>
-                <tr>
-                    <td colspan="8">
-                        <ul class="pagination pagination-sm">
-                            {% for page in tot_pages|get_range %}
-                                <li {% if curr_page == page %}class="active"{% endif %}><a
-                                        href="?limits={{ c_r_limit }}&page={{ page }}">{{ page|add:'1' }}</a></li>
+                        </thead>
+                        <tbody>
+                        {# List Format: hashid(0), certname(1), environment(2), time start(3), time end(4), success(5), noop(6), failure(7), pending(8), report status(9) #}
+                        {% if reports %}
+                            {% for report in reports %}
+                                <tr>
+                                    <td>
+                                        {% ifequal report.9 "changed" %}<span class="glyphicon glyphicon-plus"
+                                                                              style="color: #5cb85c"></span>{% endifequal %}
+                                        {% ifequal report.9 "unchanged" %}<span class="glyphicon glyphicon-minus"
+                                                                                style="color: #5bc0de"></span>{% endifequal %}
+                                        {% ifequal report.9 "failed" %}<span class="glyphicon glyphicon-remove"
+                                                                             style="color: #d9534f"></span>{% endifequal %}
+                                        {% if report.5 or report.6 or report.7 or report.8 %}
+                                            <a href="{% url 'events' certname=report.1 hashid=report.0 %}?report_timestamp={{ report.3 }}&envname={{ report.2 }}">{{ report.0 }}</a>
+                                        {% else %}
+                                            {{ report.0 }}
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ report.2 }}</td>
+                                    <td>{{ report.3|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
+                                    <td>{{ report.4|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
+                                    <td style="text-align: center"><p style="margin-bottom: 0"
+                                                                      class="bg-success img-rounded">
+                                        <strong>{{ report.5 }}</strong></p></td>
+                                    <td style="text-align: center"><p style="margin-bottom: 0"
+                                                                      class="bg-info img-rounded">
+                                        <strong>{{ report.6 }}</strong></p></td>
+                                    <td style="text-align: center"><p style="margin-bottom: 0"
+                                                                      class="bg-danger img-rounded">
+                                        <strong>{{ report.7 }}</strong></p></td>
+                                    <td style="text-align: center"><p style="margin-bottom: 0"
+                                                                      class="bg-warning img-rounded">
+                                        <strong>{{ report.8 }}</strong></p></td>
+                                </tr>
                             {% endfor %}
-                        </ul>
-                    </td>
-                </tr>
-                </tfoot>
-            </table>
+                        {% else %}
+                            <p>No reports were found in puppetdb for <strong>{{ certname }}</strong></p>
+                        {% endif %}
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                            <td colspan="8">
+                                <ul class="pagination pagination-sm">
+                                    {% for page in tot_pages|get_range %}
+                                        <li {% if curr_page == page %}class="active"{% endif %}><a
+                                                href="?limits={{ c_r_limit }}&page={{ page }}">{{ page|add:'1' }}</a>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </td>
+                        </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
+    <script id="js_class">
+        var chart = c3.generate({
+            size: {
+                height: 200
+            },
+            bindto: '#time_graph',
+            data: {
+                x: 'x',
+                xFormat: '%Y-%m-%d %H:%M:%S',
+                columns: [
+                    ['x', {% for report in report_runtimes %}'{{ report.1 }}', {% endfor %}],
+                    ['Report Run Times',{% for report in report_runtimes %} {{ report.0 }}, {% endfor  %}]
+                ],
+                type: 'spline'
+            },
+            axis: {
+                x: {
+                    type: 'timeseries',
+                    // if true, treat x value as localtime (Default)
+                    // if false, convert to UTC internally
+                    localtime: false,
+                    tick: {
+                        format: '%H:%M',
+                        rotate: 75,
+                    }
+                }
+            }
+        });
+    </script>
 {% endblock %}
