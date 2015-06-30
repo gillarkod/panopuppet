@@ -121,14 +121,30 @@ def reports(request, certname=None):
             if event['subject']['title'] == report['certname']:
                 found_report = True
                 # hashid, certname, environment, time start, time end, success, noop, failure, pending
-                report_status.append([report['hash'], report['certname'], report['environment'], report['start-time'],
-                                      report['end-time'],
-                                      event['successes'], event['noops'], event['failures'], event['skips']])
+                report_status.append(
+                    [report['hash'],
+                     report['certname'],
+                     report['environment'],
+                     report['start-time'],
+                     report['end-time'],
+                     event['successes'],
+                     event['noops'],
+                     event['failures'],
+                     event['skips'],
+                     report['status']])
                 break
         if found_report is False:
             report_status.append(
-                [report['hash'], report['certname'], report['environment'], report['start-time'], report['end-time'],
-                 0, 0, 0, 0])
+                [report['hash'],
+                 report['certname'],
+                 report['environment'],
+                 report['start-time'],
+                 report['end-time'],
+                 0,
+                 0,
+                 0,
+                 0,
+                 report['status']])
     report_status = sort_tables(report_status, order=True, col=3)
     context['certname'] = certname
     context['reports'] = report_status

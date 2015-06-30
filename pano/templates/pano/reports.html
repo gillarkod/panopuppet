@@ -7,7 +7,20 @@
 {% block content %}
     <div class="row">
         <div class="col-md-12">
-            <h2>Reports for {{ certname }}</h2>
+            <h3>{{ certname }}</h3>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <h4>Report Run Times</h4>
+        </div>
+        <div class="col-md-6">
+            <h4>Node Inventory</h4>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <h4>Reports for {{ certname }}</h4>
         </div>
     </div>
     <div class="row">
@@ -26,12 +39,15 @@
                 </tr>
                 </thead>
                 <tbody>
-                {# List Format: hashid(0), certname(1), environment(2), time start(3), time end(4), success(5), noop(6), failure(7), pending(8) #}
+                {# List Format: hashid(0), certname(1), environment(2), time start(3), time end(4), success(5), noop(6), failure(7), pending(8), report status(9) #}
                 {% if reports %}
                     {% for report in reports %}
                         <tr>
                             <td>
-                                {% if report.5 or report.6 or report.7 or    report.8 %}
+                                {% ifequal report.9 "changed" %}<span class="glyphicon glyphicon-plus" style="color: #5cb85c"></span>{% endifequal %}
+                                {% ifequal report.9 "unchanged" %}<span class="glyphicon glyphicon-minus" style="color: #5bc0de"></span>{% endifequal %}
+                                {% ifequal report.9 "failed" %}<span class="glyphicon glyphicon-remove" style="color: #d9534f"></span>{% endifequal %}
+                                {% if report.5 or report.6 or report.7 or report.8 %}
                                     <a href="{% url 'events' certname=report.1 hashid=report.0 %}?report_timestamp={{ report.3 }}&envname={{ report.2 }}">{{ report.0 }}</a>
                                 {% else %}
                                     {{ report.0 }}
