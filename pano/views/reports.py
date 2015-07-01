@@ -5,7 +5,8 @@ from pano.methods.dictfuncs import sort_table as sort_tables
 from pano.puppetdb import puppetdb
 from pano.settings import CACHE_TIME
 from pano.puppetdb.puppetdb import set_server, get_server
-from pano.views.views import default_context
+from pano.settings import AVAILABLE_SOURCES
+import pytz
 from pano.puppetdb.pdbutils import json_to_datetime
 from django.template import defaultfilters as filters
 from django.utils.timezone import localtime
@@ -16,7 +17,8 @@ __author__ = 'etaklar'
 @login_required
 @cache_page(CACHE_TIME)
 def reports(request, certname=None):
-    context = default_context
+    context = {'timezones': pytz.common_timezones,
+               'SOURCES': AVAILABLE_SOURCES}
     if request.method == 'GET':
         if 'source' in request.GET:
             source = request.GET.get('source')

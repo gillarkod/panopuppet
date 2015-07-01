@@ -1,13 +1,14 @@
+__author__ = 'etaklar'
 from django.contrib.auth import authenticate, login
 from django.shortcuts import redirect, render
 from pano.puppetdb.puppetdb import set_server
-from pano.views.views import default_context
-
-__author__ = 'etaklar'
+from pano.settings import AVAILABLE_SOURCES
+import pytz
 
 
 def splash(request):
-    context = default_context
+    context = {'timezones': pytz.common_timezones,
+               'SOURCES': AVAILABLE_SOURCES}
     if request.method == 'GET':
         if 'source' in request.GET:
             source = request.GET.get('source')
