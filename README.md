@@ -299,5 +299,9 @@ Upcoming branches:
 * no_auth
   * There will be no ldap authentication support included.
 
+# Contact Me
+If you have any questions you are welcome to contact me @ chat.freenode.net - My nickname is Propyless
+and if I do not respond you may leave me an email and I will reply to your question there.
+
 # Development Server 
 Django runserver...
