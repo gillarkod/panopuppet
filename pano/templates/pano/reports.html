@@ -12,9 +12,9 @@
 
 {% block content %}
     <script>
-        function refresh_data(obj) {
+        $(document).ready(function refresh_data() {
             var backgroundTask = $.Deferred();
-            var url = '../api/facts/?certname={{ certname }}';
+            var url = '../../api/facts/?certname={{ certname }}&facts={{ node_facts }}';
             $.get(url, function (json) {
                 var response = $(jQuery.parseJSON(json));
                 var facts = response[0]['facts_list'];
@@ -24,52 +24,16 @@
                     data = '<tr><td colspan="2">No facts found.</td></tr>';
                 }
                 else {
-                    fact.forEach(function (facts) {
+                    facts.forEach(function (fact) {
                         data += '<tr>';
                         //Certname
-                        data += '<td>' + +'</td>';
+                        data += '<td>' + fact['name'] + '</td>';
+                        data += '<td>' + fact['value'] + '</td>';
+                        data += '</tr>';
                     });
                 }
                 // update table with the new json data to the table body
-                $("table tbody").html(data);
-                $('#nodePaneTitle').html('Query Results - Number of results: ' + response[0]['total_nodes']);
-
-                // update glyphicons
-                var sortfield = ['certname', 'catalog-timestamp', 'facts-timestamp', 'report-timestamp', 'successes', 'failures', 'noops', 'skips'];
-
-                sortfield.forEach(function (field) {
-                    var fieldHeader = $('#' + field + '-header');
-                    var fieldLink = $('#' + field + '-link');
-                    $(fieldHeader).find('span').removeAttr('class');
-                    // if field is active
-                    if (response[0]['c_r_sfield'] == field) {
-                        var url = '?sortfield=' + field + '&sortfieldby=' + response[0]['c_r_sfieldby_o'];
-                        if (response[0]['c_r_sfieldby'] == 'desc') {
-                            $(fieldHeader).find('span').removeClass('glyphicon glyphicon-chevron-up');
-                            $(fieldHeader).find('span').addClass('glyphicon glyphicon-chevron-down');
-                            $(fieldLink).attr('href', url);
-                        }
-                        else if (response[0]['c_r_sfieldby'] == 'asc') {
-                            $(fieldHeader).find('span').removeClass('glyphicon glyphicon-chevron-down');
-                            $(fieldHeader).find('span').addClass('glyphicon glyphicon-chevron-up');
-                            $(fieldLink).prop('href', url);
-                        }
-                        // if field is not the active sort field
-                    }
-                });
-                // update pager buttons TODO: concat if there is lots of pages.
-                var pager_buttons = '';
-                for (var i = 1; i <= response[0]['tot_pages']; i++) {
-                    if (response[0]['c_r_page'] === i) {
-                        pager_buttons += '<li class="active"><a onclick="refresh_data(this); return false;" href="?page=' + i + '">' + i + '</a></li>';
-                    }
-                    else {
-                        pager_buttons += '<li><a onclick="refresh_data(this); return false;" href="?page=' + i + '">' + i + '</a></li>';
-                    }
-                }
-                // Set selected limits value
-                $("#limits").val(response[0]['c_r_limit']);
-                $('#footPager').html(pager_buttons);
+                $("#inventoryfactsbody").html(data);
             })
                     .fail(function () {
                         var data = '<tr><td colspan="8">Can not connect to PuppetDB.</td></tr>';
@@ -78,7 +42,7 @@
 
             backgroundTask.resolve();
             return backgroundTask;
-        }
+        });
     </script>
     <div class="row">
         <div class="col-md-12">
@@ -108,14 +72,12 @@
                 <div class="table-responsive">
                     <table class="table table-condensed table-striped">
                         <thead>
-                        <th>Name</th>
-                        <th>Value</th>
-                        </thead>
-                        <tbody>
                         <tr>
-                            <td>Hej</td>
-                            <td>Du</td>
+                            <th>Name</th>
+                            <th>Value</th>
                         </tr>
+                        </thead>
+                        <tbody id="inventoryfactsbody">
                         </tbody>
                     </table>
                 </div>
@@ -206,7 +168,7 @@
     <script id="js_class">
         var chart = c3.generate({
             size: {
-                height: 200
+                height: 210
             },
             bindto: '#time_graph',
             data: {
@@ -223,7 +185,7 @@
                     type: 'timeseries',
                     tick: {
                         format: '%H:%M',
-                        rotate: 75,
+                        rotate: 75
                     }
                 }
             }

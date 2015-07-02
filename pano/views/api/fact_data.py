@@ -24,8 +24,8 @@ def facts_json(request):
 
     source_url, source_certs, source_verify = get_server(request)
 
-    certname = False
-    facts = False
+    certname = None
+    facts = None
     if 'certname' in request.GET:
         certname = request.GET.get('certname')
     if 'facts' in request.GET:
@@ -39,6 +39,8 @@ def facts_json(request):
         fact_query = list()
         for fact in facts:
             fact = fact.strip()
+            # Match for characters that are not a-Z or 0-9 or _
+            # if theres a match illegal chars exist...
             regex = re.compile(r'[^aA-zZ0-9_]')
             matches = regex.findall(fact)
             if matches:
@@ -52,13 +54,29 @@ def facts_json(request):
                 {
                     1: '["and",["=","certname","' + certname + '"],["or",' + fact_query + ']]'
                 },
+            'order-by':
+                {
+                    'order-field':
+                        {
+                            'field': 'name',
+                            'order': 'asc',
+                        }
+                }
         }
-    elif not facts:
+    else:
         facts_params = {
             'query':
                 {
                     1: '["=","certname","' + certname + '"]'
                 },
+            'order-by':
+                {
+                    'order-field':
+                        {
+                            'field': 'name',
+                            'order': 'asc',
+                        }
+                }
         }
     facts_list = puppetdb.api_get(
         api_url=source_url,

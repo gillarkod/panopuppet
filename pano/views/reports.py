@@ -5,7 +5,7 @@ from pano.methods.dictfuncs import sort_table as sort_tables
 from pano.puppetdb import puppetdb
 from pano.settings import CACHE_TIME
 from pano.puppetdb.puppetdb import set_server, get_server
-from pano.settings import AVAILABLE_SOURCES
+from pano.settings import AVAILABLE_SOURCES, NODES_DEFAULT_FACTS
 import pytz
 from pano.puppetdb.pdbutils import json_to_datetime
 from django.template import defaultfilters as filters
@@ -167,6 +167,7 @@ def reports(request, certname=None):
     context['reports'] = report_status
     context['report_runtimes'] = report_runtimes
     context['curr_page'] = page_num
+    context['node_facts'] = ','.join(NODES_DEFAULT_FACTS)
     context['tot_pages'] = "{:.0f}".format(num_pages)
 
     return render(request, 'pano/reports.html', context)
