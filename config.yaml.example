@@ -45,6 +45,12 @@ LDAP_GSEARCH_PATH:
 LDAP_ALLOW_GRP:
 LDAP_DENY_GRP:
 
+NODES_DEFAULT_FACTS:
+  - 'operatingsystem'
+  - 'operatingsystemrelease'
+  - 'kernel'
+  - 'ipaddress'
+
 ########################
 # DJANGO CONFIGURATION #
 ########################
