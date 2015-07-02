@@ -31,7 +31,6 @@ class common_functions(TestCase):
         """
         expected_result = '0'
         results = get_percentage(0, 0)
-        print(results)
         self.assertEquals(results, expected_result)
 
     def test_get_percentage_4(self):
@@ -42,3 +41,21 @@ class common_functions(TestCase):
         expected_result = '0'
         results = get_percentage(100, 0)
         self.assertEquals(results, expected_result)
+
+    def test_get_percentage_5(self):
+        """
+        Test is word/100 should fail.
+        """
+        self.assertRaises(ValueError, get_percentage, value='word', max_val=100)
+
+    def test_get_percentage_6(self):
+        """
+        Test is word/bird should fail.
+        """
+        self.assertRaises(ValueError, get_percentage, value='word', max_val='bird')
+
+    def test_get_percentage_7(self):
+        """
+        Test is 100/bird should fail.
+        """
+        self.assertRaises(ValueError, get_percentage, value=100, max_val='bird')
