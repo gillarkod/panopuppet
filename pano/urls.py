@@ -1,3 +1,4 @@
+__author__ = 'etaklar'
 from pano.views.analytics import analytics
 from pano.views.dashboard import dashboard
 from pano.views.event_analytics import event_analytics
@@ -9,12 +10,8 @@ from pano.views.report_events import detailed_events
 from pano.views.reports import reports
 from pano.views.splash import splash
 from pano.views.api.node_data import nodes_json
-
-__author__ = 'etaklar'
-
+from pano.views.api.fact_data import facts_json
 from django.conf.urls import patterns, url
-
-from pano import views
 
 urlpatterns = patterns('',
                        url(r'^$', splash, name='index'),
@@ -33,4 +30,5 @@ urlpatterns = patterns('',
 
                        # API URLS
                        url(r'^api/nodes/$', nodes_json, name='api_nodes'),
+                       url(r'^api/facts/$', facts_json, name='api_facts'),
                        )

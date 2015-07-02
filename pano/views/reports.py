@@ -136,7 +136,8 @@ def reports(request, certname=None):
                      event['noops'],
                      event['failures'],
                      event['skips'],
-                     report['status']])
+                     report['status'],
+                     report['configuration-version']])
                 break
         if found_report is False:
             report_status.append(
@@ -149,7 +150,8 @@ def reports(request, certname=None):
                  0,
                  0,
                  0,
-                 report['status']])
+                 report['status'],
+                 report['configuration-version']])
 
     report_status = sort_tables(report_status, order=True, col=3)
 

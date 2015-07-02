@@ -11,6 +11,75 @@
 {% endblock %}
 
 {% block content %}
+    <script>
+        function refresh_data(obj) {
+            var backgroundTask = $.Deferred();
+            var url = '../api/facts/?certname={{ certname }}';
+            $.get(url, function (json) {
+                var response = $(jQuery.parseJSON(json));
+                var facts = response[0]['facts_list'];
+                var data = '';
+                var num_nodes = facts.length;
+                if (num_nodes === 0) {
+                    data = '<tr><td colspan="2">No facts found.</td></tr>';
+                }
+                else {
+                    fact.forEach(function (facts) {
+                        data += '<tr>';
+                        //Certname
+                        data += '<td>' + +'</td>';
+                    });
+                }
+                // update table with the new json data to the table body
+                $("table tbody").html(data);
+                $('#nodePaneTitle').html('Query Results - Number of results: ' + response[0]['total_nodes']);
+
+                // update glyphicons
+                var sortfield = ['certname', 'catalog-timestamp', 'facts-timestamp', 'report-timestamp', 'successes', 'failures', 'noops', 'skips'];
+
+                sortfield.forEach(function (field) {
+                    var fieldHeader = $('#' + field + '-header');
+                    var fieldLink = $('#' + field + '-link');
+                    $(fieldHeader).find('span').removeAttr('class');
+                    // if field is active
+                    if (response[0]['c_r_sfield'] == field) {
+                        var url = '?sortfield=' + field + '&sortfieldby=' + response[0]['c_r_sfieldby_o'];
+                        if (response[0]['c_r_sfieldby'] == 'desc') {
+                            $(fieldHeader).find('span').removeClass('glyphicon glyphicon-chevron-up');
+                            $(fieldHeader).find('span').addClass('glyphicon glyphicon-chevron-down');
+                            $(fieldLink).attr('href', url);
+                        }
+                        else if (response[0]['c_r_sfieldby'] == 'asc') {
+                            $(fieldHeader).find('span').removeClass('glyphicon glyphicon-chevron-down');
+                            $(fieldHeader).find('span').addClass('glyphicon glyphicon-chevron-up');
+                            $(fieldLink).prop('href', url);
+                        }
+                        // if field is not the active sort field
+                    }
+                });
+                // update pager buttons TODO: concat if there is lots of pages.
+                var pager_buttons = '';
+                for (var i = 1; i <= response[0]['tot_pages']; i++) {
+                    if (response[0]['c_r_page'] === i) {
+                        pager_buttons += '<li class="active"><a onclick="refresh_data(this); return false;" href="?page=' + i + '">' + i + '</a></li>';
+                    }
+                    else {
+                        pager_buttons += '<li><a onclick="refresh_data(this); return false;" href="?page=' + i + '">' + i + '</a></li>';
+                    }
+                }
+                // Set selected limits value
+                $("#limits").val(response[0]['c_r_limit']);
+                $('#footPager').html(pager_buttons);
+            })
+                    .fail(function () {
+                        var data = '<tr><td colspan="8">Can not connect to PuppetDB.</td></tr>';
+                        $("table tbody").html(data);
+                    });
+
+            backgroundTask.resolve();
+            return backgroundTask;
+        }
+    </script>
     <div class="row">
         <div class="col-md-12">
             <h3>{{ certname }}</h3>
@@ -36,6 +105,20 @@
                         Node Inventory
                     </h1>
                 </div>
+                <div class="table-responsive">
+                    <table class="table table-condensed table-striped">
+                        <thead>
+                        <th>Name</th>
+                        <th>Value</th>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>Hej</td>
+                            <td>Du</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -53,6 +136,7 @@
                         <tr>
                             <th>Hash</th>
                             <th>Environment</th>
+                            <th>Configuration Version</th>
                             <th>Start Time</th>
                             <th>End Time</th>
                             <th>Success</th>
@@ -62,7 +146,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        {# List Format: hashid(0), certname(1), environment(2), time start(3), time end(4), success(5), noop(6), failure(7), pending(8), report status(9) #}
+                        {# List Format: hashid(0), certname(1), environment(2), time start(3), time end(4), success(5), noop(6), failure(7), pending(8), report status(9), config-version(10) #}
                         {% if reports %}
                             {% for report in reports %}
                                 <tr>
@@ -80,6 +164,7 @@
                                         {% endif %}
                                     </td>
                                     <td>{{ report.2 }}</td>
+                                    <td>{{ report.10 }}</td>
                                     <td>{{ report.3|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
                                     <td>{{ report.4|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
                                     <td style="text-align: center"><p style="margin-bottom: 0"
