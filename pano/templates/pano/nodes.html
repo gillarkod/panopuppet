@@ -70,7 +70,7 @@
                 }
             }
             $.get(url, function (json) {
-                var response = $(jQuery.parseJSON(json));
+                var response = $(jQuery(json));
                 var nodes = response[0]['nodeList'];
                 var data = '';
                 var num_nodes = nodes.length;
@@ -176,7 +176,6 @@
                     operators: ['puppet_equal', 'puppet_re_match'],
                     placeholder: 'host.example.com',
                     input: function (rule, name) {
-                        var $container = rule.$el.find('.rule-value-container');
                         return '\
                         <select class="form-control" name="' + name + '_1"> \
         <option value="None">-</option> \
@@ -208,7 +207,6 @@
                     'If you wish to create a new subquery to the facts endpoint you must add a new group first.',
                     operators: ['puppet_equal', 'puppet_nequal', 'puppet_g', 'puppet_ge', 'puppet_l', 'puppet_le', 'puppet_re_match'],
                     input: function (rule, name) {
-                        var $container = rule.$el.find('.rule-value-container');
                         return '\
                         <select class="form-control" name="' + name + '_1"> \
         <option value="None">-</option> \
@@ -235,7 +233,6 @@
                     'If you wish to create a new subquery to the resource endpoint you must add a new group first.',
                     operators: ['puppet_equal', 'puppet_nequal', 'puppet_g', 'puppet_ge', 'puppet_l', 'puppet_le', 'puppet_re_match'],
                     input: function (rule, name) {
-                        var $container = rule.$el.find('.rule-value-container');
                         return '\
                         <select class="form-control" name="' + name + '_1"> \
                             <option value="None">-</option> \

@@ -332,4 +332,4 @@ def nodes_json(request):
         'c_r_sfieldby_o': sort_field_order_opposite,
         'tot_pages': '{0:g}'.format(num_pages),
     }
-    return HttpResponse(json.dumps(context))
+    return HttpResponse(json.dumps(context), content_type="application/json")
