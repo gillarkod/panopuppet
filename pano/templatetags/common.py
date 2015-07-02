@@ -113,7 +113,7 @@ def get_percentage(value, max_val):
        {{ myval|get_percentage:max_value }}
     """
     if max_val == 0:
-        return 0
+        return '0'
     return "{0:.0f}".format((value / max_val) * 100)
 
 
