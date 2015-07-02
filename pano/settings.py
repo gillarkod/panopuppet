@@ -96,6 +96,9 @@ LDAP_USEARCH_PATH = cfg.get('LDAP_USEARCH_PATH', None)
 LDAP_GSEARCH_PATH = cfg.get('LDAP_GSEARCH_PATH', None)
 LDAP_ALLOW_GRP = cfg.get('LDAP_ALLOW_GRP', None)
 LDAP_DENY_GRP = cfg.get('LDAP_DENY_GRP', None)
+NODES_DEFAULT_FACTS = cfg.get('NODES_DEFAULT_FACTS',
+                              ['operatingsystem', 'operatingsystemrelease', 'puppetversion', 'kernel', 'kernelrelease',
+                               'ipaddress', 'uptime'])
 
 # Caching Time Settings
 # Set cache time to 0 to disable caching
