@@ -11,6 +11,7 @@ from pano.views.reports import reports
 from pano.views.splash import splash
 from pano.views.api.node_data import nodes_json
 from pano.views.api.fact_data import facts_json
+from pano.views.api.report_data import reports_json
 from django.conf.urls import patterns, url
 
 urlpatterns = patterns('',
@@ -31,4 +32,5 @@ urlpatterns = patterns('',
                        # API URLS
                        url(r'^api/nodes/$', nodes_json, name='api_nodes'),
                        url(r'^api/facts/$', facts_json, name='api_facts'),
+                       url(r'^api/reports/(?P<certname>[\w\.-]+)/$', reports_json, name='api_reports'),
                        )

@@ -8,15 +8,20 @@
     <link href="{% static 'pano/css/c3.min.css' %}" rel="stylesheet" type="text/css">
     <script src="{% static 'pano/js/c3.min.js' %}"></script>
     <script src="{% static 'pano/js/d3.min.js' %}"></script>
+    <script>
+        $(document).ready(function () {
+            get_facts();
+        });
+    </script>
 {% endblock %}
 
 {% block content %}
     <script>
-        $(document).ready(function refresh_data() {
+        function get_facts() {
             var backgroundTask = $.Deferred();
             var url = '../../api/facts/?certname={{ certname }}&facts={{ node_facts }}';
             $.get(url, function (json) {
-                var response = $(jQuery.parseJSON(json));
+                var response = $(jQuery(json));
                 var facts = response[0]['facts_list'];
                 var data = '';
                 var num_nodes = facts.length;
@@ -42,7 +47,39 @@
 
             backgroundTask.resolve();
             return backgroundTask;
-        });
+        }
+
+        function get_reports() {
+            var backgroundTask = $.Deferred();
+            var url = '../../api/facts/?certname={{ certname }}&facts={{ node_facts }}';
+            $.get(url, function (json) {
+                var response = $(jQuery(json));
+                var facts = response[0]['facts_list'];
+                var data = '';
+                var num_nodes = facts.length;
+                if (num_nodes === 0) {
+                    data = '<tr><td colspan="2">No facts found.</td></tr>';
+                }
+                else {
+                    facts.forEach(function (fact) {
+                        data += '<tr>';
+                        //Certname
+                        data += '<td>' + fact['name'] + '</td>';
+                        data += '<td>' + fact['value'] + '</td>';
+                        data += '</tr>';
+                    });
+                }
+                // update table with the new json data to the table body
+                $("#inventoryfactsbody").html(data);
+            })
+                    .fail(function () {
+                        var data = '<tr><td colspan="8">Can not connect to PuppetDB.</td></tr>';
+                        $("table tbody").html(data);
+                    });
+
+            backgroundTask.resolve();
+            return backgroundTask;
+        }
     </script>
     <div class="row">
         <div class="col-md-12">
