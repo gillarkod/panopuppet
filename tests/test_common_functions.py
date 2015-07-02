@@ -1,6 +1,4 @@
 __author__ = 'etaklar'
-from datetime import datetime, timedelta
-import json
 from django.test import TestCase
 from pano.templatetags.common import get_percentage
 
