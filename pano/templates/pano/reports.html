@@ -11,6 +11,7 @@
     <script>
         $(document).ready(function () {
             get_facts();
+            get_reports();
         });
     </script>
 {% endblock %}
@@ -42,7 +43,7 @@
             })
                     .fail(function () {
                         var data = '<tr><td colspan="8">Can not connect to PuppetDB.</td></tr>';
-                        $("table tbody").html(data);
+                        $("inventoryfactsbody").html(data);
                     });
 
             backgroundTask.resolve();
@@ -51,36 +52,82 @@
 
         function get_reports() {
             var backgroundTask = $.Deferred();
-            var url = '../../api/facts/?certname={{ certname }}&facts={{ node_facts }}';
+            var url = '../../api/reports/{{ certname }}';
             $.get(url, function (json) {
                 var response = $(jQuery(json));
-                var facts = response[0]['facts_list'];
+                var reports = response[0]['reports_list'];
                 var data = '';
-                var num_nodes = facts.length;
-                if (num_nodes === 0) {
-                    data = '<tr><td colspan="2">No facts found.</td></tr>';
+                var num_reports = reports.length;
+                if (num_reports === 0) {
+                    data = '<tr><td colspan="2">No reports found for node {{ certname }}.</td></tr>';
                 }
                 else {
-                    facts.forEach(function (fact) {
+                    reports.forEach(function (report) {
                         data += '<tr>';
-                        //Certname
-                        data += '<td>' + fact['name'] + '</td>';
-                        data += '<td>' + fact['value'] + '</td>';
+                        data += '<td>';
+                        if ( report['report_status'] == 'changed' ) {
+                            data += '<span class="glyphicon glyphicon-plus" style="color: #5cb85c"></span>';
+                        }
+                        else if ( report['report_status'] == 'unchanged' ) {
+                            data += '<span class="glyphicon glyphicon-minus" style="color: #5bc0de"></span>';
+                        }
+                        else if ( report['report_status'] == 'failed' ) {
+                            data += '<span class="glyphicon glyphicon-remove" style="color: #d9534f"></span>';
+                        }
+                        data += report['hash'] + '</td>';
+                        data += '<td>' + report['environment'] + '</td>';
+                        data += '<td>' + report['config_version'] + '</td>';
+                        data += '<td>' + report['start_time'] + '</td>';
+                        data += '<td>' + report['end_time'] + '</td>';
+                        data += '<td>' + report['events_successes'] + '</td>';
+                        data += '<td>' + report['events_noops'] + '</td>';
+                        data += '<td>' + report['events_failures'] + '</td>';
+                        data += '<td>' + report['events_skipped'] + '</td>';
                         data += '</tr>';
                     });
                 }
                 // update table with the new json data to the table body
-                $("#inventoryfactsbody").html(data);
+                $("#reportstablebody").html(data);
             })
                     .fail(function () {
-                        var data = '<tr><td colspan="8">Can not connect to PuppetDB.</td></tr>';
-                        $("table tbody").html(data);
+                        var data = '<tr><td colspan="9">Can not connect to PuppetDB.</td></tr>';
+                        $("reportstablebody").html(data);
                     });
 
             backgroundTask.resolve();
             return backgroundTask;
         }
     </script>
+    {%  comment %} #}
+                                        {% ifequal report.9 "failed" %}<span class="glyphicon glyphicon-remove"
+                                                                             style="color: #d9534f"></span>{% endifequal %}
+                                        {% if report.5 or report.6 or report.7 or report.8 %}
+                                            <a href="{% url 'events' certname=report.1 hashid=report.0 %}?report_timestamp={{ report.3 }}&envname={{ report.2 }}">{{ report.0 }}</a>
+                                        {% else %}
+                                            {{ report.0 }}
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ report.2 }}</td>
+                                    <td>{{ report.10 }}</td>
+                                    <td>{{ report.3|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
+                                    <td>{{ report.4|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
+                                    <td style="text-align: center"><p style="margin-bottom: 0"
+                                                                      class="bg-success img-rounded">
+                                        <strong>{{ report.5 }}</strong></p></td>
+                                    <td style="text-align: center"><p style="margin-bottom: 0"
+                                                                      class="bg-info img-rounded">
+                                        <strong>{{ report.6 }}</strong></p></td>
+                                    <td style="text-align: center"><p style="margin-bottom: 0"
+                                                                      class="bg-danger img-rounded">
+                                        <strong>{{ report.7 }}</strong></p></td>
+                                    <td style="text-align: center"><p style="margin-bottom: 0"
+                                                                      class="bg-warning img-rounded">
+                                        <strong>{{ report.8 }}</strong></p></td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <p>No reports were found in puppetdb for <strong>{{ certname }}</strong></p>
+                        {% endif %} {% endcomment %}
     <div class="row">
         <div class="col-md-12">
             <h3>{{ certname }}</h3>
@@ -144,49 +191,12 @@
                             <th>Skipped</th>
                         </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="reportstablebody">
                         {# List Format: hashid(0), certname(1), environment(2), time start(3), time end(4), success(5), noop(6), failure(7), pending(8), report status(9), config-version(10) #}
-                        {% if reports %}
-                            {% for report in reports %}
-                                <tr>
-                                    <td>
-                                        {% ifequal report.9 "changed" %}<span class="glyphicon glyphicon-plus"
-                                                                              style="color: #5cb85c"></span>{% endifequal %}
-                                        {% ifequal report.9 "unchanged" %}<span class="glyphicon glyphicon-minus"
-                                                                                style="color: #5bc0de"></span>{% endifequal %}
-                                        {% ifequal report.9 "failed" %}<span class="glyphicon glyphicon-remove"
-                                                                             style="color: #d9534f"></span>{% endifequal %}
-                                        {% if report.5 or report.6 or report.7 or report.8 %}
-                                            <a href="{% url 'events' certname=report.1 hashid=report.0 %}?report_timestamp={{ report.3 }}&envname={{ report.2 }}">{{ report.0 }}</a>
-                                        {% else %}
-                                            {{ report.0 }}
-                                        {% endif %}
-                                    </td>
-                                    <td>{{ report.2 }}</td>
-                                    <td>{{ report.10 }}</td>
-                                    <td>{{ report.3|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
-                                    <td>{{ report.4|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
-                                    <td style="text-align: center"><p style="margin-bottom: 0"
-                                                                      class="bg-success img-rounded">
-                                        <strong>{{ report.5 }}</strong></p></td>
-                                    <td style="text-align: center"><p style="margin-bottom: 0"
-                                                                      class="bg-info img-rounded">
-                                        <strong>{{ report.6 }}</strong></p></td>
-                                    <td style="text-align: center"><p style="margin-bottom: 0"
-                                                                      class="bg-danger img-rounded">
-                                        <strong>{{ report.7 }}</strong></p></td>
-                                    <td style="text-align: center"><p style="margin-bottom: 0"
-                                                                      class="bg-warning img-rounded">
-                                        <strong>{{ report.8 }}</strong></p></td>
-                                </tr>
-                            {% endfor %}
-                        {% else %}
-                            <p>No reports were found in puppetdb for <strong>{{ certname }}</strong></p>
-                        {% endif %}
                         </tbody>
                         <tfoot>
                         <tr>
-                            <td colspan="8">
+                            <td colspan="9">
                                 <ul class="pagination pagination-sm">
                                     {% for page in tot_pages|get_range %}
                                         <li {% if curr_page == page %}class="active"{% endif %}><a

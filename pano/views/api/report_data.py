@@ -111,7 +111,7 @@ def reports_json(request, certname=None):
                 })
 
     context['certname'] = certname
-    context['reports'] = report_status
+    context['reports_list'] = report_status
     context['curr_page'] = page_num
     context['tot_pages'] = "{:.0f}".format(num_pages)
     return HttpResponse(json.dumps(context), content_type="application/json")
