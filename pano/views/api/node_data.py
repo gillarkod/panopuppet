@@ -266,7 +266,7 @@ def nodes_json(request):
                     csv_headers.append(fact)
 
                     # build the params for each fact.
-                    facts_params = facts_params = {
+                    facts_params = {
                         'query':
                             {
                                 1: '["=","name","' + fact + '"]'

@@ -59,7 +59,7 @@ def reports(request, certname=None):
             for report in latest_report:
                 report_env = report['environment']
                 report_hash = report['hash']
-            return redirect('/pano/events/' + certname + '/' + report_hash + '?report_timestamp=' + request.GET.get(
+            return redirect('/pano/events/' + report_hash + '?report_timestamp=' + request.GET.get(
                 'report_timestamp') + '&envname=' + report_env)
 
     page_num = int(request.GET.get('page', 0))

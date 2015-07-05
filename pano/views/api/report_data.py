@@ -18,12 +18,19 @@ def reports_json(request, certname=None):
     source_url, source_certs, source_verify = get_server(request)
     # Redirects to the events page if GET param latest is true..
     context = {}
-    page_num = int(request.GET.get('page', 0))
-    if page_num <= 0:
+    # Cur Page Number
+    if request.GET.get('page', False):
+        if request.session['report_page'] != int(request.GET.get('page', 1)):
+            request.session['report_page'] = int(request.GET.get('page', 1))
+        if request.session['report_page'] <= 0:
+            request.session['report_page'] = 1
+    else:
+        if 'report_page' not in request.session:
+            request.session['report_page'] = 1
+    if request.session['report_page'] <= 0:
         offset = 0
     else:
-        offset = "{:.0f}".format(page_num * 25)
-
+        offset = (25 * request.session['report_page']) - 25
     reports_params = {
         'query':
             {
@@ -106,12 +113,12 @@ def reports_json(request, certname=None):
                     'events_noops': 0,
                     'events_failures': 0,
                     'events_skipped': 0,
-                    'report_status': 0,
+                    'report_status': report['status'],
                     'config_version': report['configuration-version']
                 })
 
     context['certname'] = certname
     context['reports_list'] = report_status
-    context['curr_page'] = page_num
+    context['curr_page'] = request.session['report_page']
     context['tot_pages'] = "{:.0f}".format(num_pages)
     return HttpResponse(json.dumps(context), content_type="application/json")
