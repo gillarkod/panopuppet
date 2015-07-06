@@ -98,7 +98,7 @@
                 // Update pager buttons
                 var pager_buttons = '';
                 for (var i = 1; i <= response[0]['tot_pages']; i++) {
-                    if (response[0]['c_r_page'] === i) {
+                    if (response[0]['curr_page'] === i) {
                         pager_buttons += '<li class="active"><a onclick="refresh_data(this); return false;" href="?page=' + i + '">' + i + '</a></li>';
                     }
                     else {
