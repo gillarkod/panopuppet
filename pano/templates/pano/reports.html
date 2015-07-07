@@ -60,39 +60,39 @@
             $.get(url, function (json) {
                 var response = $(jQuery(json));
                 var reports = response[0]['reports_list'];
-                var data = '';
+                var report_data = '';
                 var num_reports = reports.length;
                 if (num_reports === 0) {
-                    data = '<tr><td colspan="2">No reports found for node {{ certname }}.</td></tr>';
+                    report_data = '<tr><td colspan="2">No reports found for node {{ certname }}.</td></tr>';
                 }
                 else {
                     reports.forEach(function (report) {
-                        data += '<tr>';
-                        data += '<td>';
+                        report_data += '<tr>';
+                        report_data += '<td>';
                         if (report['report_status'] == 'changed') {
-                            data += '<span class="glyphicon glyphicon-plus" style="color: #5cb85c"></span>';
+                            report_data += '<span class="glyphicon glyphicon-plus" style="color: #5cb85c"></span>';
                         }
                         else if (report['report_status'] == 'unchanged') {
-                            data += '<span class="glyphicon glyphicon-minus" style="color: #5bc0de"></span>';
+                            report_data += '<span class="glyphicon glyphicon-minus" style="color: #5bc0de"></span>';
                         }
                         else if (report['report_status'] == 'failed') {
-                            data += '<span class="glyphicon glyphicon-remove" style="color: #d9534f"></span>';
+                            report_data += '<span class="glyphicon glyphicon-remove" style="color: #d9534f"></span>';
                         }
-                        if ( report['events_successes'] > 0 || report['events_noops'] > 0 || report['events_failures'] > 0 || report['events_skipped'] > 0 ) {
-                            data += '<a href="../../events/' + report['hash'] + '?report_timestamp=' + report['start_time'] + '">' + report['hash'] + '</a></td>';
+                        if (report['events_successes'] > 0 || report['events_noops'] > 0 || report['events_failures'] > 0 || report['events_skipped'] > 0) {
+                            report_data += '<a href="../../events/' + report['hash'] + '?report_timestamp=' + report['start_time'] + '">' + report['hash'] + '</a></td>';
                         }
                         else {
-                        data += report['hash'] + '</td>';
+                            report_data += report['hash'] + '</td>';
                         }
-                        data += '<td>' + report['environment'] + '</td>';
-                        data += '<td>' + report['config_version'] + '</td>';
-                        data += '<td>' + report['start_time'] + '</td>';
-                        data += '<td>' + report['end_time'] + '</td>';
-                        data += '<td style="text-align: center"><p style="margin-bottom: 0" class="bg-success img-rounded"><strong>' + report['events_successes'] + '</strong></p></td>';
-                        data += '<td style="text-align: center"><p style="margin-bottom: 0" class="bg-info img-rounded"><strong>' + report['events_noops'] + '</strong></p></td>';
-                        data += '<td style="text-align: center"><p style="margin-bottom: 0" class="bg-danger img-rounded"><strong>' + report['events_failures'] + '</strong></p></td>';
-                        data += '<td style="text-align: center"><p style="margin-bottom: 0" class="bg-warning img-rounded"><strong>' + report['events_skipped'] + '</strong></p></td>';
-                        data += '</tr>';
+                        report_data += '<td>' + report['environment'] + '</td>';
+                        report_data += '<td>' + report['config_version'] + '</td>';
+                        report_data += '<td>' + report['start_time'] + '</td>';
+                        report_data += '<td>' + report['end_time'] + '</td>';
+                        report_data += '<td style="text-align: center"><p style="margin-bottom: 0" class="bg-success img-rounded"><strong>' + report['events_successes'] + '</strong></p></td>';
+                        report_data += '<td style="text-align: center"><p style="margin-bottom: 0" class="bg-info img-rounded"><strong>' + report['events_noops'] + '</strong></p></td>';
+                        report_data += '<td style="text-align: center"><p style="margin-bottom: 0" class="bg-danger img-rounded"><strong>' + report['events_failures'] + '</strong></p></td>';
+                        report_data += '<td style="text-align: center"><p style="margin-bottom: 0" class="bg-warning img-rounded"><strong>' + report['events_skipped'] + '</strong></p></td>';
+                        report_data += '</tr>';
                     });
                 }
                 // Update pager buttons
@@ -107,7 +107,23 @@
                 }
                 $('#footPager').html(pager_buttons);
                 // update table with the new json data to the table body
-                $("#reportstablebody").html(data);
+                $("#reportstablebody").html(report_data);
+
+                // Update chart
+                var x_data = ['x'];
+                var runtime_data = ['Report Run Times'];
+
+                reports.forEach(function (report) {
+                    x_data.push(report['start_time']);
+                    runtime_data.push(report['run_duration']);
+                });
+                chart.load({
+                    columns: [
+                        x_data,
+                        runtime_data
+                    ],
+                    type: 'spline'
+                });
             })
                     .fail(function () {
                         var data = '<tr><td colspan="9">Can not connect to PuppetDB.</td></tr>';
@@ -208,8 +224,6 @@
                 x: 'x',
                 xFormat: '%Y-%m-%d %H:%M:%S',
                 columns: [
-                    ['x', {% for report in report_runtimes %}'{{ report.1 }}', {% endfor %}],
-                    ['Report Run Times',{% for report in report_runtimes %} {{ report.0 }}, {% endfor  %}]
                 ],
                 type: 'spline'
             },

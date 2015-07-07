@@ -2,7 +2,6 @@ __author__ = 'etaklar'
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import HttpResponse
 from django.views.decorators.cache import cache_page
-from pano.methods.dictfuncs import sort_table as sort_tables
 from pano.puppetdb import puppetdb
 from pano.settings import CACHE_TIME
 from pano.puppetdb.puppetdb import get_server
@@ -99,23 +98,27 @@ def reports_json(request, certname=None):
                     'events_failures': event['failures'],
                     'events_skipped': event['skips'],
                     'report_status': report['status'],
-                    'config_version': report['configuration-version']
+                    'config_version': report['configuration-version'],
+                    'run_duration': "{0:.0f}".format(
+                        (json_to_datetime(report['end-time']) - json_to_datetime(report['start-time'])).total_seconds())
                 })
                 break
         if found_report is False:
-                report_status.append({
-                    'hash': report['hash'],
-                    'certname': report['certname'],
-                    'environment': report['environment'],
-                    'start_time': filters.date(localtime(json_to_datetime(report['start-time'])), 'Y-m-d H:i:s'),
-                    'end_time': filters.date(localtime(json_to_datetime(report['start-time'])), 'Y-m-d H:i:s'),
-                    'events_successes': 0,
-                    'events_noops': 0,
-                    'events_failures': 0,
-                    'events_skipped': 0,
-                    'report_status': report['status'],
-                    'config_version': report['configuration-version']
-                })
+            report_status.append({
+                'hash': report['hash'],
+                'certname': report['certname'],
+                'environment': report['environment'],
+                'start_time': filters.date(localtime(json_to_datetime(report['start-time'])), 'Y-m-d H:i:s'),
+                'end_time': filters.date(localtime(json_to_datetime(report['start-time'])), 'Y-m-d H:i:s'),
+                'events_successes': 0,
+                'events_noops': 0,
+                'events_failures': 0,
+                'events_skipped': 0,
+                'report_status': report['status'],
+                'config_version': report['configuration-version'],
+                'run_duration': "{0:.0f}".format(
+                    (json_to_datetime(report['end-time']) - json_to_datetime(report['start-time'])).total_seconds())
+            })
 
     context['certname'] = certname
     context['reports_list'] = report_status
