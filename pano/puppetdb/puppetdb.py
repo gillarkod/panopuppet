@@ -58,7 +58,6 @@ def get_server(request, type='puppetdb'):
                 PUPPETMASTER_CLIENTBUCKET_CERTIFICATES, \
                 PUPPETMASTER_CLIENTBUCKET_VERIFY_SSL, \
                 PUPPETMASTER_CLIENTBUCKET_SHOW
-            pass
         elif type == 'fileserver':
             return \
                 PUPPETMASTER_FILESERVER_HOST, \
