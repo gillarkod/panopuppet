@@ -13,6 +13,21 @@
             get_facts();
             get_reports();
         });
+        $(document).on({
+            ajaxStart: function () {
+                bootbox.dialog({
+                    title: "Loading...",
+                    message: "Fetching data from PuppetDB.",
+                    show: true,
+                    backdrop: false,
+                    closeButton: false,
+                    animate: false
+                });
+            },
+            ajaxStop: function () {
+                bootbox.hideAll()
+            }
+        });
     </script>
 {% endblock %}
 
@@ -223,8 +238,7 @@
             data: {
                 x: 'x',
                 xFormat: '%Y-%m-%d %H:%M:%S',
-                columns: [
-                ],
+                columns: [],
                 type: 'spline'
             },
             axis: {

@@ -12,6 +12,21 @@
         $(document).ready(function () {
             refresh_data();
         });
+        $(document).on({
+            ajaxStart: function () {
+                bootbox.dialog({
+                    title: "Loading...",
+                    message: "Fetching data from PuppetDB.",
+                    show: true,
+                    backdrop: false,
+                    closeButton: false,
+                    animate: false
+                });
+            },
+            ajaxStop: function () {
+                bootbox.hideAll()
+            }
+        });
     </script>
 {% endblock %}
 
