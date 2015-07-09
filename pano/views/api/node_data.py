@@ -7,9 +7,7 @@ import json
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseBadRequest, HttpResponse, StreamingHttpResponse
 from django.shortcuts import redirect
-
 from django.views.decorators.csrf import ensure_csrf_cookie
-
 from pano.views import Echo
 from pano.methods.dictfuncs import dictstatus as dictstatus
 from pano.puppetdb.pdbutils import generate_csv
@@ -268,7 +266,7 @@ def nodes_json(request):
                     csv_headers.append(fact)
 
                     # build the params for each fact.
-                    facts_params = facts_params = {
+                    facts_params = {
                         'query':
                             {
                                 1: '["=","name","' + fact + '"]'
@@ -334,4 +332,4 @@ def nodes_json(request):
         'c_r_sfieldby_o': sort_field_order_opposite,
         'tot_pages': '{0:g}'.format(num_pages),
     }
-    return HttpResponse(json.dumps(context))
+    return HttpResponse(json.dumps(context), content_type="application/json")

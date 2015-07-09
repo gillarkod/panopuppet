@@ -290,6 +290,10 @@ But its recommended to run the `python manage.py collectstatic` command again in
 are served to your clients. Also make sure to read the config.yaml.example file and see if any new variables have been
 implemented!
 
+# Configuration Options
+NODES_DEFAULT_FACTS - Is a list of facts to be shown on the node report page. 
+                      Default value is: ['operatingsystem', 'operatingsystemrelease', 'puppetversion', 'kernel', 'kernelrelease', 'ipaddress', 'uptime']
+
 # Available branches
 The master branch has a release which includes:
 * ldap authentication

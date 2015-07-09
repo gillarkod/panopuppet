@@ -88,10 +88,11 @@
 {% block content %}
     <div class="row">
         <div class="col-md-12">
-            <h3>Events for {{ certname }} in {{ request.GET.envname }} environment</h3>
+            <h3>Events for {{ certname }} in {{ environment }} environment</h3>
             <h4>Report ID: {{ hashid }} @ {{ report_timestamp }}</h4>
         </div>
     </div>
+    {% if events_list %}
     <div class="row">
         <div class="col-md-12">
             <div class="panel-group" id="events_accordion" role="tablist" aria-multiselectable="true">
@@ -154,25 +155,26 @@
                 })
                 ;
     </script>
+    {% endif %}
     <div class="row">
         <div class="col-md-12">
             <div class="panel panel-primary">
                 <div class="panel-heading"><h4 class="panel-title">Event Details</h4></div>
                 <table style="border-collapse: separate" id="eventsTable"
                        class="table-responsive table-condensed tablesorter">
-                    <thead>
-                    <tr>
-                        <th>Class</th>
-                        <th>Title</th>
-                        <th>Type</th>
-                        <th>Timestamp Started</th>
-                        <th>Property</th>
-                        <th>From</th>
-                        <th>To</th>
-                    </tr>
-                    </thead>
                     <tbody>
                     {% if events_list %}
+                        <thead>
+                        <tr>
+                            <th>Class</th>
+                            <th>Title</th>
+                            <th>Type</th>
+                            <th>Timestamp Started</th>
+                            <th>Property</th>
+                            <th>From</th>
+                            <th>To</th>
+                        </tr>
+                        </thead>
                         {% for event in events_list %}
                             <tr {% if event.status == 'success' %}class="bg-success parent"
                                 {% elif event.status == 'failure' %}class="bg-danger parent"
@@ -223,8 +225,10 @@
                             {% endif %}
                         {% endfor %}
                     {% else %}
-                        <p>No events were found in puppetdb for <strong>{{ certname }}</strong> report id: {{ hashid }}
-                        </p>
+                        <tr>
+                            <td>No events were found in puppetdb for <strong>{{ certname }}</strong> with report
+                                id: {{ hashid }}</td>
+                        </tr>
                     {% endif %}
                     </tbody>
                 </table>

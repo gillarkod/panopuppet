@@ -1,8 +1,7 @@
 __author__ = 'etaklar'
 from datetime import datetime, timedelta
-import json
 from django.test import TestCase
-from pano.puppetdb.pdbutils import is_unreported, json_to_datetime
+from pano.puppetdb.pdbutils import is_unreported
 
 
 class CheckIfUnreported(TestCase):

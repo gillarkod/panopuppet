@@ -1,3 +1,4 @@
+__author__ = 'etaklar'
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 from django.views.decorators.cache import cache_page
@@ -5,15 +6,15 @@ from pano.puppetdb import puppetdb
 from pano.puppetdb.pdbutils import json_to_datetime
 from pano.settings import CACHE_TIME
 from pano.puppetdb.puppetdb import set_server, get_server
-from pano.views.views import default_context
-
-__author__ = 'etaklar'
+from pano.settings import AVAILABLE_SOURCES
+import pytz
 
 
 @login_required
 @cache_page(CACHE_TIME * 60)  # Cache for cache_time multiplied 60 because the report will never change...
-def detailed_events(request, certname=None, hashid=None):
-    context = default_context
+def detailed_events(request, hashid=None):
+    context = {'timezones': pytz.common_timezones,
+               'SOURCES': AVAILABLE_SOURCES}
     if request.method == 'GET':
         if 'source' in request.GET:
             source = request.GET.get('source')
@@ -47,9 +48,8 @@ def detailed_events(request, certname=None, hashid=None):
         api_version='v4',
         params=puppetdb.mk_puppetdb_query(events_params),
     )
-    single_event = ''
     environment = ''
-
+    certname = ''
     event_execution_times = []
     sorted_events = None
     last_event_time = None
@@ -59,6 +59,7 @@ def detailed_events(request, certname=None, hashid=None):
     if len(events_list) != 0:
         single_event = events_list[0]
         environment = single_event['environment']
+        certname = single_event['certname']
         for event in events_list:
             event_title = event['resource-title']
             event_start_time = json_to_datetime(event['timestamp'])
