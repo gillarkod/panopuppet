@@ -13,7 +13,14 @@
     <script>
         $(document).ready(function () {
             get_data();
+            var selector = '.nav li';
+            $(selector).on('click', function () {
+                $(selector).removeClass('active');
+                $(this).addClass('active');
+            });
         });
+
+
         $(document).on({
             ajaxStart: function () {
                 bootbox.dialog({
@@ -249,7 +256,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
-                <ul class="nav nav-tabs">
+                <ul id="node_pages" class="nav nav-tabs">
                     <li><a onclick="get_nodes(this).done(); return false;" href="?show=recent">Recent</a></li>
                     <li><a onclick="get_nodes(this).done(); return false;" href="?show=failed">Failed</a></li>
                     <li><a onclick="get_nodes(this).done(); return false;" href="?show=changed">Changed</a></li>
