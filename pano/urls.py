@@ -9,6 +9,7 @@ from pano.views.nodes import nodes
 from pano.views.report_events import detailed_events
 from pano.views.reports import reports
 from pano.views.splash import splash
+from pano.views.radiator import radiator
 from pano.views.api.node_data import nodes_json
 from pano.views.api.fact_data import facts_json
 from pano.views.api.dashboard_data import dashboard_status_json, dashboard_nodes_json, dashboard_json
@@ -29,7 +30,7 @@ urlpatterns = patterns('',
                        url(r'^eventanalytics/$', event_analytics, name='event_analytics'),
                        url(r'^eventanalytics/(?P<view>[\w]+)/$', event_analytics, name='event_analytics'),
                        url(r'^facts/(?P<certname>[\w\.-]+)/$', facts, name='facts'),
-
+                       url(r'^radiator/$', radiator, name='radiator'),
                        # API URLS
                        url(r'^api/nodes/$', nodes_json, name='api_nodes'),
                        url(r'^api/facts/$', facts_json, name='api_facts'),

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PanoPuppet</title>
+    {% load staticfiles %}
+    <script src="{% static 'pano/js/jquery.1.11.1.min.js' %}"></script>
+    <script src="{% static 'pano/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'pano/js/bootbox.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'pano/css/bootstrap.min.css' %}">
+    <link rel="shortcut icon" href="{% static 'pano/favicon.ico' %}" type="image/x-icon">
+    <script>
+        $(document).ready(function () {
+            refresh_data();
+        });
+    </script>
+</head>
+<body>
+<script>
+    // <--start--> PuppetDashboard Code for Resizing Fonts in Radiator View - Is licensed under the Apache 2.0 license
+    $(function () {
+        $(window).bind('resize', function () {
+            resizeMe();
+        }).trigger('resize');
+    });
+
+    function resizeMe() {
+        var preferredHeight = 944;
+        var displayHeight = $(window).height();
+        var percentageHeight = displayHeight / preferredHeight;
+
+        var preferredWidth = 1100;
+        var displayWidth = $(window).width();
+        var percentageWidth = displayWidth / preferredWidth;
+
+        var newFontSize;
+        if (percentageHeight < percentageWidth) {
+            newFontSize = Math.floor("815" * percentageHeight) - 30;
+        } else {
+            newFontSize = Math.floor("815" * percentageWidth) - 30;
+        }
+        $(".col-md-2").css("font-size", newFontSize + "%");
+        $(".progress-bar").css("font-size", newFontSize + "%");
+        $("body").css("background", 'black');
+    }
+    // <--end--> PuppetDashboard Code for Resizing Fonts in Radiator View - Is licensed under the Apache 2.0 license
+    function refresh_data() {
+        var backgroundTask = $.Deferred();
+        var url = '../api/dashboard/status';
+        $.get(url, function (json) {
+            var response = $(jQuery(json));
+            var total = response[0]['population'];
+
+            var failed = response[0]['failed_nodes'];
+            var changed = response[0]['changed_nodes'];
+            var noop = response[0]['pending_nodes'];
+            var unchanged = total -
+                    response[0]['failed_nodes'] -
+                    response[0]['changed_nodes'] -
+                    response[0]['pending_nodes'] -
+                    response[0]['unreported_nodes'];
+            var unreported = response[0]['unreported_nodes'];
+            $("#failed-count").html(failed);
+            $("#failed-bar").css("width", Math.round((failed / total) * 100) + "%");
+
+            $("#changed-count").html(changed);
+            $("#changed-bar").css("width", Math.round((changed / total) * 100) + "%");
+
+            $("#noop-count").html(noop);
+            $("#noop-bar").css("width", Math.round((noop / total) * 100) + "%");
+            $("#unchanged-count").html(unchanged);
+            $("#unchanged-bar").css("width", Math.round((unchanged / total) * 100) + "%");
+
+            $("#unreported-count").html(unreported);
+            $("#unreported-bar").css("width", Math.round((unreported / total) * 100) + "%");
+        })
+                .complete(function () {
+                    setTimeout(refresh_data, 30000);
+                })
+                .fail(function () {
+                    console.log("PuppetDB API is not reachable.")
+                });
+
+        backgroundTask.resolve();
+
+        return backgroundTask;
+
+    }
+</script>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-1"></div>
+                <div id="failed-count" class="col-md-2 text-danger"
+                     style="height: 15vh; padding: 0; text-align: right;">
+
+                </div>
+                <div class="col-md-8" style="border-bottom: 1px grey solid; padding: 0;">
+                    <div class="progress" style="height: 15vh; background:black; margin-bottom: 0;">
+                        <div id="failed-bar" class="progress-bar progress-bar-danger" role="progressbar"
+                             style="width:0; line-height: 15vh; vertical-align: middle; text-align: left;">
+                            Failed
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-1"></div>
+            </div>
+            <div class="row">
+                <div class="col-md-1"></div>
+                <div id="noop-count" class="col-md-2 text-info"
+                     style="height: 15vh; padding: 0; text-align: right;">
+                </div>
+                <div class="col-md-8" style="border-bottom: 1px grey solid; padding: 0;">
+                    <div class="progress" style="height: 15vh; background:black; margin-bottom: 0;">
+                        <div id="noop-bar" class="progress-bar progress-bar-info" role="progressbar"
+                             style="width:0; line-height: 15vh; vertical-align: middle; text-align: left;">
+                            Noop
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-1"></div>
+            </div>
+            <div class="row">
+                <div class="col-md-1"></div>
+                <div id="changed-count" class="col-md-2 text-primary"
+                     style="height: 15vh; padding: 0; text-align: right;">
+                </div>
+                <div class="col-md-8" style="border-bottom: 1px grey solid; padding: 0;">
+                    <div class="progress" style="height: 15vh; background:black; margin-bottom: 0;">
+                        <div id="changed-bar" class="progress-bar progress-bar-primary" role="progressbar"
+                             style="width:0; line-height: 15vh; vertical-align: middle; text-align: left;">
+                            Changed
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-1"></div>
+            </div>
+            <div class="row">
+                <div class="col-md-1"></div>
+                <div id="unchanged-count" class="col-md-2 text-success"
+                     style="height: 15vh; padding: 0; text-align: right;">
+                </div>
+                <div class="col-md-8" style="border-bottom: 1px grey solid; padding: 0;">
+                    <div class="progress" style="height: 15vh; background:black; margin-bottom: 0;">
+                        <div id=unchanged-bar class="progress-bar progress-bar-success" role="progressbar"
+                             style="width:0; line-height: 15vh; vertical-align: middle; text-align: left;">
+                            Unchanged
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-1"></div>
+            </div>
+            <div class="row">
+                <div class="col-md-1"></div>
+                <div id="unreported-count" class="col-md-2 text-warning"
+                     style="height: 15vh; padding: 0; text-align: right;">
+                </div>
+                <div class="col-md-8" style="border-bottom: 1px grey solid; padding: 0;">
+                    <div class="progress" style="height: 15vh; background:black; margin-bottom: 0;">
+                        <div id="unreported-bar" class="progress-bar progress-bar-warning" role="progressbar"
+                             style="width:0; line-height: 15vh; vertical-align: middle; text-align: left;">
+                            Unreported
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-1"></div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
