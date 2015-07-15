@@ -45,6 +45,31 @@
         $("body").css("background", 'black');
     }
     // <--end--> PuppetDashboard Code for Resizing Fonts in Radiator View - Is licensed under the Apache 2.0 license
+
+    // http://stackoverflow.com/questions/5275224/converting-big-numbers-to-bigger-factors-in-javascript
+    // Truncate a number to ind decimal places
+    function truncNb(Nb, ind) {
+        var _nb = Nb * (Math.pow(10, ind));
+        _nb = Math.floor(_nb);
+        _nb = _nb / (Math.pow(10, ind));
+        return _nb;
+    }
+    // convert a big number to k,M,G
+    function int2roundKMG(val) {
+        var _str = "";
+        if (val >= 1e9) {
+            _str = truncNb((val / 1e9), 1) + ' G';
+        } else if (val >= 1e6) {
+            _str = truncNb((val / 1e6), 1) + ' M';
+        } else if (val >= 1e3) {
+            _str = truncNb((val / 1e3), 1) + ' k';
+        } else {
+            _str = parseInt(val);
+        }
+        return _str;
+    }
+
+
     function refresh_data() {
         var backgroundTask = $.Deferred();
         var url = '../api/dashboard/status';
@@ -61,18 +86,19 @@
                     response[0]['pending_nodes'] -
                     response[0]['unreported_nodes'];
             var unreported = response[0]['unreported_nodes'];
-            $("#failed-count").html(failed);
+            $("#failed-count").html(int2roundKMG(failed));
             $("#failed-bar").css("width", Math.round((failed / total) * 100) + "%");
 
-            $("#changed-count").html(changed);
+            $("#changed-count").html(int2roundKMG(changed));
             $("#changed-bar").css("width", Math.round((changed / total) * 100) + "%");
 
-            $("#noop-count").html(noop);
+            $("#noop-count").html(int2roundKMG(noop));
             $("#noop-bar").css("width", Math.round((noop / total) * 100) + "%");
-            $("#unchanged-count").html(unchanged);
+
+            $("#unchanged-count").html(int2roundKMG(unchanged));
             $("#unchanged-bar").css("width", Math.round((unchanged / total) * 100) + "%");
 
-            $("#unreported-count").html(unreported);
+            $("#unreported-count").html(int2roundKMG(unreported));
             $("#unreported-bar").css("width", Math.round((unreported / total) * 100) + "%");
         })
                 .complete(function () {
@@ -95,7 +121,6 @@
                 <div class="col-md-1"></div>
                 <div id="failed-count" class="col-md-2 text-danger"
                      style="height: 15vh; padding: 0; text-align: right;">
-
                 </div>
                 <div class="col-md-8" style="border-bottom: 1px grey solid; padding: 0;">
                     <div class="progress" style="height: 15vh; background:black; margin-bottom: 0;">
