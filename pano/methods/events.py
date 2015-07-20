@@ -201,7 +201,8 @@ def get_report(key, value, request):
             {
                 'operator': 'and',
                 1: '["=","' + key + '","' + value + '"]',
-                2: '["=","latest-report?",true]'
+                2: '["=","latest-report?",true]',
+                3: '["in", "certname",["extract", "certname",["select-nodes",["null?","deactivated",true]]]]'
             },
     }
     results = pdb_api_get(
