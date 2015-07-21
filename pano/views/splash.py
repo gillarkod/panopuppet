@@ -4,6 +4,8 @@ from django.shortcuts import redirect, render
 from pano.puppetdb.puppetdb import set_server
 from pano.settings import AVAILABLE_SOURCES
 import pytz
+from pano.settings import AUTH_METHOD
+from pano.models import LdapGroupPermissions
 
 
 def splash(request):
@@ -27,10 +29,27 @@ def splash(request):
             if user is not None:
                 if user.is_active:
                     login(request, user)
-                    if next_url:
-                        return redirect(next_url)
-                    else:
-                        return redirect('dashboard')
+                    # Work out the permissions for this user based on ldap groups
+                    if AUTH_METHOD == 'ldap':
+                        ldap_user = user.ldap_user
+                        ldap_user_groups = ldap_user.group_dns
+                        base_query = ['["and",["or"']
+                        for group in ldap_user_groups:
+                            results = LdapGroupPermissions.objects.filter(ldap_group_name=group)
+                            if results.exists():
+                                value = results.values()
+                                value = value[0]['puppetdb_query']
+                                base_query.append(value)
+                        if len(base_query) == 1:
+                            base_query = None
+                        else:
+                            base_query = ','.join(base_query) + ']]'
+                        request.session['permission_filter'] = base_query
+
+                        if next_url:
+                            return redirect(next_url)
+                        else:
+                            return redirect('dashboard')
                 else:
                     context['login_error'] = "Account is disabled."
                     context['nexturl'] = next_url
