@@ -1,3 +1,9 @@
 from django.contrib import admin
+from .models import LdapGroupPermissions
 
-# Register your models here.
+
+class LdapGroupsAdmin(admin.ModelAdmin):
+    search_fields = ['ldap_group_name']
+
+
+admin.site.register(LdapGroupPermissions, LdapGroupsAdmin)
