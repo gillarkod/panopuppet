@@ -187,11 +187,17 @@ def mk_puppetdb_query(params):
         i = 0
         if len(q_dict) > 1:
             while i < len(q_dict) - 1:
-                query += q_dict[i + 1] + ','
+                if q_dict[i + 1] is None:
+                    pass
+                else:
+                    query += q_dict[i + 1] + ','
                 i += 1
 
         elif len(q_dict) == 1:
-            query += q_dict[1] + ','
+            if q_dict[i + 1] is None:
+                return []
+            else:
+                query += q_dict[1] + ','
 
         # remove the last comma
         query = query.rstrip(',')
