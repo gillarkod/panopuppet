@@ -30,7 +30,7 @@ def splash(request):
                 if user.is_active:
                     login(request, user)
                     # Work out the permissions for this user based on ldap groups
-                    if AUTH_METHOD == 'ldap':
+                    if AUTH_METHOD == 'ldap' and user.backend == 'django_auth_ldap.backend.LDAPBackend':
                         ldap_user = user.ldap_user
                         ldap_user_groups = ldap_user.group_dns
                         base_query = ['["and",["or"']
