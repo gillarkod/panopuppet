@@ -41,15 +41,15 @@ def splash(request):
                                 value = value[0]['puppetdb_query']
                                 base_query.append(value)
                         if len(base_query) == 1:
-                            base_query = None
+                            pass
                         else:
                             base_query = ','.join(base_query) + ']]'
-                        request.session['permission_filter'] = base_query
+                            request.session['permission_filter'] = base_query
 
-                        if next_url:
-                            return redirect(next_url)
-                        else:
-                            return redirect('dashboard')
+                    if next_url:
+                        return redirect(next_url)
+                    else:
+                        return redirect('dashboard')
                 else:
                     context['login_error'] = "Account is disabled."
                     context['nexturl'] = next_url
