@@ -1,15 +1,11 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 from django.views.decorators.cache import cache_page
-from pano.methods.dictfuncs import sort_table as sort_tables
 from pano.puppetdb import puppetdb
 from pano.settings import CACHE_TIME
 from pano.puppetdb.puppetdb import set_server, get_server
 from pano.settings import AVAILABLE_SOURCES, NODES_DEFAULT_FACTS
 import pytz
-from pano.puppetdb.pdbutils import json_to_datetime
-from django.template import defaultfilters as filters
-from django.utils.timezone import localtime
 
 __author__ = 'etaklar'
 
