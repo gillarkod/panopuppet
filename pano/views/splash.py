@@ -2,7 +2,7 @@ __author__ = 'etaklar'
 from django.contrib.auth import authenticate, login
 from django.shortcuts import redirect, render
 from pano.puppetdb.puppetdb import set_server
-from pano.settings import AVAILABLE_SOURCES
+from pano.settings import AVAILABLE_SOURCES, ENABLE_PERMISSIONS
 import pytz
 from pano.settings import AUTH_METHOD
 from pano.models import LdapGroupPermissions
@@ -30,7 +30,7 @@ def splash(request):
                 if user.is_active:
                     login(request, user)
                     # Work out the permissions for this user based on ldap groups
-                    if AUTH_METHOD == 'ldap' and user.backend == 'django_auth_ldap.backend.LDAPBackend':
+                    if AUTH_METHOD == 'ldap' and user.backend == 'django_auth_ldap.backend.LDAPBackend' and ENABLE_PERMISSIONS:
                         ldap_user = user.ldap_user
                         ldap_user_groups = ldap_user.group_dns
                         base_query = ['["and",["or"']
