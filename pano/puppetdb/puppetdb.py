@@ -21,7 +21,8 @@ import requests
 from pano.settings import PUPPETDB_HOST, PUPPETDB_VERIFY_SSL, PUPPETDB_CERTIFICATES, AVAILABLE_SOURCES, \
     PUPPETMASTER_CLIENTBUCKET_CERTIFICATES, PUPPETMASTER_CLIENTBUCKET_HOST, PUPPETMASTER_CLIENTBUCKET_SHOW, \
     PUPPETMASTER_CLIENTBUCKET_VERIFY_SSL, PUPPETMASTER_FILESERVER_CERTIFICATES, PUPPETMASTER_FILESERVER_HOST, \
-    PUPPETMASTER_FILESERVER_SHOW, PUPPETMASTER_FILESERVER_VERIFY_SSL, PUPPET_RUN_INTERVAL
+    PUPPETMASTER_FILESERVER_SHOW, PUPPETMASTER_FILESERVER_VERIFY_SSL, PUPPET_RUN_INTERVAL, AUTH_METHOD, \
+    ENABLE_PERMISSIONS
 
 
 def get_server(request, type='puppetdb'):
@@ -122,7 +123,6 @@ def api_get(api_url=PUPPETDB_HOST,
     methods = {
         'get': requests.get,
     }
-
     if path[0] != '/':
         path = '/{0}'.format(path)
 
@@ -143,7 +143,7 @@ def api_get(api_url=PUPPETDB_HOST,
             return []
 
 
-def mk_puppetdb_query(params):
+def mk_puppetdb_query(params, request=None):
     """
     formats the dict into a query string for puppetdb
     :param params: dict
@@ -180,10 +180,15 @@ def mk_puppetdb_query(params):
                                                                             ]'
     """
 
-    def query_build(q_dict):
-        query = ''
-        if 'operator' in q_dict:
-            query += '["and", '
+    def query_build(q_dict, user_request):
+        if user_request and AUTH_METHOD == 'ldap' and ENABLE_PERMISSIONS:
+            permission_filter = user_request.session.get('permission_filter', False)
+            if permission_filter and isinstance(permission_filter, str):
+                query = '["and",' + user_request.session.get('permission_filter', False) + ','
+            else:
+                query = '["and",'
+        else:
+            query = '["and",'
         i = 0
         if len(q_dict) > 1:
             while i < len(q_dict) - 1:
@@ -201,9 +206,9 @@ def mk_puppetdb_query(params):
 
         # remove the last comma
         query = query.rstrip(',')
-        # add the closing bracket if there was an operator
-        if 'operator' in q_dict:
-            query += ']'
+        query += ']'
+        if query == '["and"]':
+            query = ''
         return query
 
     """
@@ -234,7 +239,9 @@ def mk_puppetdb_query(params):
     if type(params) is dict:
         query_dict = {}
         if 'query' in params:
-            query_dict['query'] = query_build(params['query'])
+            query_dict['query'] = query_build(params['query'], request)
+        elif 'query' not in params and request:
+            query_dict['query'] = query_build({}, request)
         if 'summarize-by' in params:
             query_dict['summarize-by'] = params.get('summarize-by', 'certname')
         if 'limit' in params:
