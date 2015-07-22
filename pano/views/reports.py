@@ -53,14 +53,20 @@ def reports(request, certname=None):
                 verify=source_verify,
                 path='/reports',
                 api_version='v4',
-                params=puppetdb.mk_puppetdb_query(latest_report_params),
+                params=puppetdb.mk_puppetdb_query(latest_report_params, request),
             )
             report_hash = ""
-            for report in latest_report:
-                report_env = report['environment']
-                report_hash = report['hash']
-            return redirect('/pano/events/' + report_hash + '?report_timestamp=' + request.GET.get(
-                'report_timestamp') + '&envname=' + report_env)
+            # If latest reports do not exist, send to the nodes page
+            # Should only occur if the user is trying to hax their way
+            # into a node without having the correct permission
+            if latest_report:
+                for report in latest_report:
+                    report_env = report['environment']
+                    report_hash = report['hash']
+                return redirect('/pano/events/' + report_hash + '?report_timestamp=' + request.GET.get(
+                    'report_timestamp') + '&envname=' + report_env)
+            else:
+                return redirect('/pano/nodes/')
 
     context['certname'] = certname
     context['node_facts'] = ','.join(NODES_DEFAULT_FACTS)

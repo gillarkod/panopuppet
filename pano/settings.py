@@ -89,6 +89,7 @@ if PUPPETDB_HOST is None:
 # It will fallback to auth in django, so if you have created accounts in django admin page
 # they will be able to log in.
 AUTH_METHOD = cfg.get('AUTH_METHOD', 'basic')
+ENABLE_PERMISSIONS = cfg.get('ENABLE_PERMISSIONS', False)
 LDAP_SERVER = cfg.get('LDAP_SERVER', None)
 LDAP_BIND_DN = cfg.get('LDAP_BIND_DN', None)
 LDAP_BIND_PW = cfg.get('LDAP_BIND_PW', None)

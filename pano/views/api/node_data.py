@@ -153,7 +153,7 @@ def nodes_json(request):
             path='/nodes',
             api_version='v4',
             params=puppetdb.mk_puppetdb_query(
-                node_params),
+                node_params, request),
         )
     else:
         node_list = puppetdb.api_get(
@@ -163,7 +163,7 @@ def nodes_json(request):
             path='/nodes',
             api_version='v4',
             params=puppetdb.mk_puppetdb_query(
-                node_params),
+                node_params, request),
         )
 
     # Work out the number of pages from the xrecords response
@@ -204,7 +204,7 @@ def nodes_json(request):
             cert=source_certs,
             verify=source_verify,
             path='/event-counts',
-            params=puppetdb.mk_puppetdb_query(report_params),
+            params=puppetdb.mk_puppetdb_query(report_params, request),
             api_version='v4',
         )
     else:
@@ -213,7 +213,7 @@ def nodes_json(request):
             cert=source_certs,
             verify=source_verify,
             path='event-counts',
-            params=puppetdb.mk_puppetdb_query(report_params),
+            params=puppetdb.mk_puppetdb_query(report_params, request),
             api_version='v4',
         )
     # number of results depending on sort field.

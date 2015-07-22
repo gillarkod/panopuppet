@@ -34,13 +34,6 @@ def dashboard_status_json(request):
     }
 
     jobs = {
-        'population': {
-            'url': source_url,
-            'certs': source_certs,
-            'verify': source_verify,
-            'id': 'population',
-            'path': '/metrics/mbean/com.puppetlabs.puppetdb.query.population:type=default,name=num-nodes',
-        },
         'tot_resource': {
             'url': source_url,
             'certs': source_certs,
@@ -62,6 +55,7 @@ def dashboard_status_json(request):
             'api_version': 'v4',
             'id': 'all_nodes',
             'path': '/nodes',
+            'request': request
         },
         'events': {
             'url': source_url,
@@ -71,12 +65,14 @@ def dashboard_status_json(request):
             'path': 'event-counts',
             'api_version': 'v4',
             'params': events_params,
+            'request': request
         },
     }
     puppetdb_results = run_puppetdb_jobs(jobs)
 
     # Assign vars from the completed jobs
-    puppet_population = puppetdb_results['population']
+    # Number of results from all_nodes is our population.
+    puppet_population = len(puppetdb_results['all_nodes'])
     # Total resources managed by puppet metric
     total_resources = puppetdb_results['tot_resource']
     # Average resource per node metric
@@ -105,7 +101,7 @@ def dashboard_status_json(request):
     node_off_timestamps_count = len(mismatch_list)
     node_pending_count = len(pending_list)
 
-    context['population'] = puppet_population['Value']
+    context['population'] = puppet_population
     context['total_resource'] = total_resources['Value']
     context['avg_resource'] = "{:.2f}".format(avg_resource_node['Value'])
     context['failed_nodes'] = node_fail_count
@@ -142,6 +138,12 @@ def dashboard_nodes_json(request):
             },
         'summarize-by': 'certname',
     }
+    all_nodes_params = {
+        'query':
+            {
+                1: '["and",["=","latest-report?",true],["in", "certname",["extract", "certname",["select-nodes",["null?","deactivated",true]]]]]'
+            },
+    }
     nodes_params = {
         'limit': 25,
         'order-by': {
@@ -161,6 +163,7 @@ def dashboard_nodes_json(request):
             'api_version': 'v4',
             'id': 'all_nodes',
             'path': '/nodes',
+            'request': request
         },
         'events': {
             'url': source_url,
@@ -170,6 +173,7 @@ def dashboard_nodes_json(request):
             'path': 'event-counts',
             'api_version': 'v4',
             'params': events_params,
+            'request': request
         },
         'nodes': {
             'url': source_url,
@@ -179,6 +183,7 @@ def dashboard_nodes_json(request):
             'id': 'nodes',
             'path': '/nodes',
             'params': nodes_params,
+            'request': request
         },
     }
 
@@ -257,13 +262,6 @@ def dashboard_json(request):
     }
 
     jobs = {
-        'population': {
-            'url': source_url,
-            'certs': source_certs,
-            'verify': source_verify,
-            'id': 'population',
-            'path': '/metrics/mbean/com.puppetlabs.puppetdb.query.population:type=default,name=num-nodes',
-        },
         'tot_resource': {
             'url': source_url,
             'certs': source_certs,
@@ -285,6 +283,7 @@ def dashboard_json(request):
             'api_version': 'v4',
             'id': 'all_nodes',
             'path': '/nodes',
+            'request': request
         },
         'events': {
             'url': source_url,
@@ -294,6 +293,7 @@ def dashboard_json(request):
             'path': 'event-counts',
             'api_version': 'v4',
             'params': events_params,
+            'request': request
         },
         'nodes': {
             'url': source_url,
@@ -303,12 +303,14 @@ def dashboard_json(request):
             'id': 'nodes',
             'path': '/nodes',
             'params': nodes_params,
+            'request': request
         },
     }
     puppetdb_results = run_puppetdb_jobs(jobs)
 
     # Assign vars from the completed jobs
-    puppet_population = puppetdb_results['population']
+    # Number of results from all_nodes is our population.
+    puppet_population = len(puppetdb_results['all_nodes'])
     # Total resources managed by puppet metric
     total_resources = puppetdb_results['tot_resource']
     # Average resource per node metric
@@ -356,7 +358,7 @@ def dashboard_json(request):
 
     context['node_list'] = merged_nodes_list
     context['selected_view'] = dashboard_show
-    context['population'] = puppet_population['Value']
+    context['population'] = puppet_population
     context['total_resource'] = total_resources['Value']
     context['avg_resource'] = "{:.2f}".format(avg_resource_node['Value'])
     context['failed_nodes'] = node_fail_count

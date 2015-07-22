@@ -27,21 +27,21 @@ def analytics(request):
     events_class_params = {
         'query':
             {
-                1: '["and",["=","latest-report?",true],["in", "certname",["extract", "certname",["select-nodes",["null?","deactivated",true]]]]]'
+                1: '["and",["=","latest-report?",true],["in","certname",["extract","certname",["select-nodes",["null?","deactivated",true]]]]]'
             },
         'summarize-by': 'containing-class',
     }
     events_resource_params = {
         'query':
             {
-                1: '["and",["=","latest-report?",true],["in", "certname",["extract", "certname",["select-nodes",["null?","deactivated",true]]]]]'
+                1: '["and",["=","latest-report?",true],["in","certname",["extract","certname",["select-nodes",["null?","deactivated",true]]]]]'
             },
         'summarize-by': 'resource',
     }
     events_status_params = {
         'query':
             {
-                1: '["and",["=","latest-report?",true],["in", "certname",["extract", "certname",["select-nodes",["null?","deactivated",true]]]]]'
+                1: '["and",["=","latest-report?",true],["in","certname",["extract","certname",["select-nodes",["null?","deactivated",true]]]]]'
             },
         'summarize-by': 'resource',
     }
@@ -64,6 +64,7 @@ def analytics(request):
             'path': '/event-counts',
             'api_version': 'v4',
             'params': events_class_params,
+            'request': request
         },
         'events_resource_list': {
             'url': source_url,
@@ -73,6 +74,7 @@ def analytics(request):
             'path': '/event-counts',
             'api_version': 'v4',
             'params': events_resource_params,
+            'request': request
         },
         'events_status_list': {
             'url': source_url,
@@ -82,6 +84,7 @@ def analytics(request):
             'path': '/aggregate-event-counts',
             'api_version': 'v4',
             'params': events_status_params,
+            'request': request
         },
         'reports_run_avg': {
             'url': source_url,
@@ -89,7 +92,9 @@ def analytics(request):
             'verify': source_verify,
             'id': 'reports_run_avg',
             'path': '/reports',
+            'api_version': 'v4',
             'params': reports_runavg_params,
+            'request': request
         },
     }
 
@@ -108,7 +113,10 @@ def analytics(request):
             (json_to_datetime(report['end-time']) - json_to_datetime(report['start-time'])).total_seconds())
         avg_run_time += int(run_time)
         run_avg_times.append(run_time)
-    avg_run_time = "{0:.0f}".format(avg_run_time / num_runs_avg)
+    if num_runs_avg != 0:
+        avg_run_time = "{0:.0f}".format(avg_run_time / num_runs_avg)
+    else:
+        avg_run_time = 0
 
     class_event_results = []
     class_resource_results = []
