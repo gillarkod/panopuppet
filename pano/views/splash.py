@@ -41,10 +41,15 @@ def splash(request):
                                 value = value[0]['puppetdb_query']
                                 base_query.append(value)
                         if len(base_query) == 1:
-                            pass
+                            if user.is_staff or user.is_superuser:
+                                request.session['permission_filter'] = False
+                            else:
+                                request.session['permission_filter'] = None
                         else:
-                            base_query = ','.join(base_query) + ']]'
-                            request.session['permission_filter'] = base_query
+                            if user.is_staff or user.is_superuser:
+                                request.session['permission_filter'] = False
+                            else:
+                                request.session['permission_filter'] = ','.join(base_query) + ']]'
 
                     if next_url:
                         return redirect(next_url)

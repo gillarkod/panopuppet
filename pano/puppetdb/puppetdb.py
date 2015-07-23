@@ -129,6 +129,9 @@ def api_get(api_url=PUPPETDB_HOST,
     if params:
         path += '?{0}'.format(urlparse.urlencode(params))
 
+    if params is None:
+        return list(), list()
+
     url = '{0}{1}'.format(api_url + api_version, path)
     resp = methods[method](url,
                            headers=headers,
@@ -183,8 +186,10 @@ def mk_puppetdb_query(params, request=None):
     def query_build(q_dict, user_request):
         if user_request and AUTH_METHOD == 'ldap' and ENABLE_PERMISSIONS:
             permission_filter = user_request.session.get('permission_filter', False)
-            if permission_filter and isinstance(permission_filter, str):
-                query = '["and",' + user_request.session.get('permission_filter', False) + ','
+            if permission_filter is None:
+                return None
+            elif permission_filter and isinstance(permission_filter, str):
+                query = '["and",' + permission_filter + ','
             else:
                 query = '["and",'
         else:
