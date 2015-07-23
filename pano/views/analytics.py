@@ -132,10 +132,11 @@ def analytics(request):
         class_total = item['skips'] + item['failures'] + item['noops'] + item['successes']
         class_resource_results.append((class_name, class_total))
 
-    for status, value in events_status_list.items():
-        if value is 0 or status == 'total':
-            continue
-        class_status_results.append((status, value))
+    if events_status_list:
+        for status, value in events_status_list.items():
+            if value is 0 or status == 'total':
+                continue
+            class_status_results.append((status, value))
 
     context['class_events'] = class_event_results
     context['class_status'] = class_status_results
