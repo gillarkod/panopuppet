@@ -71,7 +71,9 @@
 
 {% block content %}
     <div class="row">
-        <h2>Facts for {{ certname }}</h2>
+        <div class="col-md-12">
+            <h2>Facts for {{ certname }}</h2>
+        </div>
     </div>
     <div class="row">
         <div class="col-md-12">
@@ -91,7 +93,9 @@
                         </tr>
                     {% endfor %}
                 {% else %}
-                    No facts were found in puppetdb for node {{ certname }}.
+                    <tr>
+                        <td>No facts were found in puppetdb for node {{ certname }}.</td>
+                    </tr>
                 {% endif %}
                 </tbody>
             </table>

@@ -13,7 +13,7 @@ class CreatePuppetdbQueries(TestCase):
                 },
         }
         expected_results = {
-            'query': '["=","certname","hostname.example.com"]'
+            'query': '["and",["=","certname","hostname.example.com"]]'
         }
         results = mk_puppetdb_query(content)
         self.assertEqual(expected_results, results)
@@ -28,7 +28,7 @@ class CreatePuppetdbQueries(TestCase):
                 },
         }
         expected_results = {
-            'query': '["and", ["=","hash","e4fug294hf3293hf9348g3804hg3084h"],["=","latest-report?",true]]'
+            'query': '["and",["=","hash","e4fug294hf3293hf9348g3804hg3084h"],["=","latest-report?",true]]'
         }
         results = mk_puppetdb_query(content)
         self.assertEqual(expected_results, results)
@@ -42,7 +42,7 @@ class CreatePuppetdbQueries(TestCase):
                 },
         }
         expected_results = {
-            'query': '["and", ["=","hash","e4fug294hf3293hf9348g3804hg3084h"]]'
+            'query': '["and",["=","hash","e4fug294hf3293hf9348g3804hg3084h"]]'
         }
         results = mk_puppetdb_query(content)
         self.assertEqual(expected_results, results)
@@ -66,7 +66,7 @@ class CreatePuppetdbQueries(TestCase):
             'summarize-by': 'containing-class',
         }
         expected_results = {
-            'query': '["=","certname","hostname.example.com"]',
+            'query': '["and",["=","certname","hostname.example.com"]]',
             'summarize-by': 'containing-class'
         }
         results = mk_puppetdb_query(content)
@@ -106,7 +106,7 @@ class CreatePuppetdbQueries(TestCase):
         }
         expected_results = {
             'order-by': '[{"field":"report_timestamp","order":"desc"}]',
-            'query': '["=","certname","hostname.example.com"]'
+            'query': '["and",["=","certname","hostname.example.com"]]'
         }
         results = mk_puppetdb_query(content)
         self.assertEqual(expected_results, results)
@@ -129,7 +129,7 @@ class CreatePuppetdbQueries(TestCase):
                 }
         }
         expected_results = {
-            'query': '["and", ["=","certname","hostname1.example.com"],["=","certname","hostname2.example.com"]]',
+            'query': '["and",["=","certname","hostname1.example.com"],["=","certname","hostname2.example.com"]]',
             'order-by': '[{"field":"report_timestamp","order":"desc"}]'
         }
         results = mk_puppetdb_query(content)

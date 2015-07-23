@@ -146,15 +146,20 @@ def nodes_json(request):
         }
     node_sort_fields = ['certname', 'catalog-timestamp', 'report-timestamp', 'facts-timestamp']
     if sort_field in node_sort_fields:
-        node_list, node_headers = puppetdb.api_get(
-            api_url=source_url,
-            cert=source_certs,
-            verify=source_verify,
-            path='/nodes',
-            api_version='v4',
-            params=puppetdb.mk_puppetdb_query(
-                node_params),
-        )
+        try:
+            node_list, node_headers = puppetdb.api_get(
+                api_url=source_url,
+                cert=source_certs,
+                verify=source_verify,
+                path='/nodes',
+                api_version='v4',
+                params=puppetdb.mk_puppetdb_query(
+                    node_params, request),
+            )
+        except:
+            node_list = []
+            node_headers = dict()
+            node_headers['X-Records'] = 0
     else:
         node_list = puppetdb.api_get(
             api_url=source_url,
@@ -163,7 +168,7 @@ def nodes_json(request):
             path='/nodes',
             api_version='v4',
             params=puppetdb.mk_puppetdb_query(
-                node_params),
+                node_params, request),
         )
 
     # Work out the number of pages from the xrecords response
@@ -204,7 +209,7 @@ def nodes_json(request):
             cert=source_certs,
             verify=source_verify,
             path='/event-counts',
-            params=puppetdb.mk_puppetdb_query(report_params),
+            params=puppetdb.mk_puppetdb_query(report_params, request),
             api_version='v4',
         )
     else:
@@ -213,7 +218,7 @@ def nodes_json(request):
             cert=source_certs,
             verify=source_verify,
             path='event-counts',
-            params=puppetdb.mk_puppetdb_query(report_params),
+            params=puppetdb.mk_puppetdb_query(report_params, request),
             api_version='v4',
         )
     # number of results depending on sort field.

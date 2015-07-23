@@ -1,15 +1,11 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 from django.views.decorators.cache import cache_page
-from pano.methods.dictfuncs import sort_table as sort_tables
 from pano.puppetdb import puppetdb
 from pano.settings import CACHE_TIME
 from pano.puppetdb.puppetdb import set_server, get_server
 from pano.settings import AVAILABLE_SOURCES, NODES_DEFAULT_FACTS
 import pytz
-from pano.puppetdb.pdbutils import json_to_datetime
-from django.template import defaultfilters as filters
-from django.utils.timezone import localtime
 
 __author__ = 'etaklar'
 
@@ -53,14 +49,20 @@ def reports(request, certname=None):
                 verify=source_verify,
                 path='/reports',
                 api_version='v4',
-                params=puppetdb.mk_puppetdb_query(latest_report_params),
+                params=puppetdb.mk_puppetdb_query(latest_report_params, request),
             )
             report_hash = ""
-            for report in latest_report:
-                report_env = report['environment']
-                report_hash = report['hash']
-            return redirect('/pano/events/' + report_hash + '?report_timestamp=' + request.GET.get(
-                'report_timestamp') + '&envname=' + report_env)
+            # If latest reports do not exist, send to the nodes page
+            # Should only occur if the user is trying to hax their way
+            # into a node without having the correct permission
+            if latest_report:
+                for report in latest_report:
+                    report_env = report['environment']
+                    report_hash = report['hash']
+                return redirect('/pano/events/' + report_hash + '?report_timestamp=' + request.GET.get(
+                    'report_timestamp') + '&envname=' + report_env)
+            else:
+                return redirect('/pano/nodes/')
 
     context['certname'] = certname
     context['node_facts'] = ','.join(NODES_DEFAULT_FACTS)

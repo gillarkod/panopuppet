@@ -104,7 +104,7 @@ if AUTH_METHOD == 'ldap':
     AUTH_LDAP_GROUP_SEARCH = LDAPSearch(LDAP_GSEARCH_PATH,
                                         ldap.SCOPE_SUBTREE, "(objectClass=Group)")
     AUTH_LDAP_GROUP_TYPE = ActiveDirectoryGroupType()
-    AUTH_LDAP_CACHE_GROUPS = False
+    AUTH_LDAP_CACHE_GROUPS = True
     AUTH_LDAP_GROUP_CACHE_TIMEOUT = 300
     AUTH_LDAP_REQUIRE_GROUP = LDAP_ALLOW_GRP
     # The following OPT_REFERRALS option is CRUCIAL for getting this

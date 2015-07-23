@@ -55,7 +55,7 @@ def reports_json(request, certname=None):
         path='/reports',
         api_version='v4',
         params=puppetdb.mk_puppetdb_query(
-            reports_params),
+            reports_params, request),
     )
 
     # Work out the number of pages from the xrecords response
@@ -81,7 +81,7 @@ def reports_json(request, certname=None):
             path='event-counts',
             api_url=source_url,
             api_version='v4',
-            params=puppetdb.mk_puppetdb_query(events_params),
+            params=puppetdb.mk_puppetdb_query(events_params, request),
         )
         # Make list of the results
         for event in eventcount_list:

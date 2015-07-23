@@ -171,7 +171,9 @@ def get_events_summary(request, timespan='latest'):
         events_params = {
             'query':
                 {
-                    1: '["and",["=","latest-report?",true],["in", "certname",["extract", "certname",["select-nodes",["null?","deactivated",true]]]]]'
+                    'operator': 'and',
+                    1: '["=","latest-report?",true]',
+                    2: '["in","certname",["extract","certname",["select-nodes",["null?","deactivated",true]]]]',
                 },
         }
     source_url, source_certs, source_verify = get_server(request)
@@ -181,7 +183,7 @@ def get_events_summary(request, timespan='latest'):
         verify=source_verify,
         path='events/',
         api_version='v4',
-        params=mk_puppetdb_query(events_params))
+        params=mk_puppetdb_query(events_params, request))
     summary = summary_of_events(events)
     return summary
 
@@ -211,6 +213,6 @@ def get_report(key, value, request):
         verify=source_verify,
         path='events/',
         api_version='v4',
-        params=mk_puppetdb_query(events_params),
+        params=mk_puppetdb_query(events_params, request),
     )
     return results

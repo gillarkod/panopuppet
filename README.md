@@ -47,6 +47,7 @@ Thank you for taking your time to try PanoPuppet.
 * Fully featured Dashboard for use with PuppetDB
 * Analytics Page providing insight into your puppet environment
 * LDAP Authentication
+* LDAP Group Permissions - Restrict which servers a group can view
 * Events Analyzer (Like Events Inspector from Puppet Enterprise)
 * Search nodes by facts and subqueries (Query Builder)
 * Export data to CSV with or without selected facts
@@ -54,9 +55,16 @@ Thank you for taking your time to try PanoPuppet.
 # Requirements
 PuppetDB requires at least PuppetDB 2.0 or higher
 Puppetv3
-python3
-install requirements listed in requirements.txt
+Python3
+Install requirements listed in requirements.txt
 Recommended to use virtualenv (+ virtualenvwrapper)
+
+# Supported Operating Systems
+* RHEL6,7
+* CentOS6,7
+* Ubuntu 14.04
+* Debian 8 (jessie) - LDAP issues)
+
 
 # Notes about puppetv4
 * Puppetv4 has changed the endpoints for the filebucket and fileserver so you will not be able to view files
@@ -100,13 +108,6 @@ See the below examples:
 
 ![Querybuilder Example Query 2](screenshots/querybuilder_example2.png)
 
-## About the code
-I do not have a lot of experience developing and this is my first proper project,
-therefore I ask you to unclench your fists (butt cheeks) while reading my code.
-I have followed the PEP8 standards for coding but the comments might be sparse,
-sorry for that.
-
-Code has been relatively fixed and optimized even though i'm sure there is much more I can do.
 
 # Screenshots
 ## Login Page
@@ -164,6 +165,23 @@ identify and see if the class "ntp" is failing for all 1000 nodes.
 ![Latest Events Analytics](screenshots/pp_events_analytics_successfull_resources.png)
 ![Latest Events Analytics](screenshots/pp_events_analytics_successfull_resources_detailed.png)
 
+# LDAP Permissions
+If you have enabled Permissions on users via the config file `ENABLE_PERMISSIONS: true`
+By default no normal user (user that is not superuser or staff) will be able to see any servers
+found in PuppetDB.
+You must then go to the django admin page `http://<panopuppet-URL>/puppetadmin`, log in as a staff or superuser and add the users
+group into the `Ldap group permissionss` table.
+The whole CN for the group must be specified.
+`cn=puppetusers,ou=groups,dc=example,dc=com`
+You must also specify a PuppetDB query which will be appended to all queries made.
+The query must use subqueries as it must be able to support all endpoints.
+It is highly recommened to use the puppetdb query and generate the query you want to apply.
+
+When the user logs in he or she will only be able to see the results of the puppetdb query you specified for that group.
+
+## Member of Multiple Groups
+If a user is a member of multiple groups which have restrictions set for each one
+each rule found will be added in an puppetDB  OR operator, like so. `["and", ["or", [rule1],[rule2]]]`
 
 # Installation
 
@@ -172,6 +190,25 @@ I had some issues installing python-ldap using the python3 fork on a RHEL6 serve
 Here are some of the issues I had...
 * missing dependencies - yum install python-devel openldap-devel cyrus-sasl-devel
 * GCC not compiling the python-ldap module... Follow instructions here... http://bugs.python.org/issue21121
+
+## For other OS other than RHEL and CentOS
+While the general directions below work for any OS the package names are most likely different.
+
+A user yotaka has provided me with the packages needed for ubuntu trusy.
+```
+apt-get install git gcc make apache2 python3 python3-dev libldap2-dev cyrus-sasl2-dbg libsasl2-dev 
+python-virtualenv virtualenvwrapper libapache2-mod-wsgi-py3
+```
+Yotaka also experienced some issues looking like this...
+```
+[Tue Jun 23 17:34:17.205468 2015] [:error] [pid 12269:tid 139819172513664] Exception ignored in: <module 'threading' from '/usr/lib/python3.4/threading.py'>
+[Tue Jun 23 17:34:17.205496 2015] [:error] [pid 12269:tid 139819172513664] Traceback (most recent call last):
+[Tue Jun 23 17:34:17.205509 2015] [:error] [pid 12269:tid 139819172513664]   File "/usr/lib/python3.4/threading.py", line 1288, in _shutdown
+[Tue Jun 23 17:34:17.205985 2015] [:error] [pid 12269:tid 139819172513664]     assert tlock is not None
+[Tue Jun 23 17:34:17.206000 2015] [:error] [pid 12269:tid 139819172513664] AssertionError:
+```
+If you happen to come across the same problem here is the solution:
+http://askubuntu.com/questions/569550/assertionerror-using-apache2-and-libapache2-mod-wsgi-py3-on-ubuntu-14-04-python
 
 ## RHEL/CentOS 6
 ```
@@ -289,6 +326,13 @@ Upgrading PanoPuppet should be no harder than doing a git pull origin/master in 
 But its recommended to run the `python manage.py collectstatic` command again in case new css/javascripts have been added so that they
 are served to your clients. Also make sure to read the config.yaml.example file and see if any new variables have been
 implemented!
+
+Upgrading PanoPuppet has a few new steps now as user profiles and permissions has been implemented.
+Now you should always run the following commands when updating panopuppet.
+`python manage.py collectstatic`
+`python manage.py migrate`
+`python manage.py makemigration`
+If it doesnt apply any changes, that just means that no changes were done to the database for those latest commits.
 
 # Configuration Options
 NODES_DEFAULT_FACTS - Is a list of facts to be shown on the node report page. 

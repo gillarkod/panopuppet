@@ -2,6 +2,7 @@ __author__ = 'takeshi'
 
 from pano.puppetdb.puppetdb import get_server
 from pano.puppetdb.puppetdb import api_get as pdb_api_get
+from pano.puppetdb.puppetdb import mk_puppetdb_query
 import requests
 import hashlib
 import difflib
@@ -59,11 +60,22 @@ def get_file(request, certname, environment, rtitle, rtype, md5sum_from=None, md
             return resp.text
 
     def get_resource(certname, rtype, rtitle):
+        resource_params = {
+            'query':
+                {
+                    'operator': 'and',
+                    1: '["=", "certname", "' + certname + '"]',
+                    2: '["=", "type", "' + rtype + '"]',
+                    3: '["=", "title", "' + rtitle + '"]'
+
+                },
+        }
         data = pdb_api_get(
             api_url=puppetdb_source,
-            path='nodes/' + certname + '/resources/' + rtype + '/' + rtitle,
+            path='resources',
             verify=puppetdb_verify,
-            cert=puppetdb_certs)
+            cert=puppetdb_certs,
+            params=mk_puppetdb_query(resource_params, request))
         if not data:
             return False
         else:

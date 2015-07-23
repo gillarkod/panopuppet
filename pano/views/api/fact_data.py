@@ -84,7 +84,7 @@ def facts_json(request):
         verify=source_verify,
         path='/facts/',
         params=puppetdb.mk_puppetdb_query(
-            facts_params),
+            facts_params, request),
     )
     context['certname'] = certname
     context['facts_list'] = facts_list
