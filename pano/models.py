@@ -17,4 +17,5 @@ class LdapGroupPermissions(models.Model):
 class SavedQueries(models.Model):
     id = models.AutoField(primary_key=True)
     username = models.CharField(max_length=24)
+    identifier = models.CharField(max_length=32)
     filter = models.TextField()
