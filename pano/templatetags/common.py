@@ -3,6 +3,7 @@ __author__ = 'etaklar'
 from urllib import parse
 from django import template
 import json
+import pprint
 
 register = template.Library()
 
@@ -76,6 +77,13 @@ def query_to_rules(query):
             contents['operator'] = subq_operators[subq_filter[2][2][1][1][0]]
             return contents
 
+        def subquery2(subq_filter):
+            value = list()
+            operator = subq_operators[subq_filter[0]]
+            value.append('"' + subq_filter[1] + '"')
+            value.append(subq_filter[2])
+            return value, operator
+
         i = 0
         while i < len(data):
             # Is it an operator?
@@ -91,12 +99,26 @@ def query_to_rules(query):
                     rules['rules'].append(read_query(data[i]))
                 # if its type string "in" then its the start of a sub query!
                 elif data[i][0] == "in":
-                    rules['rules'].append(subquery(data[i]))
+                    contents = dict()
+                    contents['value'] = list()
+                    # ID
+                    if data[i][2][2][0] == "select-facts":
+                        contents['id'] = 'facts'
+                    elif data[i][2][2][0] == "select-resources":
+                        contents['id'] = 'resources'
+                    elif data[i][2][2][0] == "select-nodes":
+                        contents['id'] = 'nodes'
+                    for entry in data[i][2][2][1]:
+                        if isinstance(entry, list):
+                            contents['value'], contents['operator'] = subquery2(entry)
+                            rules['rules'].append(contents)
             i += 1
         return rules
+
     try:
         pdb_query = json.loads(query)
         pdb_parsed = read_query(pdb_query)
+
     except:
         pdb_parsed = None
     return json.dumps(pdb_parsed)
