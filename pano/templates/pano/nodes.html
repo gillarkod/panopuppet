@@ -46,17 +46,43 @@
                     <div id="collapseFilter" class="panel-collapse collapse in" role="tabpanel"
                          aria-labelledby="headingFilter">
                         <div class="panel-body">
-                            <div id="builder-nodes"></div>
-                            <div class="btn-group">
-                                <form id="searchform">
-                                    <input type="hidden" id="search" name="search" value=""/>
-                                </form>
-                                <button id="searchbutton" class="btn btn-primary search-puppet" data-target="nodes">
-                                    Search
-                                </button>
-                                <button class="btn btn-primary search-refresh" data-target="nodes">Refresh</button>
-                                <button class="btn btn-primary search-clear" data-target="nodes">Reset</button>
-                                <button class="btn btn-primary parse-puppet" data-target="nodes">Generate</button>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div id="builder-nodes"></div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <form id="searchform">
+                                        <input type="hidden" id="search" name="search" value=""/>
+                                    </form>
+                                    <div class="btn-group">
+                                        <button id="searchbutton" class="btn btn-primary search-puppet"
+                                                data-target="nodes">
+                                            Search
+                                        </button>
+                                        <button class="btn btn-primary search-refresh" data-target="nodes">Refresh
+                                        </button>
+                                        <button class="btn btn-info parse-puppet" data-target="nodes">Generate</button>
+                                        <button class="btn btn-danger search-clear" data-target="nodes">Reset</button>
+                                    </div>
+                                    <div class="btn-group">
+                                        <button class="btn btn-success save-query" data-target="nodes">Save Query
+                                        </button>
+                                    </div>
+                                    <div class="btn-group">
+                                        <button class="btn btn-default dropdown-toggle" type="button"
+                                                data-toggle="dropdown">Load Query <span class="caret"></span></button>
+                                        <ul class="dropdown-menu" role="menu" aria-labelledby="menu_querys">
+                                            {% for query in saved_queries %}
+                                                <li>
+                                                    <a role="menuitem" tabindex="-1"
+                                                       href="{% url 'nodes' %}?load_query={{ query.filter }}">{{ query.identifier }}</a>
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -293,6 +319,24 @@
                     title: $(this).text(),
                     message: '<pre class="code-popup">' + res + '</pre>'
                 });
+            }
+        });
+        // save filter
+        $('.save-query').on('click', function () {
+            var res = $('#builder-' + $(this).data('target')).queryBuilder('getPuppet');
+            if (!$.isEmptyObject(res)) {
+                var ident = prompt("Please enter an identifying name for the query.");
+                if (!$.isEmptyObject(ident)) {
+                    $.post("{% url 'api_filter' %}", {
+                                "puppetdb_filter": res,
+                                "identifier": ident,
+                                "csrfmiddlewaretoken": document.getElementsByName('csrfmiddlewaretoken')[0].value
+                            }
+                    );
+                }
+                else {
+
+                }
             }
         });
         // send the query refresh_data(this).done(refresh_data(this))

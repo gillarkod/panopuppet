@@ -11,15 +11,18 @@ from pano.models import SavedQueries
 @login_required
 @cache_page(CACHE_TIME)
 def filter_json(request):
-    context = {}
     username = request.user.get_username()
     if request.method == 'POST':
         u_filter = request.POST.get('puppetdb_filter', False)
-        if u_filter:
-            SavedQueries.objects.create(username=username, filter=u_filter)
+        u_identifier = request.POST.get('identifier', False)
+        if u_filter and u_identifier:
+            SavedQueries.objects.create(username=username, filter=u_filter, identifier=u_identifier)
             return HttpResponse('Saved Filter')
         else:
             return HttpResponseBadRequest('Invalid request for filter API.')
     elif request.method == 'GET':
         user_filters = get_list_or_404(SavedQueries, username=username)
-        print(user_filters)
+        filters = {}
+        for user_filter in user_filters:
+            filters[user_filter.identifier] = user_filter.filter
+        return HttpResponse(json.dumps(filters))
