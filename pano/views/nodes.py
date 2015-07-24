@@ -22,6 +22,7 @@ def nodes(request):
             set_server(request, source)
         elif 'load_query' in request.GET:
             request.session['search'] = request.GET.get('load_query', request.session['search'])
+            return redirect('nodes')
     elif request.method == 'POST':
         if 'timezone' in request.POST:
             request.session['django_timezone'] = request.POST['timezone']
