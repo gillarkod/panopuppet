@@ -72,14 +72,23 @@
                                     </div>
                                     <div class="btn-group">
                                         <button class="btn btn-default dropdown-toggle" type="button"
-                                                data-toggle="dropdown">Load Query <span class="caret"></span></button>
+                                                data-toggle="dropdown" formaction="{% url 'nodes' %}">
+                                            Load Query <span class="caret"></span>
+                                        </button>
                                         <ul class="dropdown-menu" role="menu" aria-labelledby="menu_querys">
-                                            {% for query in saved_queries %}
-                                                <li>
+                                            {% if saved_queries %}
+                                                {% for query in saved_queries %}
+                                                    <li>
+                                                        <a role="menuitem" tabindex="-1"
+                                                           href="{% url 'nodes' %}?load_query={{ query.filter }}">{{ query.identifier }}</a>
+                                                    </li>
+                                                {% endfor %}
+                                            {% else %}
+                                                <li class="disabled">
                                                     <a role="menuitem" tabindex="-1"
-                                                       href="{% url 'nodes' %}?load_query={{ query.filter }}">{{ query.identifier }}</a>
+                                                       href="#">No saved queries</a>
                                                 </li>
-                                            {% endfor %}
+                                            {% endif %}
                                         </ul>
                                     </div>
                                 </div>
