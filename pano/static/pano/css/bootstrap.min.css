@@ -7,3 +7,6 @@ table#factstable, table#eventsTable {
     table-layout: fixed;
     word-wrap: break-word;
 }
+.open> ul>li.hz{
+    display: inline-flex !important;
+}
