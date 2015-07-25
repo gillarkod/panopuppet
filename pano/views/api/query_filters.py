@@ -1,6 +1,6 @@
 __author__ = 'etaklar'
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_list_or_404
+from django.shortcuts import get_list_or_404, redirect
 from django.http import HttpResponseBadRequest, HttpResponse
 from django.views.decorators.cache import cache_page
 from pano.settings import CACHE_TIME
@@ -21,8 +21,14 @@ def filter_json(request):
         else:
             return HttpResponseBadRequest('Invalid request for filter API.')
     elif request.method == 'GET':
-        user_filters = get_list_or_404(SavedQueries, username=username)
-        filters = {}
-        for user_filter in user_filters:
-            filters[user_filter.identifier] = user_filter.filter
-        return HttpResponse(json.dumps(filters))
+        delete_query_id = request.GET.get('delete_query', False)
+        if delete_query_id:
+            delete_query_id = int(delete_query_id)
+            SavedQueries.objects.filter(id=delete_query_id, username=request.user.get_username()).delete()
+            return redirect(request.GET.get('next_url', '/'))
+        else:
+            user_filters = get_list_or_404(SavedQueries, username=username)
+            filters = {}
+            for user_filter in user_filters:
+                filters[user_filter.identifier] = user_filter.filter
+            return HttpResponse(json.dumps(filters))
