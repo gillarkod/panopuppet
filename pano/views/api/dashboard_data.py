@@ -227,7 +227,7 @@ def dashboard_nodes_json(request):
 
     return HttpResponse(json.dumps(context), content_type="application/json")
 
-
+@login_required
 @cache_page(CACHE_TIME)
 def dashboard_json(request):
     context = {}
