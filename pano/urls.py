@@ -14,6 +14,7 @@ from pano.views.api.node_data import nodes_json
 from pano.views.api.fact_data import facts_json
 from pano.views.api.dashboard_data import dashboard_status_json, dashboard_nodes_json, dashboard_json
 from pano.views.api.report_data import reports_json
+from pano.views.api.query_filters import filter_json
 from django.conf.urls import patterns, url
 
 urlpatterns = patterns('',
@@ -34,8 +35,10 @@ urlpatterns = patterns('',
                        # API URLS
                        url(r'^api/nodes/$', nodes_json, name='api_nodes'),
                        url(r'^api/facts/$', facts_json, name='api_facts'),
+                       url(r'^api/filters/$', filter_json, name='api_filter'),
                        url(r'^api/reports/(?P<certname>[\w\.-]+)/$', reports_json, name='api_reports'),
                        url(r'^api/dashboard/$', dashboard_json, name='api_dashboard'),
                        url(r'^api/dashboard/status$', dashboard_status_json, name='api_dashboard_status'),
+                       url(r'^api/status$', dashboard_status_json, name='api_dashboard_status'),
                        url(r'^api/dashboard/nodes/$', dashboard_nodes_json, name='api_dashboard_nodes'),
                        )

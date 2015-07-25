@@ -98,6 +98,9 @@ def nodes_json(request):
                     request.session['search'] = request.GET.get('search')
         else:
             if 'search' not in request.session:
+                request.session['sortfield'] = 'report-timestamp'
+                request.session['sortfieldby'] = 'desc'
+                request.session['page'] = 1
                 request.session['search'] = None
 
         # Set offset

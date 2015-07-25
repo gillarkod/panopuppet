@@ -28,11 +28,6 @@ def get_item(dictionary, key_id):
 @register.filter
 def query_to_rules(query):
     operators = ['not', 'and', 'or']
-    allowed_equality_operators = ['=', '>', '>=', '<', '<=', '~']
-    search_equality_operators = {
-        '=': 'equal',
-        '~': 'regex_match'
-    }
     subq_operators = {
         '=': 'puppet_equal',
         '<': 'puppet_l',
@@ -48,33 +43,15 @@ def query_to_rules(query):
             'rules': []
         }
 
-        def certname_search(cert_filter):
-            contents = dict()
-            # Operator
-            contents['operator'] = search_equality_operators[cert_filter[0]]
-            # ID
-            contents['id'] = cert_filter[1]
-            # Value
-            contents['value'] = cert_filter[2]
-            return contents
-
         def subquery(subq_filter):
-            contents = dict()
-            contents['value'] = list()
-            # ID
-            if subq_filter[2][2][0] == "select-facts":
-                contents['id'] = 'facts'
-            elif subq_filter[2][2][0] == "select-resources":
-                contents['id'] = 'resources'
-            elif subq_filter[2][2][0] == "select-nodes":
-                contents['id'] = 'nodes'
-            # Value 1
-            contents['value'].append('"' + subq_filter[2][2][1][1][1] + '"')
-            # Value 2
-            contents['value'].append(subq_filter[2][2][1][1][2])
-            # Operator
-            contents['operator'] = subq_operators[subq_filter[2][2][1][1][0]]
-            return contents
+            value = list()
+            operator = subq_operators[subq_filter[0]]
+            if isinstance(subq_filter[1], list):
+                value.append(json.dumps(subq_filter[1]))
+            else:
+                value.append('"' + subq_filter[1] + '"')
+            value.append(subq_filter[2])
+            return value, operator
 
         i = 0
         while i < len(data):
@@ -83,17 +60,27 @@ def query_to_rules(query):
                 rules['condition'] = data[i].upper()
             # identify certname search
             if type(data[i]) is list:
-                # if its an equality operator its a certname search
-                if data[i][0] in allowed_equality_operators:
-                    rules['rules'].append(certname_search(data[i]))
                 # is it an operator? Start of a new group?
-                elif data[i][0] in operators:
+                if data[i][0] in operators:
                     rules['rules'].append(read_query(data[i]))
                 # if its type string "in" then its the start of a sub query!
                 elif data[i][0] == "in":
-                    rules['rules'].append(subquery(data[i]))
+                    contents = dict()
+                    contents['value'] = list()
+                    # ID
+                    if data[i][2][2][0] == "select-facts":
+                        contents['id'] = 'facts'
+                    elif data[i][2][2][0] == "select-resources":
+                        contents['id'] = 'resources'
+                    elif data[i][2][2][0] == "select-nodes":
+                        contents['id'] = 'nodes'
+                    for entry in data[i][2][2][1]:
+                        if isinstance(entry, list):
+                            contents['value'], contents['operator'] = subquery(entry)
+                            rules['rules'].append(contents)
             i += 1
         return rules
+
     try:
         pdb_query = json.loads(query)
         pdb_parsed = read_query(pdb_query)

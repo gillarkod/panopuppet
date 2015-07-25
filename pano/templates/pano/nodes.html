@@ -46,17 +46,54 @@
                     <div id="collapseFilter" class="panel-collapse collapse in" role="tabpanel"
                          aria-labelledby="headingFilter">
                         <div class="panel-body">
-                            <div id="builder-nodes"></div>
-                            <div class="btn-group">
-                                <form id="searchform">
-                                    <input type="hidden" id="search" name="search" value=""/>
-                                </form>
-                                <button id="searchbutton" class="btn btn-primary search-puppet" data-target="nodes">
-                                    Search
-                                </button>
-                                <button class="btn btn-primary search-refresh" data-target="nodes">Refresh</button>
-                                <button class="btn btn-primary search-clear" data-target="nodes">Reset</button>
-                                <button class="btn btn-primary parse-puppet" data-target="nodes">Generate</button>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div id="builder-nodes"></div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <form id="searchform">
+                                        <input type="hidden" id="search" name="search" value=""/>
+                                    </form>
+                                    <div class="btn-group">
+                                        <button id="searchbutton" class="btn btn-primary search-puppet"
+                                                data-target="nodes">
+                                            Search
+                                        </button>
+                                        <button class="btn btn-primary search-refresh" data-target="nodes">Refresh
+                                        </button>
+                                        <button class="btn btn-info parse-puppet" data-target="nodes">Generate</button>
+                                        <button class="btn btn-danger search-clear" data-target="nodes">Reset</button>
+                                    </div>
+                                    <div class="btn-group">
+                                        <button class="btn btn-success save-query" data-target="nodes">Save Query
+                                        </button>
+                                    </div>
+                                    <div class="btn-group">
+                                        <button class="btn btn-default dropdown-toggle" type="button"
+                                                data-toggle="dropdown" formaction="{% url 'nodes' %}">
+                                            Load Query <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu" role="menu" aria-labelledby="menu_querys">
+                                            {% if saved_queries %}
+                                                {% for query in saved_queries %}
+                                                    <li class="hz">
+                                                        <a role="menuitem" tabindex="-1"
+                                                           href="{% url 'api_filter' %}?delete_query={{ query.id }}&next_url={% url 'nodes' %}"><span class="glyphicon glyphicon-remove text-danger"></span></a>
+                                                        <a role="menuitem" tabindex="-1"
+                                                           href="{% url 'nodes' %}?load_query={{ query.filter }}">{{ query.identifier }}</a>
+                                                    </li>
+                                                {% endfor %}
+                                            {% else %}
+                                                <li class="disabled">
+                                                    <a role="menuitem" tabindex="-1"
+                                                       href="#">No saved queries</a>
+                                                </li>
+                                            {% endif %}
+                                        </ul>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -295,6 +332,24 @@
                 });
             }
         });
+        // save filter
+        $('.save-query').on('click', function () {
+            var res = $('#builder-' + $(this).data('target')).queryBuilder('getPuppet');
+            if (!$.isEmptyObject(res)) {
+                var ident = prompt("Please enter an identifying name for the query.");
+                if (!$.isEmptyObject(ident)) {
+                    $.post("{% url 'api_filter' %}", {
+                                "puppetdb_filter": res,
+                                "identifier": ident,
+                                "csrfmiddlewaretoken": document.getElementsByName('csrfmiddlewaretoken')[0].value
+                            }
+                    );
+                }
+                else {
+
+                }
+            }
+        });
         // send the query refresh_data(this).done(refresh_data(this))
         $('.search-puppet').on('click', function () {
             var res = $('#builder-' + $(this).data('target')).queryBuilder('getPuppet');
@@ -368,10 +423,11 @@
                         <tfoot>
                         <tr>
                             <td colspan="1"><strong>Download as: </strong>
-                                <a id="csv" href="../api/nodes/?dl_csv=true" download>CSV</a> | <a id="csvfacts"
-                                                                                                   onclick="csv_facts()"
-                                                                                                   href="#"
-                                                                                                   download>CSV with
+                                <a id="csv" href="{% url 'api_nodes' %}?dl_csv=true" download>CSV</a> | <a id="csvfacts"
+                                                                                                           onclick="csv_facts()"
+                                                                                                           href="#"
+                                                                                                           download>CSV
+                                    with
                                     Facts</a> <input type="text" placeholder="Example: osfamily,kernel,kernelversion"
                                                      class="form-control input-sm" id="include_facts"
                                                      name="include_facts">
