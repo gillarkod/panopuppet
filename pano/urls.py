@@ -39,5 +39,6 @@ urlpatterns = patterns('',
                        url(r'^api/reports/(?P<certname>[\w\.-]+)/$', reports_json, name='api_reports'),
                        url(r'^api/dashboard/$', dashboard_json, name='api_dashboard'),
                        url(r'^api/dashboard/status$', dashboard_status_json, name='api_dashboard_status'),
+                       url(r'^api/status$', dashboard_status_json, name='api_dashboard_status'),
                        url(r'^api/dashboard/nodes/$', dashboard_nodes_json, name='api_dashboard_nodes'),
                        )
