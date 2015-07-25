@@ -14,7 +14,7 @@ from pano.views.api.node_data import nodes_json
 from pano.views.api.fact_data import facts_json
 from pano.views.api.dashboard_data import dashboard_status_json, dashboard_nodes_json, dashboard_json
 from pano.views.api.report_data import reports_json
-from pano.views.api.filter import filter_json
+from pano.views.api.query_filters import filter_json
 from django.conf.urls import patterns, url
 
 urlpatterns = patterns('',
