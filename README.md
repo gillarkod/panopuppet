@@ -355,5 +355,7 @@ Upcoming branches:
 If you have any questions you are welcome to contact me @ chat.freenode.net - My nickname is Propyless
 and if I do not respond you may leave me an email and I will reply to your question there.
 
+You can also find me in #panopuppet @ chat.freenode.net
+
 # Development Server 
 Django runserver...
