@@ -23,15 +23,6 @@ Thank you for taking your time to try PanoPuppet.
 - [Issues](#issues)
   - [QueryBuilder](#querybuilder)
 - [Screenshots](#screenshots)
-  - [Login Page](#login-page)
-  - [Dashboard - Recent Tab is the default view](#dashboard---recent-tab-is-the-default-view)
-  - [Nodes View](#nodes-view)
-  - [Nodes Search](#nodes-search)
-  - [Nodes Reports](#nodes-reports)
-  - [Nodes Report Events](#nodes-report-events)
-  - [Node Report Events Execution Times](#node-report-events-execution-times)
-  - [Latest Run Graphs](#latest-run-graphs)
-  - [Events Analytics](#events-analytics)
 - [LDAP Permissions](#ldap-permissions)
   - [Multiple Groups](#member-of-multiple-groups) 
 - [Installation](#installation)
@@ -128,6 +119,11 @@ within a few minutes of the latest facts timestamp its quite accurate to assume
 that the compilation has failed.
 ![Dashboard](screenshots/pp_dashboard.png)
 
+## Radiator View
+Just like the Puppetdashboard radiator view, colours match those of bootstrap and
+status colours used in PanoPuppet.
+![Radiator View](screenshots/pp_radiator.png)
+
 ## Nodes View
 Here you see all the nodes in paginated iew. You can sort the data by any column.
 You also get a quick link to the latest report if there are any events available.
@@ -137,10 +133,18 @@ You also get a quick link to the latest report if there are any events available
 ![Nodes Search Results](screenshots/pp_nodesearch.png)
 ![Nodes Search Results](screenshots/pp_nodesearch2.png)
 
+## Loading Queries
+![Querybuilder Example Loading Query](screenshots/pp_load_query.png)
+
 ## Nodes Reports
 Lists each report available for this node, also urlifys the hash id for the
 report there are any events linked to it.
 ![Node Reports View](screenshots/pp_nodes_reports.png)
+
+## Nodes Download CSV with specified Facts
+With PanoPuppet you can now download a CSV file with the nodess retrieved and you are also able
+to download them with certain facts appended to the list for each node
+![Node CSV Download](screenshots/pp_download_csv_with_facts.png)
 
 ## Nodes Report Events
 You can see detailed information for each report event.
