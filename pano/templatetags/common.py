@@ -77,7 +77,7 @@ def query_to_rules(query):
                     for entry in data[i][2][2][1]:
                         if isinstance(entry, list):
                             contents['value'], contents['operator'] = subquery(entry)
-                            rules['rules'].append(contents)
+                            rules['rules'].append(contents.copy())
             i += 1
         return rules
 
