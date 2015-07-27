@@ -187,6 +187,17 @@ It is highly recommened to use the puppetdb query and generate the query you wan
 
 When the user logs in he or she will only be able to see the results of the puppetdb query you specified for that group.
 
+## Superuser and staff groups
+It is possible to make sure that all users in a specific group are allowed to log in to the admin page and see all nodes
+by using the two below config options:
+LDAP_SUPERUSER_GRP: 'cn=superuser,ou=groups,dc=example,dc=com'
+LDAP_STAFF_GRP:
+  - 'cn=staff,ou=groups,dc=example,dc=com'
+  - 'cn=admin,ou=groups,dc=example,dc=com'
+  
+You can specify them as a normal string or by specifying them as a list.
+
+
 ## Member of Multiple Groups
 If a user is a member of multiple groups which have restrictions set for each one
 each rule found will be added in an puppetDB  OR operator, like so. `["and", ["or", [rule1],[rule2]]]`

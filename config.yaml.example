@@ -45,6 +45,13 @@ LDAP_USEARCH_PATH: 'dc=example,dc=com'
 LDAP_GSEARCH_PATH:
 LDAP_ALLOW_GRP:
 LDAP_DENY_GRP:
+
+# If you have multiple groups you want to specify use a HASH, a string is sufficent if you just have one group.
+LDAP_SUPERUSER_GRP: 'cn=superuser,ou=groups,dc=example,dc=com'
+LDAP_STAFF_GRP:
+  - 'cn=staff,ou=groups,dc=example,dc=com'
+  - 'cn=admin,ou=groups,dc=example,dc=com'
+
 ENABLE_PERMISSIONS: true
 
 NODES_DEFAULT_FACTS:

@@ -86,7 +86,7 @@ DATABASES = {
 # Authentication
 # Ldap authentication
 from pano.settings import AUTH_METHOD, LDAP_SERVER, LDAP_BIND_DN, LDAP_BIND_PW, LDAP_ALLOW_GRP, LDAP_USEARCH_PATH, \
-    LDAP_GSEARCH_PATH
+    LDAP_GSEARCH_PATH, STAFF_GRP, SUPERUSER_GRP
 
 if AUTH_METHOD == 'ldap':
     import ldap
@@ -104,6 +104,12 @@ if AUTH_METHOD == 'ldap':
     AUTH_LDAP_GROUP_SEARCH = LDAPSearch(LDAP_GSEARCH_PATH,
                                         ldap.SCOPE_SUBTREE, "(objectClass=Group)")
     AUTH_LDAP_GROUP_TYPE = ActiveDirectoryGroupType()
+
+    AUTH_LDAP_USER_FLAGS_BY_GROUP = {
+        "is_staff": STAFF_GRP,
+        "is_superuser": SUPERUSER_GRP
+    }
+
     AUTH_LDAP_CACHE_GROUPS = True
     AUTH_LDAP_GROUP_CACHE_TIMEOUT = 3600
     AUTH_LDAP_REQUIRE_GROUP = LDAP_ALLOW_GRP
