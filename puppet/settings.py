@@ -105,7 +105,7 @@ if AUTH_METHOD == 'ldap':
                                         ldap.SCOPE_SUBTREE, "(objectClass=Group)")
     AUTH_LDAP_GROUP_TYPE = ActiveDirectoryGroupType()
     AUTH_LDAP_CACHE_GROUPS = True
-    AUTH_LDAP_GROUP_CACHE_TIMEOUT = 300
+    AUTH_LDAP_GROUP_CACHE_TIMEOUT = 3600
     AUTH_LDAP_REQUIRE_GROUP = LDAP_ALLOW_GRP
     # The following OPT_REFERRALS option is CRUCIAL for getting this
     # working with MS Active Directory it seems, unfortunately I have
@@ -131,7 +131,7 @@ if AUTH_METHOD == 'ldap':
                 'class': 'django.utils.log.AdminEmailHandler'
             },
             'stream_to_console': {
-                'level': 'DEBUG',
+                'level': 'ERROR',
                 'class': 'logging.StreamHandler'
             },
         },
@@ -143,7 +143,7 @@ if AUTH_METHOD == 'ldap':
             },
             'django_auth_ldap': {
                 'handlers': ['stream_to_console'],
-                'level': 'DEBUG',
+                'level': 'ERROR',
                 'propagate': True,
             },
         }
