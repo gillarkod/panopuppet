@@ -160,6 +160,11 @@ else:  # or otherwise known as 'basic' auth
     )
     LOGIN_URL = '/pano/login/'
 
+# Expire sessions at browser close
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+# Expire Session after 1 hour
+SESSION_COOKIE_AGE = 3600
+
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/
 
