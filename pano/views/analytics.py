@@ -27,32 +27,32 @@ def analytics(request):
     events_class_params = {
         'query':
             {
-                1: '["and",["=","latest-report?",true],["in","certname",["extract","certname",["select-nodes",["null?","deactivated",true]]]]]'
+                1: '["and",["=","latest_report?",true],["in","certname",["extract","certname",["select_nodes",["null?","deactivated",true]]]]]'
             },
-        'summarize-by': 'containing-class',
+        'summarize_by': 'containing_class',
     }
     events_resource_params = {
         'query':
             {
-                1: '["and",["=","latest-report?",true],["in","certname",["extract","certname",["select-nodes",["null?","deactivated",true]]]]]'
+                1: '["and",["=","latest_report?",true],["in","certname",["extract","certname",["select_nodes",["null?","deactivated",true]]]]]'
             },
-        'summarize-by': 'resource',
+        'summarize_by': 'resource',
     }
     events_status_params = {
         'query':
             {
-                1: '["and",["=","latest-report?",true],["in","certname",["extract","certname",["select-nodes",["null?","deactivated",true]]]]]'
+                1: '["and",["=","latest_report?",true],["in","certname",["extract","certname",["select_nodes",["null?","deactivated",true]]]]]'
             },
-        'summarize-by': 'resource',
+        'summarize_by': 'resource',
     }
     reports_runavg_params = {
         'limit': 100,
-        'order-by': {
-            'order-field': {
-                'field': 'receive-time',
+        'order_by': {
+            'order_field': {
+                'field': 'receive_time',
                 'order': 'desc',
             },
-            'query-field': {'field': 'certname'},
+            'query_field': {'field': 'certname'},
         },
     }
     jobs = {
@@ -110,7 +110,7 @@ def analytics(request):
     avg_run_time = 0
     for report in reports_run_avg:
         run_time = "{0:.0f}".format(
-            (json_to_datetime(report['end-time']) - json_to_datetime(report['start-time'])).total_seconds())
+            (json_to_datetime(report['end_time']) - json_to_datetime(report['start_time'])).total_seconds())
         avg_run_time += int(run_time)
         run_avg_times.append(run_time)
     if num_runs_avg != 0:
@@ -131,10 +131,11 @@ def analytics(request):
         class_name = item['subject']['type']
         class_total = item['skips'] + item['failures'] + item['noops'] + item['successes']
         class_resource_results.append((class_name, class_total))
-
+    print(events_status_list)
     if events_status_list:
-        for status, value in events_status_list.items():
-            if value is 0 or status == 'total':
+        for status, value in events_status_list[0].items():
+            print(status, value)
+            if value is 0 or status == 'total' or status == 'summarize_by':
                 continue
             class_status_results.append((status, value))
 

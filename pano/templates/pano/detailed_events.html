@@ -180,13 +180,13 @@
                                 {% elif event.status == 'failure' %}class="bg-danger parent"
                                 {% elif event.status == 'noop' %}class="bg-info parent"
                                 {% elif event.status == 'skipped' %}class="bg-warning parent"{% endif %}>
-                                <td>{{ event|get_item:'containing-class' }}</td>
-                                <td>{{ event|get_item:'resource-title' }}</td>
-                                <td>{{ event|get_item:'resource-type' }}</td>
+                                <td>{{ event|get_item:'containing_class' }}</td>
+                                <td>{{ event|get_item:'resource_title' }}</td>
+                                <td>{{ event|get_item:'resource_type' }}</td>
                                 <td>{{ event|get_item:'timestamp'|json_to_datetime|date:'Y-m-d H:i:s' }}</td>
                                 <td>{{ event.property }}</td>
-                                <td>{{ event|get_item:'old-value' }}</td>
-                                <td>{{ event|get_item:'new-value' }}</td>
+                                <td>{{ event|get_item:'old_value' }}</td>
+                                <td>{{ event|get_item:'new_value' }}</td>
                             </tr>
                             {% with event|get_item:'message' as mess %}
                                 {% if mess != None %}
@@ -210,15 +210,15 @@
                                     <td colspan="6">
                                         <strong>From: </strong><a id="filebucketURL"
                                                                   data-toggle="modal"
-                                                                  href="{% url 'filebucket' %}?certname={{ certname }}&rtype={{ event|get_item:'resource-type' }}&rtitle={{ event|get_item:'resource-title' }}&environment={{ environment }}&file_status=from&md5_from={{ event|get_item:'old-value' }}"
-                                                                  data-target="#filebucketModal">{{ event|get_item:'old-value' }}</a>
+                                                                  href="{% url 'filebucket' %}?certname={{ certname }}&rtype={{ event|get_item:'resource_type' }}&rtitle={{ event|get_item:'resource_title' }}&environment={{ environment }}&file_status=from&md5_from={{ event|get_item:'old_value' }}"
+                                                                  data-target="#filebucketModal">{{ event|get_item:'old_value' }}</a>
                                         <strong> To: </strong><a id="filebucketURL"
                                                                  data-toggle="modal"
-                                                                 href="{% url 'filebucket' %}?certname={{ certname }}&rtype={{ event|get_item:'resource-type' }}&rtitle={{ event|get_item:'resource-title' }}&environment={{ environment }}&file_status=to&md5_to={{ event|get_item:'new-value' }}"
-                                                                 data-target="#filebucketModal">{{ event|get_item:'new-value' }}</a>
+                                                                 href="{% url 'filebucket' %}?certname={{ certname }}&rtype={{ event|get_item:'resource_type' }}&rtitle={{ event|get_item:'resource_title' }}&environment={{ environment }}&file_status=to&md5_to={{ event|get_item:'new_value' }}"
+                                                                 data-target="#filebucketModal">{{ event|get_item:'new_value' }}</a>
                                         <strong> | </strong><a id="filebucketURL"
                                                                data-toggle="modal"
-                                                               href="{% url 'filebucket' %}?certname={{ certname }}&rtype={{ event|get_item:'resource-type' }}&rtitle={{ event|get_item:'resource-title' }}&environment={{ environment }}&file_status=both&md5_from={{ event|get_item:'old-value' }}&md5_to={{ event|get_item:'new-value' }}&diff=True"
+                                                               href="{% url 'filebucket' %}?certname={{ certname }}&rtype={{ event|get_item:'resource_type' }}&rtitle={{ event|get_item:'resource_title' }}&environment={{ environment }}&file_status=both&md5_from={{ event|get_item:'old_value' }}&md5_to={{ event|get_item:'new_value' }}&diff=True"
                                                                data-target="#filebucketModal"><strong>Diff</strong></a>
                                     </td>
                                 </tr>

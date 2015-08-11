@@ -17,7 +17,9 @@ api_get(path='/facts', params={'query': mk_puppetdb_query(test_params)}, verify=
 
 import urllib.parse as urlparse
 import json
+
 import requests
+
 from pano.settings import PUPPETDB_HOST, PUPPETDB_VERIFY_SSL, PUPPETDB_CERTIFICATES, AVAILABLE_SOURCES, \
     PUPPETMASTER_CLIENTBUCKET_CERTIFICATES, PUPPETMASTER_CLIENTBUCKET_HOST, PUPPETMASTER_CLIENTBUCKET_SHOW, \
     PUPPETMASTER_CLIENTBUCKET_VERIFY_SSL, PUPPETMASTER_FILESERVER_CERTIFICATES, PUPPETMASTER_FILESERVER_HOST, \
@@ -113,6 +115,10 @@ def api_get(api_url=PUPPETDB_HOST,
     :param cert: list of cert and key to use for client authentication
     :return: dict
     """
+
+    query_paths = ['nodes', 'environments', 'factsets', 'facts', 'fact-names', 'fact-paths', 'fact-contents',
+                   'catalogs', 'resources', 'edges', 'reports', 'events', 'event-counts', 'aggregate-event-counts']
+
     if not params:
         params = {}
     method = method.lower()
@@ -123,8 +129,18 @@ def api_get(api_url=PUPPETDB_HOST,
     methods = {
         'get': requests.get,
     }
-    if path[0] != '/':
-        path = '/{0}'.format(path)
+
+    if api_url[-1] != '/':
+        api_url = '{0}/'.format(api_url)
+
+    if path[0] == '/':
+        path = path.lstrip('/')
+
+    if path in query_paths:
+        path = 'pdb/query/v4/%s' % path
+    elif 'mbean' in path:
+        path = 'metrics/v1/%s' % path
+
 
     if params:
         path += '?{0}'.format(urlparse.urlencode(params))
@@ -132,7 +148,7 @@ def api_get(api_url=PUPPETDB_HOST,
     if params is None:
         return list(), list()
 
-    url = '{0}{1}'.format(api_url + api_version, path)
+    url = '{0}{1}'.format(api_url, path)
     resp = methods[method](url,
                            headers=headers,
                            verify=verify,
@@ -233,12 +249,12 @@ def mk_puppetdb_query(params, request=None):
 
     def order_by_build(ob_dict):
         # 'order-by=[{"field": "value", "order": "desc"}]'
-        if 'order-field' not in ob_dict:
+        if 'order_field' not in ob_dict:
             return None
-        if 'field' not in ob_dict['order-field'] or 'order' not in ob_dict['order-field']:
+        if 'field' not in ob_dict['order_field'] or 'order' not in ob_dict['order_field']:
             return None
-        ob_query = '[{"field":"%s","order":"%s"}]' % (ob_dict['order-field']['field'],
-                                                      ob_dict['order-field']['order'])
+        ob_query = '[{"field":"%s","order":"%s"}]' % (ob_dict['order_field']['field'],
+                                                      ob_dict['order_field']['order'])
         return ob_query
 
     if type(params) is dict:
@@ -247,16 +263,16 @@ def mk_puppetdb_query(params, request=None):
             query_dict['query'] = query_build(params['query'], request)
         elif 'query' not in params and request:
             query_dict['query'] = query_build({}, request)
-        if 'summarize-by' in params:
-            query_dict['summarize-by'] = params.get('summarize-by', 'certname')
+        if 'summarize_by' in params:
+            query_dict['summarize_by'] = params.get('summarize_by', 'certname')
         if 'limit' in params:
             query_dict['limit'] = params.get('limit', 10)
         if 'offset' in params:
             query_dict['offset'] = params.get('offset', 10)
-        if 'include-total' in params:
-            query_dict['include-total'] = params.get('include-total', 'true')
-        if 'order-by' in params:
-            query_dict['order-by'] = order_by_build(params['order-by'])
+        if 'include_total' in params:
+            query_dict['include_total'] = params.get('include_total', 'true')
+        if 'order_by' in params:
+            query_dict['order_by'] = order_by_build(params['order_by'])
     else:
         raise TypeError('mk_puppetdb_query only accept dict() as input.')
 

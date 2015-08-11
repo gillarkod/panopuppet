@@ -45,91 +45,91 @@ def summary_of_events(events_hash):
                 t_event = q.get()
                 if t_event['status'] == 'success':
                     # Classes
-                    if not t_event['containing-class'] in summary['classes_success']:
-                        summary['classes_success'][t_event['containing-class']] = 1
+                    if not t_event['containing_class'] in summary['classes_success']:
+                        summary['classes_success'][t_event['containing_class']] = 1
                     else:
-                        summary['classes_success'][t_event['containing-class']] += 1
+                        summary['classes_success'][t_event['containing_class']] += 1
                     # Nodes
                     if not t_event['certname'] in summary['nodes_success']:
                         summary['nodes_success'][t_event['certname']] = 1
                     else:
                         summary['nodes_success'][t_event['certname']] += 1
                     # Resources
-                    if not t_event['resource-title'] in summary['resources_success']:
-                        summary['resources_success'][t_event['resource-title']] = 1
+                    if not t_event['resource_title'] in summary['resources_success']:
+                        summary['resources_success'][t_event['resource_title']] = 1
                     else:
-                        summary['resources_success'][t_event['resource-title']] += 1
+                        summary['resources_success'][t_event['resource_title']] += 1
                     # Types
-                    if not t_event['resource-type'] in summary['types_success']:
-                        summary['types_success'][t_event['resource-type']] = 1
+                    if not t_event['resource_type'] in summary['types_success']:
+                        summary['types_success'][t_event['resource_type']] = 1
                     else:
-                        summary['types_success'][t_event['resource-type']] += 1
+                        summary['types_success'][t_event['resource_type']] += 1
 
                 if t_event['status'] == 'noop':
                     # Classes
-                    if not t_event['containing-class'] in summary['classes_noop']:
-                        summary['classes_noop'][t_event['containing-class']] = 1
+                    if not t_event['containing_class'] in summary['classes_noop']:
+                        summary['classes_noop'][t_event['containing_class']] = 1
                     else:
-                        summary['classes_noop'][t_event['containing-class']] += 1
+                        summary['classes_noop'][t_event['containing_class']] += 1
                     # Nodes
                     if not t_event['certname'] in summary['nodes_noop']:
                         summary['nodes_noop'][t_event['certname']] = 1
                     else:
                         summary['nodes_noop'][t_event['certname']] += 1
                     # Resources
-                    if not t_event['resource-title'] in summary['resources_noop']:
-                        summary['resources_noop'][t_event['resource-title']] = 1
+                    if not t_event['resource_title'] in summary['resources_noop']:
+                        summary['resources_noop'][t_event['resource_title']] = 1
                     else:
-                        summary['resources_noop'][t_event['resource-title']] += 1
+                        summary['resources_noop'][t_event['resource_title']] += 1
                     # Types
-                    if not t_event['resource-type'] in summary['types_noop']:
-                        summary['types_noop'][t_event['resource-type']] = 1
+                    if not t_event['resource_type'] in summary['types_noop']:
+                        summary['types_noop'][t_event['resource_type']] = 1
                     else:
-                        summary['types_noop'][t_event['resource-type']] += 1
+                        summary['types_noop'][t_event['resource_type']] += 1
 
                 if t_event['status'] == 'failure':
                     # Classes
-                    if not t_event['containing-class'] in summary['classes_failure']:
-                        summary['classes_failure'][t_event['containing-class']] = 1
+                    if not t_event['containing_class'] in summary['classes_failure']:
+                        summary['classes_failure'][t_event['containing_class']] = 1
                     else:
-                        summary['classes_failure'][t_event['containing-class']] += 1
+                        summary['classes_failure'][t_event['containing_class']] += 1
                     # Nodes
                     if not t_event['certname'] in summary['nodes_failure']:
                         summary['nodes_failure'][t_event['certname']] = 1
                     else:
                         summary['nodes_failure'][t_event['certname']] += 1
                     # Resources
-                    if not t_event['resource-title'] in summary['resources_failure']:
-                        summary['resources_failure'][t_event['resource-title']] = 1
+                    if not t_event['resource_title'] in summary['resources_failure']:
+                        summary['resources_failure'][t_event['resource_title']] = 1
                     else:
-                        summary['resources_failure'][t_event['resource-title']] += 1
+                        summary['resources_failure'][t_event['resource_title']] += 1
                     # Types
-                    if not t_event['resource-type'] in summary['types_failure']:
-                        summary['types_failure'][t_event['resource-type']] = 1
+                    if not t_event['resource_type'] in summary['types_failure']:
+                        summary['types_failure'][t_event['resource_type']] = 1
                     else:
-                        summary['types_failure'][t_event['resource-type']] += 1
+                        summary['types_failure'][t_event['resource_type']] += 1
 
                 if t_event['status'] == 'skipped':
                     # Classes
-                    if not t_event['containing-class'] in summary['classes_skipped']:
-                        summary['classes_skipped'][t_event['containing-class']] = 1
+                    if not t_event['containing_class'] in summary['classes_skipped']:
+                        summary['classes_skipped'][t_event['containing_class']] = 1
                     else:
-                        summary['classes_skipped'][t_event['containing-class']] += 1
+                        summary['classes_skipped'][t_event['containing_class']] += 1
                     # Nodes
                     if not t_event['certname'] in summary['nodes_skipped']:
                         summary['nodes_skipped'][t_event['certname']] = 1
                     else:
                         summary['nodes_skipped'][t_event['certname']] += 1
                     # Resources
-                    if not t_event['resource-title'] in summary['resources_skipped']:
-                        summary['resources_skipped'][t_event['resource-title']] = 1
+                    if not t_event['resource_title'] in summary['resources_skipped']:
+                        summary['resources_skipped'][t_event['resource_title']] = 1
                     else:
-                        summary['resources_skipped'][t_event['resource-title']] += 1
+                        summary['resources_skipped'][t_event['resource_title']] += 1
                     # Types
-                    if not t_event['resource-type'] in summary['types_skipped']:
-                        summary['types_skipped'][t_event['resource-type']] = 1
+                    if not t_event['resource_type'] in summary['types_skipped']:
+                        summary['types_skipped'][t_event['resource_type']] = 1
                     else:
-                        summary['types_skipped'][t_event['resource-type']] += 1
+                        summary['types_skipped'][t_event['resource_type']] += 1
                 out_q.put(i)
                 q.task_done()
 
@@ -172,8 +172,8 @@ def get_events_summary(request, timespan='latest'):
             'query':
                 {
                     'operator': 'and',
-                    1: '["=","latest-report?",true]',
-                    2: '["in","certname",["extract","certname",["select-nodes",["null?","deactivated",true]]]]',
+                    1: '["=","latest_report?",true]',
+                    2: '["in","certname",["extract","certname",["select_nodes",["null?","deactivated",true]]]]',
                 },
         }
     source_url, source_certs, source_verify = get_server(request)
@@ -181,7 +181,7 @@ def get_events_summary(request, timespan='latest'):
         api_url=source_url,
         cert=source_certs,
         verify=source_verify,
-        path='events/',
+        path='/events',
         api_version='v4',
         params=mk_puppetdb_query(events_params, request))
     summary = summary_of_events(events)
@@ -191,27 +191,27 @@ def get_events_summary(request, timespan='latest'):
 def get_report(key, value, request):
     source_url, source_certs, source_verify = get_server(request)
     # If key is any of the below, all is good!
-    allowed_keys = ['certname', 'resource-title', 'resource-type', 'containing-class']
+    allowed_keys = ['certname', 'resource_title', 'resource_type', 'containing_class']
     if key in allowed_keys:
         pass
     # If key does not match above the default will be shown
     else:
-        key = 'containing-class'
+        key = 'containing_class'
 
     events_params = {
         'query':
             {
                 'operator': 'and',
                 1: '["=","' + key + '","' + value + '"]',
-                2: '["=","latest-report?",true]',
-                3: '["in", "certname",["extract", "certname",["select-nodes",["null?","deactivated",true]]]]'
+                2: '["=","latest_report?",true]',
+                3: '["in", "certname",["extract", "certname",["select_nodes",["null?","deactivated",true]]]]'
             },
     }
     results = pdb_api_get(
         api_url=source_url,
         cert=source_certs,
         verify=source_verify,
-        path='events/',
+        path='/events',
         api_version='v4',
         params=mk_puppetdb_query(events_params, request),
     )

@@ -91,9 +91,9 @@ def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_st
 
     sortables = {
         'certname': 0,
-        'catalog-timestamp': 1,
-        'report-timestamp': 2,
-        'facts-timestamp': 3,
+        'catalog_timestamp': 1,
+        'report_timestamp': 2,
+        'facts_timestamp': 3,
         'successes': 4,
         'noops': 5,
         'failures': 6,
@@ -121,16 +121,16 @@ def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_st
             raise ValueError('Incorrect type given as input. Expects n_data, s_data as dict and m_list as list.')
         m_list.append((
             n_data['certname'],
-            filters.date(localtime(json_to_datetime(n_data['catalog-timestamp'])), 'Y-m-d H:i:s') if n_data['catalog-timestamp'] is not None else '',
-            filters.date(localtime(json_to_datetime(n_data['report-timestamp'])), 'Y-m-d H:i:s') if n_data['report-timestamp'] is not None else '',
-            filters.date(localtime(json_to_datetime(n_data['facts-timestamp'])), 'Y-m-d H:i:s') if n_data['facts-timestamp'] is not None else '',
+            filters.date(localtime(json_to_datetime(n_data['catalog_timestamp'])), 'Y-m-d H:i:s') if n_data['catalog_timestamp'] is not None else '',
+            filters.date(localtime(json_to_datetime(n_data['report_timestamp'])), 'Y-m-d H:i:s') if n_data['report_timestamp'] is not None else '',
+            filters.date(localtime(json_to_datetime(n_data['facts_timestamp'])), 'Y-m-d H:i:s') if n_data['facts_timestamp'] is not None else '',
             s_data.get('successes', 0),
             s_data.get('noops', 0),
             s_data.get('failures', 0),
             s_data.get('skips', 0),
         ))
         return m_list
-    # if sort field is certname or catalog/report/facts-timestamp then we will sort this way
+    # if sort field is certname or catalog/report/facts_timestamp then we will sort this way
     # or if the get_status is set to "not_all" indicating that the dashboard wants info.
     if get_status != 'all':
         for node in node_dict:
@@ -141,12 +141,12 @@ def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_st
                     # If the node has failures
                     if status['failures'] > 0:
                         failed_list = append_list(node, status, failed_list)
-                    if check_failed_compile(report_timestamp=node.get('report-timestamp', None),
-                                            fact_timestamp=node.get('facts-timestamp', None),
-                                            catalog_timestamp=node.get('catalog-timestamp', None)):
+                    if check_failed_compile(report_timestamp=node.get('report_timestamp', None),
+                                            fact_timestamp=node.get('facts_timestamp', None),
+                                            catalog_timestamp=node.get('catalog_timestamp', None)):
                         mismatch_list = append_list(node, status, mismatch_list)
                     # If the node is unreported
-                    if is_unreported(node['report-timestamp']):
+                    if is_unreported(node['report_timestamp']):
                         unreported_list = append_list(node, status, unreported_list)
                     # If the node has noops
                     if status['noops'] > 0 \
@@ -160,11 +160,11 @@ def dictstatus(node_dict, status_dict, sort=True, sortby=None, asc=False, get_st
                     break
             if found_node is False:
                 # If the node is unreported
-                if is_unreported(node['report-timestamp']):
+                if is_unreported(node['report_timestamp']):
                     unreported_list = append_list(node, dict(), unreported_list)
-                if check_failed_compile(report_timestamp=node.get('report-timestamp', None),
-                                        fact_timestamp=node.get('facts-timestamp', None),
-                                        catalog_timestamp=node.get('catalog-timestamp', None)):
+                if check_failed_compile(report_timestamp=node.get('report_timestamp', None),
+                                        fact_timestamp=node.get('facts_timestamp', None),
+                                        catalog_timestamp=node.get('catalog_timestamp', None)):
                     mismatch_list = append_list(node, dict(), mismatch_list)
     elif sortbycol <= 3 and get_status == 'all':
         for node in node_dict:
