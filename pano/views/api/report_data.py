@@ -39,13 +39,13 @@ def reports_json(request, certname=None):
             {
                 'order-field':
                     {
-                        'field': 'start-time',
+                        'field': 'start_time',
                         'order': 'desc',
                     },
                 'query-field': {'field': 'certname'},
             },
         'limit': 25,
-        'include-total': 'true',
+        'include_total': 'true',
         'offset': offset,
     }
     reports_list, headers = puppetdb.api_get(
@@ -57,7 +57,6 @@ def reports_json(request, certname=None):
         params=puppetdb.mk_puppetdb_query(
             reports_params, request),
     )
-
     # Work out the number of pages from the xrecords response
     xrecords = headers['X-Records']
     num_pages_wdec = float(xrecords) / 25
@@ -75,7 +74,7 @@ def reports_json(request, certname=None):
                 {
                     1: '["=","report","' + report['hash'] + '"]'
                 },
-            'summarize-by': 'certname',
+            'summarize_by': 'certname',
         }
         eventcount_list = puppetdb.api_get(
             path='event-counts',
@@ -91,16 +90,16 @@ def reports_json(request, certname=None):
                     'hash': report['hash'],
                     'certname': report['certname'],
                     'environment': report['environment'],
-                    'start_time': filters.date(localtime(json_to_datetime(report['start-time'])), 'Y-m-d H:i:s'),
-                    'end_time': filters.date(localtime(json_to_datetime(report['end-time'])), 'Y-m-d H:i:s'),
+                    'start_time': filters.date(localtime(json_to_datetime(report['start_time'])), 'Y-m-d H:i:s'),
+                    'end_time': filters.date(localtime(json_to_datetime(report['end_time'])), 'Y-m-d H:i:s'),
                     'events_successes': event['successes'],
                     'events_noops': event['noops'],
                     'events_failures': event['failures'],
                     'events_skipped': event['skips'],
                     'report_status': report['status'],
-                    'config_version': report['configuration-version'],
+                    'config_version': report['configuration_version'],
                     'run_duration': "{0:.0f}".format(
-                        (json_to_datetime(report['end-time']) - json_to_datetime(report['start-time'])).total_seconds())
+                        (json_to_datetime(report['end_time']) - json_to_datetime(report['start_time'])).total_seconds())
                 })
                 break
         if found_report is False:
@@ -108,16 +107,16 @@ def reports_json(request, certname=None):
                 'hash': report['hash'],
                 'certname': report['certname'],
                 'environment': report['environment'],
-                'start_time': filters.date(localtime(json_to_datetime(report['start-time'])), 'Y-m-d H:i:s'),
-                'end_time': filters.date(localtime(json_to_datetime(report['end-time'])), 'Y-m-d H:i:s'),
+                'start_time': filters.date(localtime(json_to_datetime(report['start_time'])), 'Y-m-d H:i:s'),
+                'end_time': filters.date(localtime(json_to_datetime(report['end_time'])), 'Y-m-d H:i:s'),
                 'events_successes': 0,
                 'events_noops': 0,
                 'events_failures': 0,
                 'events_skipped': 0,
                 'report_status': report['status'],
-                'config_version': report['configuration-version'],
+                'config_version': report['configuration_version'],
                 'run_duration': "{0:.0f}".format(
-                    (json_to_datetime(report['end-time']) - json_to_datetime(report['start-time'])).total_seconds())
+                    (json_to_datetime(report['end_time']) - json_to_datetime(report['start_time'])).total_seconds())
             })
 
     context['certname'] = certname

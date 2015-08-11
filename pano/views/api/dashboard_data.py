@@ -1,13 +1,16 @@
 __author__ = 'etaklar'
+import json
+
 from django.shortcuts import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
+
 from django.views.decorators.cache import cache_page
+
 from pano.methods.dictfuncs import dictstatus as dictstatus
 from pano.puppetdb.pdbutils import run_puppetdb_jobs
 from pano.settings import CACHE_TIME
 from pano.puppetdb.puppetdb import set_server, get_server
-import json
 
 
 @cache_page(CACHE_TIME)
@@ -28,9 +31,9 @@ def dashboard_status_json(request):
     events_params = {
         'query':
             {
-                1: '["and",["=","latest-report?",true],["in", "certname",["extract", "certname",["select-nodes",["null?","deactivated",true]]]]]'
+                1: '["and",["=","latest_report?",true],["in", "certname",["extract", "certname",["select_nodes",["null?","deactivated",true]]]]]'
             },
-        'summarize-by': 'certname',
+        'summarize_by': 'certname',
     }
 
     jobs = {
@@ -39,14 +42,14 @@ def dashboard_status_json(request):
             'certs': source_certs,
             'verify': source_verify,
             'id': 'tot_resource',
-            'path': '/metrics/mbean/com.puppetlabs.puppetdb.query.population:type=default,name=num-resources',
+            'path': 'mbeans/puppetlabs.puppetdb.query.population:type=default,name=num-resources',
         },
         'avg_resource': {
             'url': source_url,
             'certs': source_certs,
             'verify': source_verify,
             'id': 'avg_resource',
-            'path': '/metrics/mbean/com.puppetlabs.puppetdb.query.population:type=default,name=avg-resources-per-node',
+            'path': 'mbeans/puppetlabs.puppetdb.query.population:type=default,name=avg-resources-per-node',
         },
         'all_nodes': {
             'url': source_url,
@@ -134,24 +137,24 @@ def dashboard_nodes_json(request):
     events_params = {
         'query':
             {
-                1: '["and",["=","latest-report?",true],["in", "certname",["extract", "certname",["select-nodes",["null?","deactivated",true]]]]]'
+                1: '["and",["=","latest_report?",true],["in", "certname",["extract", "certname",["select_nodes",["null?","deactivated",true]]]]]'
             },
-        'summarize-by': 'certname',
+        'summarize_by': 'certname',
     }
     all_nodes_params = {
         'query':
             {
-                1: '["and",["=","latest-report?",true],["in", "certname",["extract", "certname",["select-nodes",["null?","deactivated",true]]]]]'
+                1: '["and",["=","latest_report?",true],["in", "certname",["extract", "certname",["select_nodes",["null?","deactivated",true]]]]]'
             },
     }
     nodes_params = {
         'limit': 25,
-        'order-by': {
-            'order-field': {
-                'field': 'report-timestamp',
+        'order_by': {
+            'order_field': {
+                'field': 'report_timestamp',
                 'order': 'desc',
             },
-            'query-field': {'field': 'certname'},
+            'query_field': {'field': 'certname'},
         },
     }
 
@@ -227,6 +230,7 @@ def dashboard_nodes_json(request):
 
     return HttpResponse(json.dumps(context), content_type="application/json")
 
+
 @login_required
 @cache_page(CACHE_TIME)
 def dashboard_json(request):
@@ -246,18 +250,18 @@ def dashboard_json(request):
     events_params = {
         'query':
             {
-                1: '["and",["=","latest-report?",true],["in", "certname",["extract", "certname",["select-nodes",["null?","deactivated",true]]]]]'
+                1: '["and",["=","latest_report?",true],["in", "certname",["extract", "certname",["select_nodes",["null?","deactivated",true]]]]]'
             },
-        'summarize-by': 'certname',
+        'summarize_by': 'certname',
     }
     nodes_params = {
         'limit': 25,
-        'order-by': {
-            'order-field': {
-                'field': 'report-timestamp',
+        'order_by': {
+            'order_field': {
+                'field': 'report_timestamp',
                 'order': 'desc',
             },
-            'query-field': {'field': 'certname'},
+            'query_field': {'field': 'certname'},
         },
     }
 
@@ -267,14 +271,14 @@ def dashboard_json(request):
             'certs': source_certs,
             'verify': source_verify,
             'id': 'tot_resource',
-            'path': '/metrics/mbean/com.puppetlabs.puppetdb.query.population:type=default,name=num-resources',
+            'path': 'mbeans/puppetlabs.puppetdb.query.population:type=default,name=num-resources',
         },
         'avg_resource': {
             'url': source_url,
             'certs': source_certs,
             'verify': source_verify,
             'id': 'avg_resource',
-            'path': '/metrics/mbean/com.puppetlabs.puppetdb.query.population:type=default,name=avg-resources-per-node',
+            'path': 'mbeans/puppetlabs.puppetdb.query.population:type=default,name=avg-resources-per-node',
         },
         'all_nodes': {
             'url': source_url,
@@ -290,7 +294,7 @@ def dashboard_json(request):
             'certs': source_certs,
             'verify': source_verify,
             'id': 'event-counts',
-            'path': 'event-counts',
+            'path': '/event-counts',
             'api_version': 'v4',
             'params': events_params,
             'request': request

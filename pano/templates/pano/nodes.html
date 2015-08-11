@@ -232,12 +232,12 @@
                         <select class="form-control" name="' + name + '_1"> \
         <option value="None">-</option> \
         <option value="&quot;certname&quot;">Certname</option> \
-        <option value="&quot;report-environment&quot;">Report Environment</option> \
-        <option value="&quot;catalog-environment&quot;">Catalog Environment</option> \
-        <option value="&quot;facts-environment&quot;">Facts Environment</option> \
-        <option value="&quot;report-timestamp&quot;">Report Timestamp Environment</option> \
-        <option value="&quot;catalog-timestamp&quot;">Catalog Timestamp</option> \
-        <option value="&quot;facts-timestamp&quot;">Facts Timestamp</option> \
+        <option value="&quot;report_environment&quot;">Report Environment</option> \
+        <option value="&quot;catalog_environment&quot;">Catalog Environment</option> \
+        <option value="&quot;facts_environment&quot;">Facts Environment</option> \
+        <option value="&quot;report_timestamp&quot;">Report Timestamp Environment</option> \
+        <option value="&quot;catalog_timestamp&quot;">Catalog Timestamp</option> \
+        <option value="&quot;facts_timestamp&quot;">Facts Timestamp</option> \
       </select>\
       <input class="form-control" type="text" name="' + name + '_2">';
                     },
@@ -389,16 +389,16 @@
                             </th>
                             <th id="catalog-timestamp-header">
                                 <a id="catalog-timestamp-link" onclick="refresh_data(this).done(); return false;"
-                                   href="?sortfield=catalog-timestamp">Catalog Timestamp <span class="glyphicon"></span></a>
+                                   href="?sortfield=catalog_timestamp">Catalog Timestamp <span class="glyphicon"></span></a>
                             </th>
                             <th id="report-timestamp-header">
                                 <a id="report-timestamp-link" onclick="refresh_data(this).done(); return false;"
-                                   href="?sortfield=report-timestamp">Report Timestamp <span
+                                   href="?sortfield=report_timestamp">Report Timestamp <span
                                         class="glyphicon"></span></a>
                             </th>
                             <th id="facts-timestamp-header">
                                 <a id="facts-timestamp-link" onclick="refresh_data(this).done(); return false;"
-                                   href="?sortfield=facts-timestamp">Facts Timestamp <span class="glyphicon"></span></a>
+                                   href="?sortfield=facts_timestamp">Facts Timestamp <span class="glyphicon"></span></a>
                             </th>
                             <th id="successes-header">
                                 <a id="successes-link" onclick="refresh_data(this).done(); return false;    "

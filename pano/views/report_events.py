@@ -30,14 +30,14 @@ def detailed_events(request, hashid=None):
             {
                 1: '["=","report","' + hashid + '"]'
             },
-        'order-by':
+        'order_by':
             {
-                'order-field':
+                'order_field':
                     {
                         'field': 'timestamp',
                         'order': 'asc',
                     },
-                'query-field': {'field': 'certname'},
+                'query_field': {'field': 'certname'},
             },
     }
     events_list = puppetdb.api_get(
@@ -61,12 +61,12 @@ def detailed_events(request, hashid=None):
         environment = single_event['environment']
         certname = single_event['certname']
         for event in events_list:
-            event_title = event['resource-title']
+            event_title = event['resource_title']
             event_start_time = json_to_datetime(event['timestamp'])
             if last_event_time is None and last_event_title is None:
                 last_event_time = event_start_time
                 last_event_title = event_title
-                run_end_time = json_to_datetime(event['run-end-time'])
+                run_end_time = json_to_datetime(event['run_end_time'])
                 continue
             else:
                 event_exec_time = (event_start_time - last_event_time).total_seconds()

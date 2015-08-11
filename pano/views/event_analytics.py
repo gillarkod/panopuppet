@@ -29,7 +29,7 @@ def event_analytics(request, view='summary'):
         if view == 'classes':
             class_name = request.GET.get('value')
             title = "Class: %s" % class_name
-            class_events = events.get_report(key='containing-class', value=class_name, request=request)
+            class_events = events.get_report(key='containing_class', value=class_name, request=request)
             context['events'] = class_events
         # Show Nodes
         elif view == 'nodes':
@@ -41,13 +41,13 @@ def event_analytics(request, view='summary'):
         elif view == 'resources':
             resource_name = request.GET.get('value')
             title = "Resource: %s" % resource_name
-            resource_events = events.get_report(key='resource-title', value=resource_name, request=request)
+            resource_events = events.get_report(key='resource_title', value=resource_name, request=request)
             context['events'] = resource_events
         # Show Types
         elif view == 'types':
             type_name = request.GET.get('value')
             title = "Type: %s" % type_name
-            type_events = events.get_report(key='resource-type', value=type_name, request=request)
+            type_events = events.get_report(key='resource_type', value=type_name, request=request)
             context['events'] = type_events
     # Show summary if none of the above matched
     else:

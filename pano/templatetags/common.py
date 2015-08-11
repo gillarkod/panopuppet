@@ -68,11 +68,11 @@ def query_to_rules(query):
                     contents = dict()
                     contents['value'] = list()
                     # ID
-                    if data[i][2][2][0] == "select-facts":
+                    if data[i][2][2][0] == "select_facts":
                         contents['id'] = 'facts'
-                    elif data[i][2][2][0] == "select-resources":
+                    elif data[i][2][2][0] == "select_resources":
                         contents['id'] = 'resources'
-                    elif data[i][2][2][0] == "select-nodes":
+                    elif data[i][2][2][0] == "select_nodes":
                         contents['id'] = 'nodes'
                     for entry in data[i][2][2][1]:
                         if isinstance(entry, list):

@@ -29,9 +29,9 @@ def nodes_json(request):
     source_url, source_certs, source_verify = get_server(request)
     valid_sort_fields = (
         'certname',
-        'catalog-timestamp',
-        'report-timestamp',
-        'facts-timestamp',
+        'catalog_timestamp',
+        'report_timestamp',
+        'facts_timestamp',
         'successes',
         'noops',
         'failures',
@@ -68,10 +68,10 @@ def nodes_json(request):
             if request.session['sortfield'] != request.GET.get('sortfield'):
                 request.session['sortfield'] = request.GET.get('sortfield')
             if request.session['sortfield'] not in valid_sort_fields:
-                request.session['sortfield'] = 'report-timestamp'
+                request.session['sortfield'] = 'report_timestamp'
         else:
             if 'sortfield' not in request.session:
-                request.session['sortfield'] = 'report-timestamp'
+                request.session['sortfield'] = 'report_timestamp'
 
         # Cur sort order
         if request.GET.get('sortfieldby', False):
@@ -89,7 +89,7 @@ def nodes_json(request):
                 pass
             else:
                 if request.GET.get('search') == 'clear_rules':
-                    request.session['sortfield'] = 'report-timestamp'
+                    request.session['sortfield'] = 'report_timestamp'
                     request.session['sortfieldby'] = 'desc'
                     request.session['page'] = 1
                     request.session['search'] = None
@@ -98,7 +98,7 @@ def nodes_json(request):
                     request.session['search'] = request.GET.get('search')
         else:
             if 'search' not in request.session:
-                request.session['sortfield'] = 'report-timestamp'
+                request.session['sortfield'] = 'report_timestamp'
                 request.session['sortfieldby'] = 'desc'
                 request.session['page'] = 1
                 request.session['search'] = None
@@ -126,10 +126,10 @@ def nodes_json(request):
             'query': {},
         }
 
-    nodes_sort_fields = ['certname', 'catalog-timestamp', 'report-timestamp', 'facts-timestamp']
+    nodes_sort_fields = ['certname', 'catalog_timestamp', 'report_timestamp', 'facts_timestamp']
     if sort_field in nodes_sort_fields:
-        node_params['order-by'] = {
-            'order-field':
+        node_params['order_by'] = {
+            'order_field':
                 {
                     'field': sort_field,
                     'order': sort_field_order,
@@ -138,16 +138,16 @@ def nodes_json(request):
         if dl_csv is False:
             node_params['limit'] = request.session['limits']
             node_params['offset'] = request.session['offset']
-        node_params['include-total'] = 'true'
+        node_params['include_total'] = 'true'
     else:
-        node_params['order-by'] = {
-            'order-field':
+        node_params['order_by'] = {
+            'order_field':
                 {
-                    'field': 'report-timestamp',
+                    'field': 'report_timestamp',
                     'order': 'desc',
                 },
         }
-    node_sort_fields = ['certname', 'catalog-timestamp', 'report-timestamp', 'facts-timestamp']
+    node_sort_fields = ['certname', 'catalog_timestamp', 'report_timestamp', 'facts_timestamp']
     if sort_field in node_sort_fields:
         try:
             node_list, node_headers = puppetdb.api_get(
@@ -182,26 +182,26 @@ def nodes_json(request):
     report_params = {
         'query':
             {
-                1: '["and",["=","latest-report?",true],["in", "certname",["extract", "certname",["select-nodes",["null?","deactivated",true]]]]]'
+                1: '["and",["=","latest_report?",true],["in", "certname",["extract", "certname",["select_nodes",["null?","deactivated",true]]]]]'
             },
-        'summarize-by': 'certname',
+        'summarize_by': 'certname',
     }
     status_sort_fields = ['successes', 'failures', 'skips', 'noops']
     if sort_field in status_sort_fields:
         if request.session['search'] is not None:
             report_params['query'] = {'operator': 'and',
                                       1: request.session['search'],
-                                      2: '["=","latest-report?",true]',
-                                      3: '["in", "certname",["extract", "certname",["select-nodes",["null?","deactivated",true]]]]',
+                                      2: '["=","latest_report?",true]',
+                                      3: '["in", "certname",["extract", "certname",["select_nodes",["null?","deactivated",true]]]]',
                                       }
-        report_params['order-by'] = {
-            'order-field':
+        report_params['order_by'] = {
+            'order_field':
                 {
                     'field': sort_field,
                     'order': sort_field_order,
                 }
         }
-        report_params['include-total'] = 'true'
+        report_params['include_total'] = 'true'
         # Don't limit results if its CSV
         if dl_csv is False:
             report_params['limit'] = request.session['limits']
