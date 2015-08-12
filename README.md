@@ -48,7 +48,7 @@ Thank you for taking your time to try PanoPuppet.
 * Export data to CSV with or without selected facts
 
 # Requirements
-PuppetDB requires at least PuppetDB 2.0 or higher
+PuppetDB requires at least PuppetDB 3.0 or higher (PDB 2.x is no longer supported from release v1.0.0)
 Puppetv3
 Python3
 Install requirements listed in requirements.txt
