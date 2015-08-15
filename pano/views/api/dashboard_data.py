@@ -64,7 +64,7 @@ def dashboard_status_json(request):
             'url': source_url,
             'certs': source_certs,
             'verify': source_verify,
-            'id': 'event-counts',
+            'id': 'event_counts',
             'path': 'event-counts',
             'api_version': 'v4',
             'params': events_params,
@@ -83,7 +83,7 @@ def dashboard_status_json(request):
     # Information about all active nodes in puppet
     all_nodes_list = puppetdb_results['all_nodes']
     # All available events for the latest puppet reports
-    event_list = puppetdb_results['event-counts']
+    event_list = puppetdb_results['event_counts']
 
     failed_list, changed_list, unreported_list, mismatch_list, pending_list = dictstatus(all_nodes_list,
                                                                                          event_list,
