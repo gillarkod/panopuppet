@@ -33,7 +33,7 @@ def facts(request, certname=None):
         api_url=source_url,
         cert=source_certs,
         verify=source_verify,
-        path='/facts/',
+        path='facts',
         params=puppetdb.mk_puppetdb_query(
             facts_params, request),
     )

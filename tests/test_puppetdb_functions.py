@@ -24,11 +24,11 @@ class CreatePuppetdbQueries(TestCase):
                 {
                     'operator': 'and',
                     1: '["=","hash","e4fug294hf3293hf9348g3804hg3084h"]',
-                    2: '["=","latest-report?",true]'
+                    2: '["=","latest_report?",true]'
                 },
         }
         expected_results = {
-            'query': '["and",["=","hash","e4fug294hf3293hf9348g3804hg3084h"],["=","latest-report?",true]]'
+            'query': '["and",["=","hash","e4fug294hf3293hf9348g3804hg3084h"],["=","latest_report?",true]]'
         }
         results = mk_puppetdb_query(content)
         self.assertEqual(expected_results, results)
@@ -49,10 +49,10 @@ class CreatePuppetdbQueries(TestCase):
 
     def test_summarize_by_query(self):
         content = {
-            'summarize-by': 'containing-class',
+            'summarize_by': 'containing_class',
         }
         expected_results = {
-            'summarize-by': 'containing-class'
+            'summarize_by': 'containing_class'
         }
         results = mk_puppetdb_query(content)
         self.assertEqual(expected_results, results)
@@ -63,20 +63,20 @@ class CreatePuppetdbQueries(TestCase):
                 {
                     1: '["=","certname","hostname.example.com"]'
                 },
-            'summarize-by': 'containing-class',
+            'summarize_by': 'containing_class',
         }
         expected_results = {
             'query': '["and",["=","certname","hostname.example.com"]]',
-            'summarize-by': 'containing-class'
+            'summarize_by': 'containing_class'
         }
         results = mk_puppetdb_query(content)
         self.assertEqual(expected_results, results)
 
     def test_order_by_query(self):
         content = {
-            'order-by':
+            'order_by':
                 {
-                    'order-field':
+                    'order_field':
                         {
                             'field': 'report_timestamp',
                             'order': 'desc',
@@ -84,7 +84,7 @@ class CreatePuppetdbQueries(TestCase):
                 }
         }
         expected_results = {
-            'order-by': '[{"field":"report_timestamp","order":"desc"}]'
+            'order_by': '[{"field":"report_timestamp","order":"desc"}]'
         }
         results = mk_puppetdb_query(content)
         self.assertEqual(expected_results, results)
@@ -95,9 +95,9 @@ class CreatePuppetdbQueries(TestCase):
                 {
                     1: '["=","certname","hostname.example.com"]'
                 },
-            'order-by':
+            'order_by':
                 {
-                    'order-field':
+                    'order_field':
                         {
                             'field': 'report_timestamp',
                             'order': 'desc',
@@ -105,7 +105,7 @@ class CreatePuppetdbQueries(TestCase):
                 }
         }
         expected_results = {
-            'order-by': '[{"field":"report_timestamp","order":"desc"}]',
+            'order_by': '[{"field":"report_timestamp","order":"desc"}]',
             'query': '["and",["=","certname","hostname.example.com"]]'
         }
         results = mk_puppetdb_query(content)
@@ -119,9 +119,9 @@ class CreatePuppetdbQueries(TestCase):
                     1: '["=","certname","hostname1.example.com"]',
                     2: '["=","certname","hostname2.example.com"]'
                 },
-            'order-by':
+            'order_by':
                 {
-                    'order-field':
+                    'order_field':
                         {
                             'field': 'report_timestamp',
                             'order': 'desc',
@@ -130,7 +130,7 @@ class CreatePuppetdbQueries(TestCase):
         }
         expected_results = {
             'query': '["and",["=","certname","hostname1.example.com"],["=","certname","hostname2.example.com"]]',
-            'order-by': '[{"field":"report_timestamp","order":"desc"}]'
+            'order_by': '[{"field":"report_timestamp","order":"desc"}]'
         }
         results = mk_puppetdb_query(content)
         self.assertEqual(expected_results, results)

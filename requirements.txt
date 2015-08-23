@@ -1,6 +1,6 @@
-Django==1.7.6
+Django
 django-auth-ldap==1.2.5
 git+https://github.com/rbarrois/python-ldap.git@py3
-pytz==2014.10
-requests==2.5.1
+pytz
+requests
 pyyaml

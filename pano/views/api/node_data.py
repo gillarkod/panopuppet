@@ -187,6 +187,21 @@ def nodes_json(request):
         'summarize_by': 'certname',
     }
     status_sort_fields = ['successes', 'failures', 'skips', 'noops']
+
+    report_status_params = {
+        'query':
+            {
+                1: '["and",["=","latest_report?",true],["in", "certname",["extract", "certname",["select_nodes",["null?","deactivated",true]]]]]'
+            }
+    }
+    report_status_list = puppetdb.api_get(
+        api_url=source_url,
+        cert=source_certs,
+        verify=source_verify,
+        path='/reports',
+        params=puppetdb.mk_puppetdb_query(report_status_params, request),
+        api_version='v4',
+    )
     if sort_field in status_sort_fields:
         if request.session['search'] is not None:
             report_params['query'] = {'operator': 'and',
@@ -239,13 +254,17 @@ def nodes_json(request):
     else:
         num_pages = num_pages_wodec
 
+    # Converts lists of dicts to dicts.
+    node_dict = {item['certname']: item for item in node_list}
+    status_dict = {item['certname']: item for item in report_status_list}
+    report_dict = {item['subject']['title']: item for item in report_list}
     if sort_field_order == 'desc':
         rows = dictstatus(
-            node_list, report_list, sortby=sort_field, asc=True, sort=False)
+            node_dict, status_dict, report_dict, sortby=sort_field, asc=True, sort=False)
         sort_field_order_opposite = 'asc'
     elif sort_field_order == 'asc':
         rows = dictstatus(
-            node_list, report_list, sortby=sort_field, asc=False, sort=False)
+            node_dict, status_dict, report_dict, sortby=sort_field, asc=False, sort=False)
         sort_field_order_opposite = 'desc'
 
     if dl_csv is True:
