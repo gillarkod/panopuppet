@@ -173,16 +173,15 @@ def dictstatus(node_dict, reports_dict, status_dict, sort=True, sortby=None, asc
                     # Append to the unreported list.
                     unreported_list = append_list(data, status_dict[node_name], unreported_list, report_status)
                 # If its got mismatching timestamps put it in the mismatching list
-                elif node_has_mismatching_timestamps is True:
+                if node_has_mismatching_timestamps is True:
                     mismatch_list = append_list(data, status_dict[node_name], mismatch_list, report_status)
                 # If the node is not unreported or has mismatching timestamps.. proceed to put in the correct lists.
-                else:
-                    if report_status == 'changed':
-                        changed_list = append_list(data, status_dict[node_name], changed_list, report_status)
-                    elif report_status == 'failed':
-                        failed_list = append_list(data, status_dict[node_name], failed_list, report_status)
-                    elif report_status == 'pending':
-                        pending_list = append_list(data, status_dict[node_name], pending_list, report_status)
+                if report_status == 'changed':
+                    changed_list = append_list(data, status_dict[node_name], changed_list, report_status)
+                elif report_status == 'failed':
+                    failed_list = append_list(data, status_dict[node_name], failed_list, report_status)
+                elif report_status == 'pending':
+                    pending_list = append_list(data, status_dict[node_name], pending_list, report_status)
 
     elif sortbycol <= 3 and get_status == 'all':
         for node_name, data in node_dict.items():
