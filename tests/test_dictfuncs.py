@@ -53,126 +53,171 @@ class MergeNodeEventData(TestCase):
             },
         }
 
-        nodes_data = [
-            {
-                'catalog-environment': 'production',
-                'catalog-timestamp': nodes_timestamps['failed-node']['catalog'],
+        nodes_data = {
+            'failed-node.example.com': {
+                'catalog_environment': 'production',
+                'catalog_timestamp': nodes_timestamps['failed-node']['catalog'],
                 'certname': 'failed-node.example.com',
                 'deactivated': None,
-                'facts-environment': 'production',
-                'facts-timestamp': nodes_timestamps['failed-node']['facts'],
-                'report-environment': 'production',
-                'report-timestamp': nodes_timestamps['failed-node']['report']
+                'facts_environment': 'production',
+                'facts_timestamp': nodes_timestamps['failed-node']['facts'],
+                'report_environment': 'production',
+                'report_timestamp': nodes_timestamps['failed-node']['report']
             },
-            {
-                'catalog-environment': 'production',
-                'catalog-timestamp': nodes_timestamps['missmatch-node1']['catalog'],
+            'missmatch-node1.example.com': {
+                'catalog_environment': 'production',
+                'catalog_timestamp': nodes_timestamps['missmatch-node1']['catalog'],
                 'certname': 'missmatch-node1.example.com',
                 'deactivated': None,
-                'facts-environment': 'production',
-                'facts-timestamp': nodes_timestamps['missmatch-node1']['facts'],
-                'report-environment': 'production',
-                'report-timestamp': nodes_timestamps['missmatch-node1']['report']
+                'facts_environment': 'production',
+                'facts_timestamp': nodes_timestamps['missmatch-node1']['facts'],
+                'report_environment': 'production',
+                'report_timestamp': nodes_timestamps['missmatch-node1']['report']
             },
-            {
-                'catalog-environment': 'production',
-                'catalog-timestamp': nodes_timestamps['missmatch-node2']['catalog'],
+            'missmatch-node2.example.com': {
+                'catalog_environment': 'production',
+                'catalog_timestamp': nodes_timestamps['missmatch-node2']['catalog'],
                 'certname': 'missmatch-node2.example.com',
                 'deactivated': None,
-                'facts-environment': 'production',
-                'facts-timestamp': nodes_timestamps['missmatch-node2']['facts'],
-                'report-environment': 'production',
-                'report-timestamp': nodes_timestamps['missmatch-node2']['report']
+                'facts_environment': 'production',
+                'facts_timestamp': nodes_timestamps['missmatch-node2']['facts'],
+                'report_environment': 'production',
+                'report_timestamp': nodes_timestamps['missmatch-node2']['report']
             },
-            {
-                'catalog-environment': 'production',
-                'catalog-timestamp': nodes_timestamps['missmatch-node3']['catalog'],
+            'missmatch-node3.example.com': {
+                'catalog_environment': 'production',
+                'catalog_timestamp': nodes_timestamps['missmatch-node3']['catalog'],
                 'certname': 'missmatch-node3.example.com',
                 'deactivated': None,
-                'facts-environment': 'production',
-                'facts-timestamp': nodes_timestamps['missmatch-node3']['facts'],
-                'report-environment': 'production',
-                'report-timestamp': nodes_timestamps['missmatch-node3']['report']
+                'facts_environment': 'production',
+                'facts_timestamp': nodes_timestamps['missmatch-node3']['facts'],
+                'report_environment': 'production',
+                'report_timestamp': nodes_timestamps['missmatch-node3']['report']
             },
-            {
-                'catalog-environment': 'production',
-                'catalog-timestamp': nodes_timestamps['unreported-node']['catalog'],
+            'unreported-node.example.com': {
+                'catalog_environment': 'production',
+                'catalog_timestamp': nodes_timestamps['unreported-node']['catalog'],
                 'certname': 'unreported-node.example.com',
                 'deactivated': None,
-                'facts-environment': 'production',
-                'facts-timestamp': nodes_timestamps['unreported-node']['facts'],
-                'report-environment': 'production',
-                'report-timestamp': nodes_timestamps['unreported-node']['report']
+                'facts_environment': 'production',
+                'facts_timestamp': nodes_timestamps['unreported-node']['facts'],
+                'report_environment': 'production',
+                'report_timestamp': nodes_timestamps['unreported-node']['report']
             },
-            {
-                'catalog-environment': 'production',
-                'catalog-timestamp': nodes_timestamps['changed-node']['catalog'],
+            'changed-node.example.com': {
+                'catalog_environment': 'production',
+                'catalog_timestamp': nodes_timestamps['changed-node']['catalog'],
                 'certname': 'changed-node.example.com',
                 'deactivated': None,
-                'facts-environment': 'production',
-                'facts-timestamp': nodes_timestamps['changed-node']['facts'],
-                'report-environment': 'production',
-                'report-timestamp': nodes_timestamps['changed-node']['report']
+                'facts_environment': 'production',
+                'facts_timestamp': nodes_timestamps['changed-node']['facts'],
+                'report_environment': 'production',
+                'report_timestamp': nodes_timestamps['changed-node']['report']
             },
-            {
-                'catalog-environment': 'production',
-                'catalog-timestamp': nodes_timestamps['unchanged-node']['catalog'],
+            'unchanged-node.example.com': {
+                'catalog_environment': 'production',
+                'catalog_timestamp': nodes_timestamps['unchanged-node']['catalog'],
                 'certname': 'unchanged-node.example.com',
                 'deactivated': None,
-                'facts-environment': 'production',
-                'facts-timestamp': nodes_timestamps['unchanged-node']['facts'],
-                'report-environment': 'production',
-                'report-timestamp': nodes_timestamps['unchanged-node']['report'],
+                'facts_environment': 'production',
+                'facts_timestamp': nodes_timestamps['unchanged-node']['facts'],
+                'report_environment': 'production',
+                'report_timestamp': nodes_timestamps['unchanged-node']['report'],
             },
-            {
-                'catalog-environment': 'production',
-                'catalog-timestamp': nodes_timestamps['pending-node']['catalog'],
+            'pending-node.example.com': {
+                'catalog_environment': 'production',
+                'catalog_timestamp': nodes_timestamps['pending-node']['catalog'],
                 'certname': 'pending-node.example.com',
                 'deactivated': None,
-                'facts-environment': 'production',
-                'facts-timestamp': nodes_timestamps['pending-node']['facts'],
-                'report-environment': 'production',
-                'report-timestamp': nodes_timestamps['pending-node']['report'],
-            }]
+                'facts_environment': 'production',
+                'facts_timestamp': nodes_timestamps['pending-node']['facts'],
+                'report_environment': 'production',
+                'report_timestamp': nodes_timestamps['pending-node']['report'],
+            }}
 
-        events_data = [{'failures': 0,
-                        'noops': 0,
-                        'skips': 0,
-                        'subject': {'title': 'changed-node.example.com'},
-                        'subject-type': 'certname',
-                        'successes': 78},
-                       {'failures': 0,
-                        'noops': 100,
-                        'skips': 0,
-                        'subject': {'title': 'pending-node.example.com'},
-                        'subject-type': 'certname',
-                        'successes': 0},
-                       {'failures': 20,
-                        'noops': 0,
-                        'skips': 10,
-                        'subject': {'title': 'failed-node.example.com'},
-                        'subject-type': 'certname',
-                        'successes': 5},
-                       {'failures': 20,
-                        'noops': 0,
-                        'skips': 10,
-                        'subject': {'title': 'missmatch-node1.example.com'},
-                        'subject-type': 'certname',
-                        'successes': 5},
-                       {'failures': 0,
-                        'noops': 0,
-                        'skips': 0,
-                        'subject': {'title': 'missmatch-node2.example.com'},
-                        'subject-type': 'certname',
-                        'successes': 25},
-                       {'failures': 0,
-                        'noops': 50,
-                        'skips': 0,
-                        'subject': {'title': 'missmatch-node3.example.com'},
-                        'subject-type': 'certname',
-                        'successes': 0}
-                       ]
+        events_data = {
+            'changed-node.example.com': {
+                'failures': 0,
+                'noops': 0,
+                'skips': 0,
+                'subject': {'title': 'changed-node.example.com'},
+                'subject-type': 'certname',
+                'successes': 78
+            },
+            'pending-node.example.com': {
+                'failures': 0,
+                'noops': 100,
+                'skips': 0,
+                'subject': {'title': 'pending-node.example.com'},
+                'subject-type': 'certname',
+                'successes': 0
+            },
+            'unreported-node.example.com': {
+                'failures': 0,
+                'noops': 0,
+                'skips': 0,
+                'subject': {'title': 'unreported-node.example.com'},
+                'subject-type': 'certname',
+                'successes': 0
+            },
+            'failed-node.example.com': {
+                'failures': 20,
+                'noops': 0,
+                'skips': 10,
+                'subject': {'title': 'failed-node.example.com'},
+                'subject-type': 'certname',
+                'successes': 5
+            },
+            'missmatch-node1.example.com': {
+                'failures': 20,
+                'noops': 0,
+                'skips': 10,
+                'subject': {'title': 'missmatch-node1.example.com'},
+                'subject-type': 'certname',
+                'successes': 5
+            },
+            'missmatch-node2.example.com': {
+                'failures': 0,
+                'noops': 0,
+                'skips': 0,
+                'subject': {'title': 'missmatch-node2.example.com'},
+                'subject-type': 'certname',
+                'successes': 25
+            },
+            'missmatch-node3.example.com': {
+                'failures': 0,
+                'noops': 50,
+                'skips': 0,
+                'subject': {'title': 'missmatch-node3.example.com'},
+                'subject-type': 'certname',
+                'successes': 0
+            }
+        }
+        reports_data = {
+            'changed-node.example.com': {
+                'status': 'changed',
+            },
+            'pending-node.example.com': {
+                'status': 'unchanged',
+            },
+            'failed-node.example.com': {
+                'status': 'failed',
+            },
+            'unreported-node.example.com': {
+                'status': 'unchanged',
+            },
+            'missmatch-node1.example.com': {
+                'status': 'failed',
+            },
+            'missmatch-node2.example.com': {
+                'status': 'changed',
+            },
+            'missmatch-node3.example.com': {
+                'status': 'unchanged',
+            }
+        }
         failed_list, changed_list, unreported_list, missmatch_list, pending_list = dictstatus(nodes_data,
+                                                                                              reports_data,
                                                                                               events_data,
                                                                                               sort=False,
                                                                                               get_status='notall')
@@ -188,7 +233,7 @@ class MergeNodeEventData(TestCase):
             filters.date(
                 localtime(json_to_datetime(nodes_timestamps['failed-node']['facts'])),
                 'Y-m-d H:i:s'),
-            5, 0, 20, 10), (
+            5, 0, 20, 10, 'failed'), (
             'missmatch-node1.example.com',
             filters.date(
                 localtime(json_to_datetime(nodes_timestamps['missmatch-node1']['catalog'])),
@@ -199,75 +244,36 @@ class MergeNodeEventData(TestCase):
             filters.date(
                 localtime(json_to_datetime(nodes_timestamps['missmatch-node1']['facts'])),
                 'Y-m-d H:i:s'),
-            5, 0, 20, 10)]
+            5, 0, 20, 10, 'failed')]
 
-        changed_expected = [(
-            'failed-node.example.com',
-            filters.date(
-                localtime(json_to_datetime(nodes_timestamps['failed-node']['catalog'])),
-                'Y-m-d H:i:s'),
-            filters.date(
-                localtime(json_to_datetime(nodes_timestamps['failed-node']['report'])),
-                'Y-m-d H:i:s'),
-            filters.date(
-                localtime(json_to_datetime(nodes_timestamps['failed-node']['facts'])),
-                'Y-m-d H:i:s'),
-            5, 0, 20, 10), (
-            'missmatch-node1.example.com',
-            filters.date(
-                localtime(json_to_datetime(nodes_timestamps['missmatch-node1']['catalog'])),
-                'Y-m-d H:i:s'),
-            filters.date(
-                localtime(json_to_datetime(nodes_timestamps['missmatch-node1']['report'])),
-                'Y-m-d H:i:s'),
-            filters.date(
-                localtime(json_to_datetime(nodes_timestamps['missmatch-node1']['facts'])),
-                'Y-m-d H:i:s'),
-            5, 0, 20, 10), (
-            'missmatch-node2.example.com',
-            filters.date(
-                localtime(json_to_datetime(nodes_timestamps['missmatch-node2']['catalog'])),
-                'Y-m-d H:i:s'),
-            filters.date(
-                localtime(json_to_datetime(nodes_timestamps['missmatch-node2']['report'])),
-                'Y-m-d H:i:s'),
-            filters.date(
-                localtime(json_to_datetime(nodes_timestamps['missmatch-node2']['facts'])),
-                'Y-m-d H:i:s'),
-            25, 0, 0, 0), (
-            'missmatch-node3.example.com',
-            filters.date(
-                localtime(json_to_datetime(nodes_timestamps['missmatch-node3']['catalog'])),
-                'Y-m-d H:i:s'),
-            filters.date(
-                localtime(json_to_datetime(nodes_timestamps['missmatch-node3']['report'])),
-                'Y-m-d H:i:s'),
-            filters.date(
-                localtime(json_to_datetime(nodes_timestamps['missmatch-node3']['facts'])),
-                'Y-m-d H:i:s'),
-            0, 50, 0, 0), (
-            'changed-node.example.com',
-            filters.date(
-                localtime(json_to_datetime(nodes_timestamps['changed-node']['catalog'])),
-                'Y-m-d H:i:s'),
-            filters.date(
-                localtime(json_to_datetime(nodes_timestamps['changed-node']['report'])),
-                'Y-m-d H:i:s'),
-            filters.date(
-                localtime(json_to_datetime(nodes_timestamps['changed-node']['facts'])),
-                'Y-m-d H:i:s'),
-            78, 0, 0, 0), (
-            'pending-node.example.com',
-            filters.date(
-                localtime(json_to_datetime(nodes_timestamps['pending-node']['catalog'])),
-                'Y-m-d H:i:s'),
-            filters.date(
-                localtime(json_to_datetime(nodes_timestamps['pending-node']['report'])),
-                'Y-m-d H:i:s'),
-            filters.date(
-                localtime(json_to_datetime(nodes_timestamps['pending-node']['facts'])),
-                'Y-m-d H:i:s'),
-            0, 100, 0, 0)]
+        changed_expected = [
+            (
+                'missmatch-node2.example.com',
+                filters.date(
+                    localtime(json_to_datetime(nodes_timestamps['missmatch-node2']['catalog'])),
+                    'Y-m-d H:i:s'),
+                filters.date(
+                    localtime(json_to_datetime(nodes_timestamps['missmatch-node2']['report'])),
+                    'Y-m-d H:i:s'),
+                filters.date(
+                    localtime(json_to_datetime(nodes_timestamps['missmatch-node2']['facts'])),
+                    'Y-m-d H:i:s'),
+                25, 0, 0, 0, 'changed'
+            ),
+            (
+                'changed-node.example.com',
+                filters.date(
+                    localtime(json_to_datetime(nodes_timestamps['changed-node']['catalog'])),
+                    'Y-m-d H:i:s'),
+                filters.date(
+                    localtime(json_to_datetime(nodes_timestamps['changed-node']['report'])),
+                    'Y-m-d H:i:s'),
+                filters.date(
+                    localtime(json_to_datetime(nodes_timestamps['changed-node']['facts'])),
+                    'Y-m-d H:i:s'),
+                78, 0, 0, 0, 'changed'
+            ),
+        ]
 
         unreported_expected = [(
             'unreported-node.example.com',
@@ -280,7 +286,7 @@ class MergeNodeEventData(TestCase):
             filters.date(
                 localtime(json_to_datetime(nodes_timestamps['unreported-node']['facts'])),
                 'Y-m-d H:i:s'),
-            0, 0, 0, 0)]
+            0, 0, 0, 0, 'unchanged')]
 
         missmatch_expected = [(
             'missmatch-node1.example.com',
@@ -293,7 +299,7 @@ class MergeNodeEventData(TestCase):
             filters.date(
                 localtime(json_to_datetime(nodes_timestamps['missmatch-node1']['facts'])),
                 'Y-m-d H:i:s'),
-            5, 0, 20, 10), (
+            5, 0, 20, 10, 'failed'), (
             'missmatch-node2.example.com',
             filters.date(
                 localtime(json_to_datetime(nodes_timestamps['missmatch-node2']['catalog'])),
@@ -304,7 +310,7 @@ class MergeNodeEventData(TestCase):
             filters.date(
                 localtime(json_to_datetime(nodes_timestamps['missmatch-node2']['facts'])),
                 'Y-m-d H:i:s'),
-            25, 0, 0, 0), (
+            25, 0, 0, 0, 'changed'), (
             'missmatch-node3.example.com',
             filters.date(
                 localtime(json_to_datetime(nodes_timestamps['missmatch-node3']['catalog'])),
@@ -315,7 +321,7 @@ class MergeNodeEventData(TestCase):
             filters.date(
                 localtime(json_to_datetime(nodes_timestamps['missmatch-node3']['facts'])),
                 'Y-m-d H:i:s'),
-            0, 50, 0, 0)]
+            0, 50, 0, 0, 'pending')]
 
         pending_expected = [(
             'missmatch-node3.example.com',
@@ -328,7 +334,7 @@ class MergeNodeEventData(TestCase):
             filters.date(
                 localtime(json_to_datetime(nodes_timestamps['missmatch-node3']['facts'])),
                 'Y-m-d H:i:s'),
-            0, 50, 0, 0), (
+            0, 50, 0, 0, 'pending'), (
             'pending-node.example.com',
             filters.date(
                 localtime(json_to_datetime(nodes_timestamps['pending-node']['catalog'])),
@@ -339,8 +345,18 @@ class MergeNodeEventData(TestCase):
             filters.date(
                 localtime(json_to_datetime(nodes_timestamps['pending-node']['facts'])),
                 'Y-m-d H:i:s'),
-            0, 100, 0, 0)]
-        # failed_list, changed_list, unreported_list, mismatch_list, pending_list
+            0, 100, 0, 0, 'pending')]
+        # Sort lists so its easier to verify...
+        failed_list.sort(key=lambda tup: tup[0])
+        failed_expected.sort(key=lambda tup: tup[0])
+        changed_list.sort(key=lambda tup: tup[0])
+        changed_expected.sort(key=lambda tup: tup[0])
+        unreported_list.sort(key=lambda tup: tup[0])
+        unreported_expected.sort(key=lambda tup: tup[0])
+        missmatch_list.sort(key=lambda tup: tup[0])
+        missmatch_expected.sort(key=lambda tup: tup[0])
+        pending_list.sort(key=lambda tup: tup[0])
+        pending_expected.sort(key=lambda tup: tup[0])
         if failed_list != failed_expected:
             self.fail(msg='Failed list does not match expectations.')
         if changed_list != changed_expected:
@@ -397,193 +413,271 @@ class MergeNodeEventData(TestCase):
             },
         }
 
-        nodes_data = [
-            {
-                'catalog-environment': 'production',
-                'catalog-timestamp': nodes_timestamps['failed-node']['catalog'],
+        nodes_data = {
+            'failed-node.example.com': {
+                'catalog_environment': 'production',
+                'catalog_timestamp': nodes_timestamps['failed-node']['catalog'],
                 'certname': 'failed-node.example.com',
                 'deactivated': None,
-                'facts-environment': 'production',
-                'facts-timestamp': nodes_timestamps['failed-node']['facts'],
-                'report-environment': 'production',
-                'report-timestamp': nodes_timestamps['failed-node']['report']
+                'facts_environment': 'production',
+                'facts_timestamp': nodes_timestamps['failed-node']['facts'],
+                'report_environment': 'production',
+                'report_timestamp': nodes_timestamps['failed-node']['report']
             },
-            {
-                'catalog-environment': 'production',
-                'catalog-timestamp': nodes_timestamps['missmatch-node1']['catalog'],
+            'missmatch-node1.example.com': {
+                'catalog_environment': 'production',
+                'catalog_timestamp': nodes_timestamps['missmatch-node1']['catalog'],
                 'certname': 'missmatch-node1.example.com',
                 'deactivated': None,
-                'facts-environment': 'production',
-                'facts-timestamp': nodes_timestamps['missmatch-node1']['facts'],
-                'report-environment': 'production',
-                'report-timestamp': nodes_timestamps['missmatch-node1']['report']
+                'facts_environment': 'production',
+                'facts_timestamp': nodes_timestamps['missmatch-node1']['facts'],
+                'report_environment': 'production',
+                'report_timestamp': nodes_timestamps['missmatch-node1']['report']
             },
-            {
-                'catalog-environment': 'production',
-                'catalog-timestamp': nodes_timestamps['missmatch-node2']['catalog'],
+            'missmatch-node2.example.com': {
+                'catalog_environment': 'production',
+                'catalog_timestamp': nodes_timestamps['missmatch-node2']['catalog'],
                 'certname': 'missmatch-node2.example.com',
                 'deactivated': None,
-                'facts-environment': 'production',
-                'facts-timestamp': nodes_timestamps['missmatch-node2']['facts'],
-                'report-environment': 'production',
-                'report-timestamp': nodes_timestamps['missmatch-node2']['report']
+                'facts_environment': 'production',
+                'facts_timestamp': nodes_timestamps['missmatch-node2']['facts'],
+                'report_environment': 'production',
+                'report_timestamp': nodes_timestamps['missmatch-node2']['report']
             },
-            {
-                'catalog-environment': 'production',
-                'catalog-timestamp': nodes_timestamps['missmatch-node3']['catalog'],
+            'missmatch-node3.example.com': {
+                'catalog_environment': 'production',
+                'catalog_timestamp': nodes_timestamps['missmatch-node3']['catalog'],
                 'certname': 'missmatch-node3.example.com',
                 'deactivated': None,
-                'facts-environment': 'production',
-                'facts-timestamp': nodes_timestamps['missmatch-node3']['facts'],
-                'report-environment': 'production',
-                'report-timestamp': nodes_timestamps['missmatch-node3']['report']
+                'facts_environment': 'production',
+                'facts_timestamp': nodes_timestamps['missmatch-node3']['facts'],
+                'report_environment': 'production',
+                'report_timestamp': nodes_timestamps['missmatch-node3']['report']
             },
-            {
-                'catalog-environment': 'production',
-                'catalog-timestamp': nodes_timestamps['unreported-node']['catalog'],
+            'unreported-node.example.com': {
+                'catalog_environment': 'production',
+                'catalog_timestamp': nodes_timestamps['unreported-node']['catalog'],
                 'certname': 'unreported-node.example.com',
                 'deactivated': None,
-                'facts-environment': 'production',
-                'facts-timestamp': nodes_timestamps['unreported-node']['facts'],
-                'report-environment': 'production',
-                'report-timestamp': nodes_timestamps['unreported-node']['report']
+                'facts_environment': 'production',
+                'facts_timestamp': nodes_timestamps['unreported-node']['facts'],
+                'report_environment': 'production',
+                'report_timestamp': nodes_timestamps['unreported-node']['report']
             },
-            {
-                'catalog-environment': 'production',
-                'catalog-timestamp': nodes_timestamps['changed-node']['catalog'],
+            'changed-node.example.com': {
+                'catalog_environment': 'production',
+                'catalog_timestamp': nodes_timestamps['changed-node']['catalog'],
                 'certname': 'changed-node.example.com',
                 'deactivated': None,
-                'facts-environment': 'production',
-                'facts-timestamp': nodes_timestamps['changed-node']['facts'],
-                'report-environment': 'production',
-                'report-timestamp': nodes_timestamps['changed-node']['report']
+                'facts_environment': 'production',
+                'facts_timestamp': nodes_timestamps['changed-node']['facts'],
+                'report_environment': 'production',
+                'report_timestamp': nodes_timestamps['changed-node']['report']
             },
-            {
-                'catalog-environment': 'production',
-                'catalog-timestamp': nodes_timestamps['unchanged-node']['catalog'],
+            'unchanged-node.example.com': {
+                'catalog_environment': 'production',
+                'catalog_timestamp': nodes_timestamps['unchanged-node']['catalog'],
                 'certname': 'unchanged-node.example.com',
                 'deactivated': None,
-                'facts-environment': 'production',
-                'facts-timestamp': nodes_timestamps['unchanged-node']['facts'],
-                'report-environment': 'production',
-                'report-timestamp': nodes_timestamps['unchanged-node']['report'],
+                'facts_environment': 'production',
+                'facts_timestamp': nodes_timestamps['unchanged-node']['facts'],
+                'report_environment': 'production',
+                'report_timestamp': nodes_timestamps['unchanged-node']['report'],
             },
-            {
-                'catalog-environment': 'production',
-                'catalog-timestamp': nodes_timestamps['pending-node']['catalog'],
+            'pending-node.example.com': {
+                'catalog_environment': 'production',
+                'catalog_timestamp': nodes_timestamps['pending-node']['catalog'],
                 'certname': 'pending-node.example.com',
                 'deactivated': None,
-                'facts-environment': 'production',
-                'facts-timestamp': nodes_timestamps['pending-node']['facts'],
-                'report-environment': 'production',
-                'report-timestamp': nodes_timestamps['pending-node']['report'],
-            }]
+                'facts_environment': 'production',
+                'facts_timestamp': nodes_timestamps['pending-node']['facts'],
+                'report_environment': 'production',
+                'report_timestamp': nodes_timestamps['pending-node']['report'],
+            }
+        }
 
-        events_data = [{'failures': 0,
-                        'noops': 0,
-                        'skips': 0,
-                        'subject': {'title': 'changed-node.example.com'},
-                        'subject-type': 'certname',
-                        'successes': 78},
-                       {'failures': 0,
-                        'noops': 100,
-                        'skips': 0,
-                        'subject': {'title': 'pending-node.example.com'},
-                        'subject-type': 'certname',
-                        'successes': 0},
-                       {'failures': 20,
-                        'noops': 0,
-                        'skips': 10,
-                        'subject': {'title': 'failed-node.example.com'},
-                        'subject-type': 'certname',
-                        'successes': 5},
-                       {'failures': 20,
-                        'noops': 0,
-                        'skips': 10,
-                        'subject': {'title': 'missmatch-node1.example.com'},
-                        'subject-type': 'certname',
-                        'successes': 5},
-                       {'failures': 0,
-                        'noops': 0,
-                        'skips': 0,
-                        'subject': {'title': 'missmatch-node2.example.com'},
-                        'subject-type': 'certname',
-                        'successes': 25},
-                       {'failures': 0,
-                        'noops': 50,
-                        'skips': 0,
-                        'subject': {'title': 'missmatch-node3.example.com'},
-                        'subject-type': 'certname',
-                        'successes': 0}
-                       ]
+        events_data = {
+            'changed-node.example.com': {
+                'failures': 0,
+                'noops': 0,
+                'skips': 0,
+                'subject': {'title': 'changed-node.example.com'},
+                'subject-type': 'certname',
+                'successes': 78
+            },
+            'pending-node.example.com': {
+                'failures': 0,
+                'noops': 100,
+                'skips': 0,
+                'subject': {'title': 'pending-node.example.com'},
+                'subject-type': 'certname',
+                'successes': 0
+            },
+            'failed-node.example.com': {
+                'failures': 20,
+                'noops': 0,
+                'skips': 10,
+                'subject': {'title': 'failed-node.example.com'},
+                'subject-type': 'certname',
+                'successes': 5
+            },
+            'unreported-node.example.com': {
+                'failures': 0,
+                'noops': 0,
+                'skips': 0,
+                'subject': {'title': 'unreported-node.example.com'},
+                'subject-type': 'certname',
+                'successes': 0
+            },
+            'unchanged-node.example.com': {
+                'failures': 0,
+                'noops': 0,
+                'skips': 0,
+                'subject': {'title': 'unchanged-node.example.com'},
+                'subject-type': 'certname',
+                'successes': 0
+            },
+            'missmatch-node1.example.com': {
+                'failures': 20,
+                'noops': 0,
+                'skips': 10,
+                'subject': {'title': 'missmatch-node1.example.com'},
+                'subject-type': 'certname',
+                'successes': 5
+            },
+            'missmatch-node2.example.com': {
+                'failures': 0,
+                'noops': 0,
+                'skips': 0,
+                'subject': {'title': 'missmatch-node2.example.com'},
+                'subject-type': 'certname',
+                'successes': 25
+            },
+            'missmatch-node3.example.com': {
+                'failures': 0,
+                'noops': 50,
+                'skips': 0,
+                'subject': {'title': 'missmatch-node3.example.com'},
+                'subject-type': 'certname',
+                'successes': 0
+            }
+        }
+
+        reports_data = {
+            'changed-node.example.com': {
+                'status': 'changed',
+            },
+            'pending-node.example.com': {
+                'status': 'pending',
+            },
+            'failed-node.example.com': {
+                'status': 'failed',
+            },
+            'missmatch-node1.example.com': {
+                'status': 'failed',
+            },
+            'missmatch-node2.example.com': {
+                'status': 'changed',
+            },
+            'missmatch-node3.example.com': {
+                'status': 'pending',
+            },
+            'unreported-node.example.com': {
+                'status': 'unchanged',
+            },
+            'unchanged-node.example.com': {
+                'status': 'unchanged',
+            }
+        }
+
         merged_list = dictstatus(nodes_data,
+                                 reports_data,
                                  events_data,
                                  sort=False,
                                  get_status='all')
         # ('certname', 'latestCatalog', 'latestReport', 'latestFacts', 'success', 'noop', 'failure', 'skipped')
-        merged_expected = [('failed-node.example.com',
-                            filters.date(localtime(json_to_datetime(nodes_timestamps['failed-node']['catalog'])),
-                                         'Y-m-d H:i:s'),
-                            filters.date(localtime(json_to_datetime(nodes_timestamps['failed-node']['report'])),
-                                         'Y-m-d H:i:s'),
-                            filters.date(localtime(json_to_datetime(nodes_timestamps['failed-node']['facts'])),
-                                         'Y-m-d H:i:s'),
-                            5, 0, 20, 10), (
-                               'missmatch-node1.example.com',
-                               filters.date(localtime(json_to_datetime(nodes_timestamps['missmatch-node1']['catalog'])),
-                                            'Y-m-d H:i:s'),
-                               filters.date(localtime(json_to_datetime(nodes_timestamps['missmatch-node1']['report'])),
-                                            'Y-m-d H:i:s'),
-                               filters.date(localtime(json_to_datetime(nodes_timestamps['missmatch-node1']['facts'])),
-                                            'Y-m-d H:i:s'),
-                               5, 0, 20, 10), (
-                               'missmatch-node2.example.com',
-                               filters.date(localtime(json_to_datetime(nodes_timestamps['missmatch-node2']['catalog'])),
-                                            'Y-m-d H:i:s'),
-                               filters.date(localtime(json_to_datetime(nodes_timestamps['missmatch-node2']['report'])),
-                                            'Y-m-d H:i:s'),
-                               filters.date(localtime(json_to_datetime(nodes_timestamps['missmatch-node2']['facts'])),
-                                            'Y-m-d H:i:s'),
-                               25, 0, 0, 0), (
-                               'missmatch-node3.example.com',
-                               filters.date(localtime(json_to_datetime(nodes_timestamps['missmatch-node3']['catalog'])),
-                                            'Y-m-d H:i:s'),
-                               filters.date(localtime(json_to_datetime(nodes_timestamps['missmatch-node3']['report'])),
-                                            'Y-m-d H:i:s'),
-                               filters.date(localtime(json_to_datetime(nodes_timestamps['missmatch-node3']['facts'])),
-                                            'Y-m-d H:i:s'),
-                               0, 50, 0, 0), (
-                               'unreported-node.example.com',
-                               filters.date(localtime(json_to_datetime(nodes_timestamps['unreported-node']['catalog'])),
-                                            'Y-m-d H:i:s'),
-                               filters.date(localtime(json_to_datetime(nodes_timestamps['unreported-node']['report'])),
-                                            'Y-m-d H:i:s'),
-                               filters.date(localtime(json_to_datetime(nodes_timestamps['unreported-node']['facts'])),
-                                            'Y-m-d H:i:s'),
-                               0, 0, 0, 0), (
-                               'changed-node.example.com',
-                               filters.date(localtime(json_to_datetime(nodes_timestamps['changed-node']['catalog'])),
-                                            'Y-m-d H:i:s'),
-                               filters.date(localtime(json_to_datetime(nodes_timestamps['changed-node']['report'])),
-                                            'Y-m-d H:i:s'),
-                               filters.date(localtime(json_to_datetime(nodes_timestamps['changed-node']['facts'])),
-                                            'Y-m-d H:i:s'),
-                               78, 0, 0, 0), (
-                               'unchanged-node.example.com',
-                               filters.date(localtime(json_to_datetime(nodes_timestamps['unchanged-node']['catalog'])),
-                                            'Y-m-d H:i:s'),
-                               filters.date(localtime(json_to_datetime(nodes_timestamps['unchanged-node']['report'])),
-                                            'Y-m-d H:i:s'),
-                               filters.date(localtime(json_to_datetime(nodes_timestamps['unchanged-node']['facts'])),
-                                            'Y-m-d H:i:s'),
-                               0, 0, 0, 0), (
-                               'pending-node.example.com',
-                               filters.date(localtime(json_to_datetime(nodes_timestamps['pending-node']['catalog'])),
-                                            'Y-m-d H:i:s'),
-                               filters.date(localtime(json_to_datetime(nodes_timestamps['pending-node']['report'])),
-                                            'Y-m-d H:i:s'),
-                               filters.date(localtime(json_to_datetime(nodes_timestamps['pending-node']['facts'])),
-                                            'Y-m-d H:i:s'),
-                           0, 100, 0, 0)]
+        merged_expected = [
+            (
+                'failed-node.example.com',
+                filters.date(localtime(json_to_datetime(nodes_timestamps['failed-node']['catalog'])),
+                             'Y-m-d H:i:s'),
+                filters.date(localtime(json_to_datetime(nodes_timestamps['failed-node']['report'])),
+                             'Y-m-d H:i:s'),
+                filters.date(localtime(json_to_datetime(nodes_timestamps['failed-node']['facts'])),
+                             'Y-m-d H:i:s'),
+                5, 0, 20, 10, 'failed'
+            ),
+            (
+                'missmatch-node1.example.com',
+                filters.date(localtime(json_to_datetime(nodes_timestamps['missmatch-node1']['catalog'])),
+                             'Y-m-d H:i:s'),
+                filters.date(localtime(json_to_datetime(nodes_timestamps['missmatch-node1']['report'])),
+                             'Y-m-d H:i:s'),
+                filters.date(localtime(json_to_datetime(nodes_timestamps['missmatch-node1']['facts'])),
+                             'Y-m-d H:i:s'),
+                5, 0, 20, 10, 'failed'
+            ),
+            (
+                'missmatch-node2.example.com',
+                filters.date(localtime(json_to_datetime(nodes_timestamps['missmatch-node2']['catalog'])),
+                             'Y-m-d H:i:s'),
+                filters.date(localtime(json_to_datetime(nodes_timestamps['missmatch-node2']['report'])),
+                             'Y-m-d H:i:s'),
+                filters.date(localtime(json_to_datetime(nodes_timestamps['missmatch-node2']['facts'])),
+                             'Y-m-d H:i:s'),
+                25, 0, 0, 0, 'changed'
+            ),
+            (
+                'missmatch-node3.example.com',
+                filters.date(localtime(json_to_datetime(nodes_timestamps['missmatch-node3']['catalog'])),
+                             'Y-m-d H:i:s'),
+                filters.date(localtime(json_to_datetime(nodes_timestamps['missmatch-node3']['report'])),
+                             'Y-m-d H:i:s'),
+                filters.date(localtime(json_to_datetime(nodes_timestamps['missmatch-node3']['facts'])),
+                             'Y-m-d H:i:s'),
+                0, 50, 0, 0, 'pending'
+            ),
+            (
+                'unreported-node.example.com',
+                filters.date(localtime(json_to_datetime(nodes_timestamps['unreported-node']['catalog'])),
+                             'Y-m-d H:i:s'),
+                filters.date(localtime(json_to_datetime(nodes_timestamps['unreported-node']['report'])),
+                             'Y-m-d H:i:s'),
+                filters.date(localtime(json_to_datetime(nodes_timestamps['unreported-node']['facts'])),
+                             'Y-m-d H:i:s'),
+                0, 0, 0, 0, 'unchanged'
+            ),
+            (
+                'changed-node.example.com',
+                filters.date(localtime(json_to_datetime(nodes_timestamps['changed-node']['catalog'])),
+                             'Y-m-d H:i:s'),
+                filters.date(localtime(json_to_datetime(nodes_timestamps['changed-node']['report'])),
+                             'Y-m-d H:i:s'),
+                filters.date(localtime(json_to_datetime(nodes_timestamps['changed-node']['facts'])),
+                             'Y-m-d H:i:s'),
+                78, 0, 0, 0, 'changed'
+            ),
+            (
+                'unchanged-node.example.com',
+                filters.date(localtime(json_to_datetime(nodes_timestamps['unchanged-node']['catalog'])),
+                             'Y-m-d H:i:s'),
+                filters.date(localtime(json_to_datetime(nodes_timestamps['unchanged-node']['report'])),
+                             'Y-m-d H:i:s'),
+                filters.date(localtime(json_to_datetime(nodes_timestamps['unchanged-node']['facts'])),
+                             'Y-m-d H:i:s'),
+                0, 0, 0, 0, 'unchanged'
+            ),
+            (
+                'pending-node.example.com',
+                filters.date(localtime(json_to_datetime(nodes_timestamps['pending-node']['catalog'])),
+                             'Y-m-d H:i:s'),
+                filters.date(localtime(json_to_datetime(nodes_timestamps['pending-node']['report'])),
+                             'Y-m-d H:i:s'),
+                filters.date(localtime(json_to_datetime(nodes_timestamps['pending-node']['facts'])),
+                             'Y-m-d H:i:s'),
+                0, 100, 0, 0, 'pending'
+            )]
         # failed_list, changed_list, unreported_list, mismatch_list, pending_list
+        merged_list.sort(key=lambda tup: tup[0])
+        merged_expected.sort(key=lambda tup: tup[0])
         self.assertEqual(merged_list, merged_expected)
