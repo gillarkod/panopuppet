@@ -1,15 +1,42 @@
 # PanoPuppet
-PanoPuppet is still under development so be prepared for big changes.
-All config will be taken from a specific file. There will be a example config file
-you can work from, but remember that when upgrading to a new version panopuppet may
-break and you will need to follow the instructions specified in the upgrade section
-of this readme.
+PanoPuppet is a PuppetDB dashboard, it uses the information available
+in PuppetDB and visualizes it for you with lists and graphs.
+You are able to browse through the latest changes in reports, nodes, resources,
+classes and types. Many features were features requested by my colleagues.
 
-While panopuppet is very stable there may be a few bugs here and there. I appreciate any
-Pull Requests or Issues created for me to take a look at. While there are no tests today
-to verify functionality, I am working on creating tests for verification.
+Its written and designed with an enterprise companies needs as a focus point.
+Where there are many XFT's and where there may be a need for extra security to
+limit the nodes a certain XFT/group should be allowed access too.
 
-Thank you for taking your time to try PanoPuppet.
+## Use Case
+One large company, several hundred XFT's operating from multiples regions.
+Security concious company where you may not always want the information available
+in PuppetDB available to everyone. Difficult to lock down a ldap/AD group to a
+subset of users.
+
+PanoPuppet gives you the ability to create PuppetDB Queries with a easy to use tool
+and use those rules to lock down an active directory group to one or more PuppetDB Queries.
+
+Users that have a rule will then only be able to see nodes that match the rule you created.
+
+# Some random info and tips...
+Since this django app can use LDAP/AD Authentication it can be a bit tricky
+to get it working for all Actice Directory designs. The default config works
+for the environment I tested it with. I have had other users reporting that
+they had to change the ldap code to accept nested groups for example or use
+another attr for the login name.
+If you need help to get it working you are most welcome to create a support issue
+in GitHub.
+
+There is an example configuration for you to look at.
+I'd suggest you make a copy and modify the lines you need too.
+
+It is written with Python3, its not Python2 compatible and I
+won't ever make it Python2 compatible.
+It will be a bit of pain to get working on RHEL7 using SCL so you
+will need to make a wrapper that enables SCL python3.
+
+
 
 **Table of Contents**
 
