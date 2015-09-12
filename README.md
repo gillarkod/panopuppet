@@ -8,6 +8,8 @@ Its written and designed with an enterprise companies needs as a focus point.
 Where there are many XFT's and where there may be a need for extra security to
 limit the nodes a certain XFT/group should be allowed access too.
 
+For the feature list click here:  [Features](#features)
+
 ## Use Case
 One large company, several hundred XFT's operating from multiples regions.
 Security concious company where you may not always want the information available
@@ -18,6 +20,9 @@ PanoPuppet gives you the ability to create PuppetDB Queries with a easy to use t
 and use those rules to lock down an active directory group to one or more PuppetDB Queries.
 
 Users that have a rule will then only be able to see nodes that match the rule you created.
+
+PanoPuppet enables you to control and delegate the information in PuppetDB to the users
+who need it.
 
 # Some random info and tips...
 Since this django app can use LDAP/AD Authentication it can be a bit tricky
