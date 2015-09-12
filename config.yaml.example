@@ -5,7 +5,15 @@
 sources:
   'PuppetDB Production':
     'DEFAULT': true
-    'PUPPETDB_HOST': 'http://puppetdb.production.example.com/'
+# URI to Puppet DB server with method, host and port
+    'PUPPETDB_HOST': 'https://puppetdb.production.example.com:8081/'
+# PUPPET DB CERTS - ordering is important here
+# Also, the files must be readable by the http daemon user
+    'PUPPETDB_CERTIFICATES':
+      - '/path/to/public_key.pem'
+      - '/path/to/private_key.pem'
+# This setting is the default
+    'PUPPETDB_VERIFY_SSL': false
     'PUPPETMASTER_CLIENTBUCKET_SHOW': true
     'PUPPETMASTER_FILESERVER_SHOW': true
     # Filebucket configuraion for the PuppetDB Production
@@ -36,8 +44,8 @@ CACHE_TIME: 60
 # Authentication method - Available auth methods = ldap and basic
 AUTH_METHOD: 'basic'
 
-# Or if you want ldap authentication
-AUTH_METHOD: 'ldap'
+# Or if you want ldap authentication uncomment this line and delete the one above
+# AUTH_METHOD: 'ldap'
 LDAP_SERVER: 'ldap://ldap.forumsys.com'
 LDAP_BIND_DN: 'cn=read-only-admin,dc=example,dc=com'
 LDAP_BIND_PW: 'password'
