@@ -12,7 +12,7 @@ limit the nodes a certain XFT/group should be allowed access too.
 One large company, several hundred XFT's operating from multiples regions.
 Security concious company where you may not always want the information available
 in PuppetDB available to everyone. Difficult to lock down a ldap/AD group to a
-subset of users.
+subset of users in PuppetDB alone..
 
 PanoPuppet gives you the ability to create PuppetDB Queries with a easy to use tool
 and use those rules to lock down an active directory group to one or more PuppetDB Queries.
