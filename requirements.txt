@@ -4,3 +4,4 @@ git+https://github.com/rbarrois/python-ldap.git@py3
 pytz
 requests
 pyyaml
+arrow
