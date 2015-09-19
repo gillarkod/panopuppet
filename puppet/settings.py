@@ -162,8 +162,10 @@ else:  # or otherwise known as 'basic' auth
 
 # Expire sessions at browser close
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-# Expire Session after 1 hour
-SESSION_COOKIE_AGE = 3600
+# Expire Session after x hours
+SESSION_AGE = cfg.get('SESSION_AGE', 60)
+SESSION_COOKIE_AGE = SESSION_AGE * 3600
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/

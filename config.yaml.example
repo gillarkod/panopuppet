@@ -72,6 +72,11 @@ NODES_DEFAULT_FACTS:
 # DJANGO CONFIGURATION #
 ########################
 
+# The session age is how long after the latest request the session cookie should expire.
+# It is specified in hours - So the below would expire the cookie after two hours.
+SESSION_AGE: 2
+
+
 SECRET_KEY: 'super_secure_random_key'
 
 # SECURITY WARNING: don't run with debug turned on in production!
