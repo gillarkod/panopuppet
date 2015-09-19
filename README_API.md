@@ -15,3 +15,11 @@ Suitable for scripting if you want some kind of monitoring to check if more than
 ### Input parameters
 * GET request
 * Takes no input parameters.
+
+
+## /pano/api/reports/\<report_hash_id\>/agent_log
+JSON Response contain logs for the given report hash id if it exists.
+
+### Input parameters
+* GET request
+* Takes no input parameters.

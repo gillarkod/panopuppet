@@ -136,11 +136,10 @@ def api_get(api_url=PUPPETDB_HOST,
     if path[0] == '/':
         path = path.lstrip('/')
 
-    if path in query_paths:
+    if path.split('/')[0] in query_paths:
         path = 'pdb/query/v4/%s' % path
     elif 'mbean' in path:
         path = 'metrics/v1/%s' % path
-
 
     if params:
         path += '?{0}'.format(urlparse.urlencode(params))

@@ -185,6 +185,10 @@ PuppetDB resource and Fileserver. If both files are available you will be
 able to get a diff between the files.
 ![Node Report Events View](screenshots/pp_node_report_events.png)
 
+## Nodes Report Agent Log
+View the puppet agents console log.
+![Node Report Events View](screenshots/pp_node_report_agent_log.png)
+
 ## Node Report Events Execution Times
 This graph shows the 10 highest execution times for the puppet run.
 ![Node Report Events Execution Times](screenshots/pp_report_events_execution_times.png)

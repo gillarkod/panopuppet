@@ -1,0 +1,165 @@
+{% extends "pano/base.html" %}
+
+{% load puppetdb_extras %}
+{% load common %}
+{% load static %}
+
+{% block head %}
+    <script src="{% static 'pano/js/bootbox.min.js' %}"></script>
+    <script>
+        $(document).ready(function () {
+            get_report();
+        });
+        $(document).on({
+            ajaxStart: function () {
+                bootbox.dialog({
+                    title: "Loading...",
+                    message: "Fetching data from PuppetDB.",
+                    show: true,
+                    backdrop: false,
+                    closeButton: true,
+                    animate: false
+                });
+            },
+            ajaxStop: function () {
+                bootbox.hideAll()
+            }
+        });
+    </script>
+    <style>
+        .bs-callout {
+            padding: 5px;
+            margin: 7px 0;
+            border: 1px solid #eee;
+            border-left-width: 5px;
+            border-radius: 3px;
+        }
+
+        .bs-callout h4 {
+            margin-top: 0;
+            margin-bottom: 5px;
+        }
+
+        .bs-callout p:last-child {
+            margin-bottom: 0;
+        }
+
+        .bs-callout code {
+            border-radius: 3px;
+        }
+
+        .bs-callout + .bs-callout {
+            margin-top: -5px;
+        }
+
+        .bs-callout-default {
+            border-left-color: #777;
+        }
+
+        .bs-callout-default h4 {
+            color: #777;
+        }
+
+        .bs-callout-primary {
+            border-left-color: #428bca;
+        }
+
+        .bs-callout-primary h4 {
+            color: #428bca;
+        }
+
+        .bs-callout-success {
+            border-left-color: #5cb85c;
+        }
+
+        .bs-callout-success h4 {
+            color: #5cb85c;
+        }
+
+        .bs-callout-danger {
+            border-left-color: #d9534f;
+        }
+
+        .bs-callout-danger h4 {
+            color: #d9534f;
+        }
+
+        .bs-callout-warning {
+            border-left-color: #f0ad4e;
+        }
+
+        .bs-callout-warning h4 {
+            color: #f0ad4e;
+        }
+
+        .bs-callout-info {
+            border-left-color: #5bc0de;
+        }
+
+        .bs-callout-info h4 {
+            color: #5bc0de;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <script>
+        function get_report(obj) {
+            var backgroundTask = $.Deferred();
+            var url = '/pano/api/reports/{{ report_hash }}/agent_log';
+            if ($(obj).attr('href')) {
+                var params = $(obj).attr('href');
+                url = url + params;
+            }
+            $.get(url, function (json) {
+                var response = $(jQuery(json));
+                var reports = response[0]['agent_log'];
+                var report_data = '';
+                if (!reports) {
+                    report_data = '<div class="alert alert-danger" role="alert">Logs could not be retrieved for {{ certname }} with hash {{ report_hash }}</div>';
+                }
+                else {
+                    reports.forEach(function (report) {
+                        var color = 'muted'; // Default colour if none of below match..
+                        if (report['level'] === 'info') {
+                            color = 'success'
+                        }
+                        else if (report['level'] === 'warning') {
+                            color = 'warning'
+                        }
+                        else if (report['level'] === 'err') {
+                            color = 'danger'
+                        }
+                        else if (report['level'] === 'notice') {
+                            color = 'muted'
+                        }
+                        report_data += '<div class="bs-callout bs-callout-' + color + '"><samp class="text-' + color +
+                                '">' + report['level'] + ': ' + report['source'] + ': '
+                                + report['message'] + '</samp></div>'
+                    });
+                }
+                $("#agent_logs").html(report_data);
+            })
+                    .fail(function () {
+                        var data = '<div class="bs-callout bs-callout-danger>Could not connect to PuppetDB.</div>';
+                        $("#agent_logs").html(data);
+                    });
+            backgroundTask.resolve();
+            return backgroundTask;
+        }
+    </script>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h1 class="panel-title">
+                        Puppet Agent Report for <strong>{{ certname }}</strong> with hash <strong>{{ report_hash }}</strong>
+                    </h1>
+                </div>
+                <div class="panel-body" id="agent_logs">
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
