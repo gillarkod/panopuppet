@@ -105,15 +105,17 @@
         function refresh_data(obj) {
             var backgroundTask = $.Deferred();
             var url = '../api/nodes/';
+            var query = '';
+            var params = '';
             if (obj) {
                 if ($(obj).attr('href')) {
-                    var params = $(obj).attr('href');
+                    params = $(obj).attr('href');
                     url = "../api/nodes/" + params;
                 }
                 else if ($(obj).attr('id') == 'searchform') {
                     $("form#searchform :input").each(function () {
-                        var params = $(this).val(); // This is the jquery object of the input
-                        url = "../api/nodes/?search=" + params;
+                        query = $(this).val(); // This is the jquery object of the input
+                        url = "../api/nodes/?search=" + query;
                     });
                 }
                 else if ($(obj).attr('id') == 'limits') {
@@ -123,13 +125,19 @@
             }
             $.get(url, function (json) {
                 var response = $(jQuery(json));
-                var nodes = response[0]['nodeList'];
-                var data = '';
-                var num_nodes = nodes.length;
-                if (num_nodes === 0) {
-                    data = '<tr><td colspan="8">No nodes matching your query.</td></tr>';
+                nodes = response[0]['nodeList'];
+                if (!nodes) {
+                    var url = "{% url 'login' %}?next={% url 'nodes' %}";
+                    if (query) {
+                        url = "{% url 'login' %}?next={% url 'nodes' %}?load_query=" + query;
+                    }
+                    window.location.replace(url);
+                }
+                else if (nodes.length === 0) {
+                    var data = '<tr><td colspan="8">No matches for query.</td></tr>';
                 }
                 else {
+                    var nodes = response[0]['nodeList'];
                     //('certname', 'latestCatalog', 'latestReport', 'latestFacts', 'success', 'noop', 'failure', 'skipped'),
                     nodes.forEach(function (node) {
                         data += '<tr>';
@@ -344,9 +352,6 @@
                                 "csrfmiddlewaretoken": document.getElementsByName('csrfmiddlewaretoken')[0].value
                             }
                     );
-                }
-                else {
-
                 }
             }
         });
