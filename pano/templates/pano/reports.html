@@ -94,6 +94,8 @@
                         else if (report['report_status'] == 'failed') {
                             report_data += '<span class="glyphicon glyphicon-remove" style="color: #d9534f"></span>';
                         }
+                        report_data += '<a href="../../events/{{ certname }}' + '/' + report['hash'] + '"><strong>[A]</strong></a>';
+
                         if (report['events_successes'] > 0 || report['events_noops'] > 0 || report['events_failures'] > 0 || report['events_skipped'] > 0) {
                             report_data += '<a href="../../events/' + report['hash'] + '?report_timestamp=' + report['start_time'] + '">' + report['hash'] + '</a></td>';
                         }

@@ -8,6 +8,7 @@ from pano.views.node_facts import facts
 from pano.views.nodes import nodes
 from pano.views.report_events import detailed_events
 from pano.views.reports import reports
+from pano.views.report_agent_logs import agent_logs
 from pano.views.splash import splash
 from pano.views.radiator import radiator
 from pano.views.api.node_data import nodes_json
@@ -26,8 +27,8 @@ urlpatterns = patterns('',
                        url(r'^filebucket/$', filebucket, name='filebucket'),
                        url(r'^nodes/$', nodes, name='nodes'),
                        url(r'^reports/(?P<certname>[\w\.-]+)/$', reports, name='reports'),
-                       url(r'^events/(?P<hashid>[\w\.-]+)/$', detailed_events,
-                           name='events'),
+                       url(r'^events/(?P<hashid>[\w\.-]+)/$', detailed_events, name='events'),
+                       url(r'^events/(?P<certname>[\w\.-]+)/(?P<report_hash>[\w]+)/$', agent_logs, name='agent_logs'),
                        url(r'^analytics/$', analytics, name='analytics'),
                        url(r'^eventanalytics/$', event_analytics, name='event_analytics'),
                        url(r'^eventanalytics/(?P<view>[\w]+)/$', event_analytics, name='event_analytics'),
