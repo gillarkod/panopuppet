@@ -24,6 +24,8 @@ Users that have a rule will then only be able to see nodes that match the rule y
 PanoPuppet enables you to control and delegate the information in PuppetDB to the users
 who need it.
 
+![PanoPuppet Design](screenshots/pp_workflow.png)
+
 # Some random info and tips...
 Since this django app can use LDAP/AD Authentication it can be a bit tricky
 to get it working for all Actice Directory designs. The default config works
