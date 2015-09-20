@@ -35,14 +35,13 @@ def reports_json(request, certname=None):
             {
                 1: '["=","certname","' + certname + '"]'
             },
-        'order-by':
+        'order_by':
             {
-                'order-field':
+                'order_field':
                     {
                         'field': 'start_time',
                         'order': 'desc',
                     },
-                'query-field': {'field': 'certname'},
             },
         'limit': 25,
         'include_total': 'true',

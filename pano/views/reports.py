@@ -32,14 +32,13 @@ def reports(request, certname=None):
                     {
                         1: '["=","certname","' + certname + '"]'
                     },
-                'order-by':
+                'order_by':
                     {
-                        'order-field':
+                        'order_field':
                             {
-                                'field': 'start-time',
+                                'field': 'start_time',
                                 'order': 'desc',
                             },
-                        'query-field': {'field': 'certname'},
                     },
                 'limit': 1,
             }
