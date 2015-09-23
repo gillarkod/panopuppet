@@ -21,7 +21,7 @@ def nodes(request):
             source = request.GET.get('source')
             set_server(request, source)
         elif 'load_query' in request.GET:
-            request.session['search'] = request.GET.get('load_query', request.session['search'])
+            request.session['search'] = request.GET.get('load_query', request.session.get('search', ''))
             return redirect('nodes')
     elif request.method == 'POST':
         if 'timezone' in request.POST:
