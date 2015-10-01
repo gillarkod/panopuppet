@@ -1,4 +1,5 @@
 from unittest import TestCase
+
 from pano.puppetdb.pdbutils import generate_csv
 
 __author__ = 'etaklar'

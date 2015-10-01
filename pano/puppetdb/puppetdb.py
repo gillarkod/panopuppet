@@ -1,5 +1,3 @@
-__author__ = 'etaklar'
-
 """
 Examples:
             Interfacing directly with api_get
@@ -15,16 +13,17 @@ api_get(path='/facts', params={'query': '["and", ["=", "name", "kernel"], ["=", 
 api_get(path='/facts', params={'query': mk_puppetdb_query(test_params)}, verify=False)
 """
 
-import urllib.parse as urlparse
 import json
-
 import requests
+import urllib.parse as urlparse
 
 from pano.settings import PUPPETDB_HOST, PUPPETDB_VERIFY_SSL, PUPPETDB_CERTIFICATES, AVAILABLE_SOURCES, \
     PUPPETMASTER_CLIENTBUCKET_CERTIFICATES, PUPPETMASTER_CLIENTBUCKET_HOST, PUPPETMASTER_CLIENTBUCKET_SHOW, \
     PUPPETMASTER_CLIENTBUCKET_VERIFY_SSL, PUPPETMASTER_FILESERVER_CERTIFICATES, PUPPETMASTER_FILESERVER_HOST, \
     PUPPETMASTER_FILESERVER_SHOW, PUPPETMASTER_FILESERVER_VERIFY_SSL, PUPPET_RUN_INTERVAL, AUTH_METHOD, \
     ENABLE_PERMISSIONS
+
+__author__ = 'etaklar'
 
 
 def get_server(request, type='puppetdb'):

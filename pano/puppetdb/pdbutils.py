@@ -1,5 +1,6 @@
 import datetime
 import queue
+
 from threading import Thread
 
 from pano.puppetdb import puppetdb

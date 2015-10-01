@@ -1,10 +1,10 @@
-__author__ = 'etaklar'
-
-from pano.puppetdb.puppetdb import api_get as pdb_api_get
-from pano.puppetdb.puppetdb import mk_puppetdb_query
 import queue
+
 from threading import Thread
-from pano.puppetdb.puppetdb import get_server
+
+from pano.puppetdb.puppetdb import api_get as pdb_api_get, mk_puppetdb_query, get_server
+
+__author__ = 'etaklar'
 
 
 def summary_of_events(events_hash):

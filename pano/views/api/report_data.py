@@ -1,14 +1,17 @@
-__author__ = 'etaklar'
+import json
+
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import HttpResponse
-from django.views.decorators.cache import cache_page
-from pano.puppetdb import puppetdb
-from pano.settings import CACHE_TIME
-from pano.puppetdb.puppetdb import get_server
-import json
 from django.template import defaultfilters as filters
 from django.utils.timezone import localtime
+from django.views.decorators.cache import cache_page
+
+from pano.puppetdb import puppetdb
 from pano.puppetdb.pdbutils import json_to_datetime
+from pano.puppetdb.puppetdb import get_server
+from pano.settings import CACHE_TIME
+
+__author__ = 'etaklar'
 
 
 @login_required

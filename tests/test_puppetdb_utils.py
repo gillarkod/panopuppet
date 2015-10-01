@@ -1,7 +1,9 @@
-__author__ = 'etaklar'
 from datetime import datetime, timedelta
 from django.test import TestCase
+
 from pano.puppetdb.pdbutils import is_unreported
+
+__author__ = 'etaklar'
 
 
 class CheckIfUnreported(TestCase):

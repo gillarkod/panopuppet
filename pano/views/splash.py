@@ -1,11 +1,13 @@
-__author__ = 'etaklar'
+import pytz
+
 from django.contrib.auth import authenticate, login
 from django.shortcuts import redirect, render
-from pano.puppetdb.puppetdb import set_server
-from pano.settings import AVAILABLE_SOURCES, ENABLE_PERMISSIONS
-import pytz
-from pano.settings import AUTH_METHOD
+
 from pano.models import LdapGroupPermissions
+from pano.puppetdb.puppetdb import set_server
+from pano.settings import AVAILABLE_SOURCES, AUTH_METHOD, ENABLE_PERMISSIONS
+
+__author__ = 'etaklar'
 
 
 def splash(request):

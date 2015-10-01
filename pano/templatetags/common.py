@@ -1,8 +1,9 @@
-__author__ = 'etaklar'
-
-from urllib import parse
-from django import template
 import json
+
+from django import template
+from urllib import parse
+
+__author__ = 'etaklar'
 
 register = template.Library()
 

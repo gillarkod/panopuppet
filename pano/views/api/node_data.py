@@ -1,5 +1,3 @@
-__author__ = 'etaklar'
-
 import csv
 import datetime
 import json
@@ -8,11 +6,14 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseBadRequest, HttpResponse, StreamingHttpResponse
 from django.shortcuts import redirect
 from django.views.decorators.csrf import ensure_csrf_cookie
-from pano.views import Echo
+
 from pano.methods.dictfuncs import dictstatus as dictstatus
-from pano.puppetdb.pdbutils import generate_csv
 from pano.puppetdb import puppetdb
+from pano.puppetdb.pdbutils import generate_csv
 from pano.puppetdb.puppetdb import set_server, get_server
+from pano.views import Echo
+
+__author__ = 'etaklar'
 
 
 @ensure_csrf_cookie

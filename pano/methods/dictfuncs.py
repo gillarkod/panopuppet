@@ -1,10 +1,11 @@
-__author__ = 'etaklar'
-
-from pano.puppetdb.pdbutils import json_to_datetime, is_unreported
-from pano.settings import PUPPET_RUN_INTERVAL
 from datetime import timedelta
 from django.template import defaultfilters as filters
 from django.utils.timezone import localtime
+
+from pano.puppetdb.pdbutils import json_to_datetime, is_unreported
+from pano.settings import PUPPET_RUN_INTERVAL
+
+__author__ = 'etaklar'
 
 
 def sort_table(table, col=0, order=False):
