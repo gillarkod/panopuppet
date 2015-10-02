@@ -1,11 +1,12 @@
+import pytz
+
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 from django.views.decorators.cache import cache_page
+
 from pano.puppetdb import puppetdb
-from pano.settings import CACHE_TIME
 from pano.puppetdb.puppetdb import set_server, get_server
-from pano.settings import AVAILABLE_SOURCES, NODES_DEFAULT_FACTS
-import pytz
+from pano.settings import AVAILABLE_SOURCES, CACHE_TIME, NODES_DEFAULT_FACTS
 
 __author__ = 'etaklar'
 

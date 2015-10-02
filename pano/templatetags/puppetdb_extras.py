@@ -1,9 +1,11 @@
-__author__ = 'etaklar'
-
-from django import template
 import datetime
 
+from django import template
+
+__author__ = 'etaklar'
+
 register = template.Library()
+
 
 # used for json_to_datetime filter
 class UTC(datetime.tzinfo):

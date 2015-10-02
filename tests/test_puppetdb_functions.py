@@ -1,7 +1,8 @@
-__author__ = 'etaklar'
-
 from django.test import TestCase
+
 from pano.puppetdb.puppetdb import mk_puppetdb_query
+
+__author__ = 'etaklar'
 
 
 class CreatePuppetdbQueries(TestCase):

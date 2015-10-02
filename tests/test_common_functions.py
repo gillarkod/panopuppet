@@ -1,6 +1,8 @@
-__author__ = 'etaklar'
 from django.test import TestCase
+
 from pano.templatetags.common import get_percentage
+
+__author__ = 'etaklar'
 
 
 class common_functions(TestCase):

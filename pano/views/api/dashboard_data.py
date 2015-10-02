@@ -1,16 +1,15 @@
-__author__ = 'etaklar'
 import json
 
-from django.shortcuts import HttpResponse
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect
-
+from django.shortcuts import HttpResponse, redirect
 from django.views.decorators.cache import cache_page
 
 from pano.methods.dictfuncs import dictstatus as dictstatus
 from pano.puppetdb.pdbutils import run_puppetdb_jobs
-from pano.settings import CACHE_TIME
 from pano.puppetdb.puppetdb import set_server, get_server
+from pano.settings import CACHE_TIME
+
+__author__ = 'etaklar'
 
 
 @cache_page(CACHE_TIME)

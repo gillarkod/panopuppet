@@ -1,11 +1,12 @@
-__author__ = 'etaklar'
-
-from django.test import TestCase
 from datetime import datetime, timedelta
-from pano.methods.dictfuncs import dictstatus
 from django.template import defaultfilters as filters
+from django.test import TestCase
 from django.utils.timezone import localtime
+
+from pano.methods.dictfuncs import dictstatus
 from pano.puppetdb.pdbutils import json_to_datetime
+
+__author__ = 'etaklar'
 
 
 class MergeNodeEventData(TestCase):

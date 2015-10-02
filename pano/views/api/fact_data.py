@@ -1,11 +1,13 @@
+import json
+import re
+
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, HttpResponse
 from django.views.decorators.cache import cache_page
+
 from pano.puppetdb import puppetdb
-from pano.settings import CACHE_TIME
 from pano.puppetdb.puppetdb import set_server, get_server
-import json
-import re
+from pano.settings import CACHE_TIME
 
 __author__ = 'etaklar'
 

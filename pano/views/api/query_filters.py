@@ -1,11 +1,14 @@
-__author__ = 'etaklar'
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_list_or_404, redirect
-from django.http import HttpResponseBadRequest, HttpResponse
-from django.views.decorators.cache import cache_page
-from pano.settings import CACHE_TIME
 import json
+
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseBadRequest, HttpResponse
+from django.shortcuts import get_list_or_404, redirect
+from django.views.decorators.cache import cache_page
+
 from pano.models import SavedQueries
+from pano.settings import CACHE_TIME
+
+__author__ = 'etaklar'
 
 
 @login_required
