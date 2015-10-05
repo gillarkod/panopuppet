@@ -361,3 +361,40 @@ def nodes_json(request):
         'tot_pages': '{0:g}'.format(num_pages),
     }
     return HttpResponse(json.dumps(context), content_type="application/json")
+
+
+def search_nodes_json(request):
+    source_url, source_certs, source_verify = get_server(request)
+    if request.method == 'GET':
+        if 'search' in request.GET:
+            search = request.GET.get('search')
+
+    # Create a search regex for certname spelt with below.
+    nodes_params = {
+        'query':
+            {
+                1: '["~","certname","' + search + '"]'
+            },
+        'order_by':
+            {
+                'order_field':
+                    {
+                        'field': 'certname',
+                        'order': 'desc',
+                    },
+            },
+        #'limit': 25,
+    }
+    nodes_list = puppetdb.api_get(
+        api_url=source_url,
+        cert=source_certs,
+        verify=source_verify,
+        path='/nodes',
+        api_version='v4',
+        params=puppetdb.mk_puppetdb_query(
+            nodes_params, request),
+    )
+    return HttpResponse(json.dumps(nodes_list), content_type="application/json")
+
+
+
