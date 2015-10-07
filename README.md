@@ -11,8 +11,8 @@ limit the nodes a certain XFT/group should be allowed access too.
 For the feature list click here:  [Features](#features)
 
 # Support
-PanoPuppet Releases >= 1.0.0 - Requires PuppetDB == 3.x (Uses the v4 api endpoint)
-PanoPuppet Releases < 1.0.0 - Requires PuppetDB == 2.x (Uses the experimental v4 api endpoint)
+* PanoPuppet Releases >= 1.0.0 - Requires PuppetDB == 3.x (Uses the v4 api endpoint)
+* PanoPuppet Releases < 1.0.0 - Requires PuppetDB == 2.x (Uses the experimental v4 api endpoint)
 
 To download a specific release you can find them [Here](https://github.com/propyless/panopuppet/releases)
 
