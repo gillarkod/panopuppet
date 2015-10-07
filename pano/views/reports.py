@@ -28,6 +28,7 @@ def reports(request, certname=None):
     # Redirects to the events page if GET param latest is true..
     if request.GET.get('latest', False):
         if request.GET.get('latest') == "true":
+            request.session['report_page'] = 1
             latest_report_params = {
                 'query':
                     {
@@ -63,6 +64,10 @@ def reports(request, certname=None):
                     'report_timestamp') + '&envname=' + report_env)
             else:
                 return redirect('/pano/nodes/')
+
+    if certname != request.session.get('last_shown_node', ''):
+        request.session['last_shown_node'] = certname
+        request.session['report_page'] = 1
 
     context['certname'] = certname
     context['node_facts'] = ','.join(NODES_DEFAULT_FACTS)
