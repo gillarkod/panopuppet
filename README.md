@@ -325,59 +325,56 @@ $ cd /srv/repo/panopuppet
 $ pip install -r requirements.txt
 ```
 
-8) This directory will be needed to serve the static files.
-mkdir /srv/staticfiles
-
-9) Apache httpd config
+8) Apache httpd config
 ```
 WSGISocketPrefix /var/run/wsgi
 <VirtualHost *:80>
-    ServerName pp.your.domain.com
-    WSGIDaemonProcess panopuppet user=apache group=apache threads=5 python-path=/srv/repo/panopuppet:/srv/.virtualenvs/panopuppet/lib/python3.3/site-packages
+    ServerName pp.tld.com
+    WSGIDaemonProcess panopuppet user=apache group=apache threads=5 python-path=/srv/repo/panopuppet:/srv/.virtualenvs/panopuppet/lib/python3.4/site-packages
     WSGIScriptAlias / /srv/repo/panopuppet/puppet/wsgi.py
+    
     ErrorLog /var/log/httpd/panopuppet.error.log
     CustomLog /var/log/httpd/panopuppet.access.log combined
-
-    Alias /static /srv/staticfiles/
+    
+    Alias /static/admin /srv/.virtualenvs/panopuppet/lib/python3.4/site-packages/django/contrib/admin/static/admin/
+    Alias /static /srv/repo/panopuppet/static
+    
+    <Directory "/srv/.virtualenvs/panopuppet/lib/python3.4/site-packages/django/contrib/admin/static/admin/">
+        Require all granted
+    </Directory>
+    
     <Directory /srv/repo/panopuppet>
         Satisfy Any
         Allow from all
     </Directory>
-
+    
+    <Directory /srv/repo/panopuppet/static/>
+        Satisfy Any
+        Allow from all
+    </Directory>
+    
     <Directory /srv/repo/panopuppet/>
         WSGIProcessGroup panopuppet
     </Directory>
 </VirtualHost>
+
 ```
 
-10) Configure PanoPuppet
-`$ cp /srv/repo/panopuppet/config.yaml.example /srv/repo/panopuppet/config.yaml`
-Use your favourite text editor to modify the file with the correct values for your envionrment.
-Please note that the example configuration file contains an example for puppetdb connection with and without SSL.
-
-Depending on your puppet infrastructure you may or may not need to specify public, private and cacert to authenticate
-with puppetdb, puppetmaster filebucket and fileserver.
-
-
-11) Populate the /srv/staticfiles with the staticfiles
-`$ cd /srv/repo/panopuppet`
-`$ python manage.py collectstatic` Say yes to the question it might ask about overwriting files in the /srv/collectstatic folder.
-
-12) chown the /srv/repo/panopuppet directory recursively to the http user you want running panopuppet.
+9) chown the /srv/repo/panopuppet directory recursively to the http user you want running panopuppet.
 This is to make sure that the panopuppet application can access the local database containing users etc.
 Support for other databases will be added at a later time.
 Make sure to replace 'apache' with the appropriate user and group.
 ` chown -R apache:apache /srv/repo/panopuppet`
 
-13) Populate the django database so that users logging in with LDAP or local users are populated into django.
+10) Populate the django database so that users logging in with LDAP or local users are populated into django.
 `$ python manage.py migrate`
 
-14) OPTIONAL STEP IF YOU DON'T WANT TO USE LDAP AND YOU ARE JUST TESTING.
+11) OPTIONAL STEP IF YOU DON'T WANT TO USE LDAP AND YOU ARE JUST TESTING.
 Create a local superuser to log in as
 `$ python manage.py createsuperuser`
 You are able to create some other users in the admin page located at http://panopuppet.your-domain.com/admin
 
-15) Restart Httpd service and it should work.
+12) Restart Httpd service and it should work.
 `/etc/init.d/httpd restart`
 
 # Upgrading
@@ -388,7 +385,6 @@ implemented!
 
 Upgrading PanoPuppet has a few new steps now as user profiles and permissions has been implemented.
 Now you should always run the following commands when updating panopuppet.
-`python manage.py collectstatic`
 `python manage.py migrate`
 `python manage.py makemigration`
 If it doesnt apply any changes, that just means that no changes were done to the database for those latest commits.
@@ -398,10 +394,6 @@ NODES_DEFAULT_FACTS - Is a list of facts to be shown on the node report page.
                       Default value is: ['operatingsystem', 'operatingsystemrelease', 'puppetversion', 'kernel', 'kernelrelease', 'ipaddress', 'uptime']
 
 # Available branches
-The master branch has a release which includes:
-* ldap authentication
-* caching
-
 Upcoming branches:
 * no_auth
   * There will be no ldap authentication support included.
