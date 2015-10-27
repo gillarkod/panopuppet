@@ -325,10 +325,6 @@ $ cd /srv/repo/panopuppet
 $ pip install -r requirements.txt
 ```
 
-If you hit any troubles with the python-ldap module you may need to run this command before running the pip install command again.
-This work around was taken from: http://bugs.python.org/issue21121
-`export CFLAGS=$(python3.3 -c 'import sysconfig; print(sysconfig.get_config_var("CFLAGS").replace("-Werror=declaration-after-statement",""))')`
-
 8) This directory will be needed to serve the static files.
 mkdir /srv/staticfiles
 
