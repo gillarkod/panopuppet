@@ -134,7 +134,7 @@ def dashboard_status_json(request):
     context['mismatching_timestamps'] = node_off_timestamps_count
     context['pending_nodes'] = node_pending_count
 
-    return HttpResponse(json.dumps(context), content_type="application/json")
+    return HttpResponse(json.dumps(context, indent=2), content_type="application/json")
 
 
 @login_required
@@ -272,7 +272,7 @@ def dashboard_nodes_json(request):
     context['node_list'] = merged_nodes_list
     context['selected_view'] = dashboard_show
 
-    return HttpResponse(json.dumps(context), content_type="application/json")
+    return HttpResponse(json.dumps(context, indent=2), content_type="application/json")
 
 
 @login_required
@@ -438,4 +438,4 @@ def dashboard_json(request):
     context['mismatching_timestamps'] = node_off_timestamps_count
     context['pending_nodes'] = node_pending_count
 
-    return HttpResponse(json.dumps(context), content_type="application/json")
+    return HttpResponse(json.dumps(context, indent=2), content_type="application/json")

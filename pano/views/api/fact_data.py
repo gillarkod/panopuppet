@@ -91,4 +91,4 @@ def facts_json(request):
     context['certname'] = certname
     context['facts_list'] = facts_list
 
-    return HttpResponse(json.dumps(context), content_type="application/json")
+    return HttpResponse(json.dumps(context, indent=2), content_type="application/json")
