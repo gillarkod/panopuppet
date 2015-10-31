@@ -7,6 +7,7 @@ from django.shortcuts import HttpResponse
 
 from pano.puppetdb import puppetdb
 from pano.puppetdb.puppetdb import get_server
+from pano.methods.dictfuncs import DictDiffer
 
 __author__ = 'etaklar'
 
@@ -86,17 +87,56 @@ def catalogue_compare_json(request, certname1=None, certname2=None):
         api_version='v4',
         params=puppetdb.mk_puppetdb_query(certname1_params, request),
     )
-    certname1_data = json.dumps(certname1_data, indent=2)
     certname2_data = puppetdb.api_get(
         path='/catalogs/%s/%s' % (certname2, show),
         api_url=source_url,
         api_version='v4',
         params=puppetdb.mk_puppetdb_query(certname2_params, request),
     )
-    certname2_data = json.dumps(certname2_data, indent=2)
 
-    from_split_lines = certname1_data.split('\n')
-    to_split_lines = certname2_data.split('\n')
-    diff = difflib.unified_diff(from_split_lines, to_split_lines)
-    diff = ('\n'.join(list(diff)))
-    return HttpResponse(diff)
+    node_for = dict()
+    node_agn = dict()
+    if show == "edges":
+        for edge in certname1_data:
+            # remove the certname tag.
+            edge.pop('certname')
+            source_type = edge['source_type']
+            source_title = edge['source_title']
+            relationship = edge['relationship']
+            target_type = edge['target_type']
+            target_title = edge['target_title']
+            node_for['%s-%s-%s-%s-%s' % (source_type, source_title, relationship, target_type, target_title)] = edge
+
+        for edge in certname2_data:
+            # remove the certname tag.
+            edge.pop('certname')
+            source_type = edge['source_type']
+            source_title = edge['source_title']
+            relationship = edge['relationship']
+            target_type = edge['target_type']
+            target_title = edge['target_title']
+            node_agn['%s-%s-%s-%s-%s' % (source_type, source_title, relationship, target_type, target_title)] = edge
+
+    diff = DictDiffer(node_agn, node_for)
+
+    new_entries = list()
+    rem_entries = list()
+    cha_entries = list()
+    # List of new entries
+    for new_entry in diff.added():
+        new_entries.append(node_agn[new_entry])
+    for rem_entry in diff.removed():
+        rem_entries.append(node_for[rem_entry])
+    for cha_entry in diff.changed():
+        for_entry = node_for[cha_entry]
+        agn_entry = node_agn[cha_entry]
+        cha_entries.append({
+            'from': for_entry,
+            'against': agn_entry
+        })
+    output = {
+        'added_entries': new_entries,
+        'deleted_entries': rem_entries,
+        'changed_entries': cha_entries
+    }
+    return HttpResponse(json.dumps(output, indent=2), content_type="application/json")
