@@ -44,14 +44,14 @@
                             <div class="row">
                                 <form>
                                     <div class="col-md-6">
-                                        <div class="form-group">
+                                        <div class="form-group" id="form-certname1">
                                             <label for="certname-1">Certname</label>
                                             <input type="text" class="form-control" name="node-1" id="node-1"
                                                    placeholder="Search and select a node.">
                                         </div>
                                     </div>
                                     <div class="col-md-6">
-                                        <div class="form-group">
+                                        <div class="form-group" id="form-certname2">
                                             <label for="certname-2">Certname </label>
                                             <input type="text" class="form-control" id="node-2"
                                                    placeholder="Compare with node to the left.">
@@ -67,12 +67,24 @@
                                         <a href="#" id="resources" class="btn btn-default btn-xs"
                                            role="button">Resources</a>
                                     </div>
+                                    <div id="diff_button" class="btn-group" role="group" aria-label="...">
+                                        <a href="#" id="compare" class="btn btn-default btn-xs"
+                                           role="button">Diff View</a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <table id="diff-table" class="table table-condensed table-striped">
+                <tbody id="diff-tbody" style="font-size: 11px;">
+                </tbody>
+            </table>
         </div>
     </div>
     <div class="row">

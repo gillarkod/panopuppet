@@ -56,11 +56,13 @@ def catalogue_json(request, certname=None):
 def catalogue_compare_json(request, certname1=None, certname2=None):
     source_url, source_certs, source_verify = get_server(request)
     show = request.GET.get('show', 'edges')
+
     if show is not None and show in ['edges', 'resources']:
         if show == 'edges':
             sort_field = 'source_title'
         elif show == 'resources':
             sort_field = 'title'
+
     certname1_params = {
         'order_by':
             {
@@ -96,7 +98,9 @@ def catalogue_compare_json(request, certname1=None, certname2=None):
 
     node_for = dict()
     node_agn = dict()
+
     if show == "edges":
+
         for edge in certname1_data:
             # remove the certname tag.
             edge.pop('certname')
@@ -117,16 +121,32 @@ def catalogue_compare_json(request, certname1=None, certname2=None):
             target_title = edge['target_title']
             node_agn['%s-%s-%s-%s-%s' % (source_type, source_title, relationship, target_type, target_title)] = edge
 
+    elif show == "resources":
+        for resource in certname1_data:
+            # remove the certname tag.
+            resource.pop('certname')
+            resource_id = resource['resource']
+            node_for[resource_id] = resource
+
+        for resource in certname2_data:
+            # remove the certname tag.
+            resource.pop('certname')
+            resource_id = resource['resource']
+            node_agn[resource_id] = resource
+
     diff = DictDiffer(node_agn, node_for)
 
     new_entries = list()
     rem_entries = list()
     cha_entries = list()
+
     # List of new entries
     for new_entry in diff.added():
         new_entries.append(node_agn[new_entry])
+
     for rem_entry in diff.removed():
         rem_entries.append(node_for[rem_entry])
+
     for cha_entry in diff.changed():
         for_entry = node_for[cha_entry]
         agn_entry = node_agn[cha_entry]
@@ -134,9 +154,11 @@ def catalogue_compare_json(request, certname1=None, certname2=None):
             'from': for_entry,
             'against': agn_entry
         })
+
     output = {
         'added_entries': new_entries,
         'deleted_entries': rem_entries,
         'changed_entries': cha_entries
     }
+
     return HttpResponse(json.dumps(output, indent=2), content_type="application/json")
