@@ -283,7 +283,8 @@ def nodes_json(request):
                            'Success',
                            'Noop',
                            'Failure',
-                           'Skipped']
+                           'Skipped',
+                           'Run Status']
             if include_facts is not False:
                 merged_list_facts = []
                 facts = {}
