@@ -1,7 +1,6 @@
 arrow
 Django
-django-auth-ldap==1.2.5
-git+https://github.com/rbarrois/python-ldap.git
+django-auth-ldap==1.2.7
 pytz
 pyyaml
 requests
