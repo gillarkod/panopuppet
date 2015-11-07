@@ -291,7 +291,7 @@ $ sudo yum install http://dl.iuscommunity.org/pub/ius/stable/CentOS/6/x86_64/ius
 `$ sudo yum install python33 python33-devel openldap-devel cyrus-sasl-devel gcc make`
 ```
 Side note: You should install virtualenv if you do not already use it because its fantastic.
-$ sudo yum install virtualenv virtualenvwrapper
+$ sudo yum install python-virtualenv python-virtualenvwrapper
 ```
 
 3) Install httpd and mod_wsgi for python33
