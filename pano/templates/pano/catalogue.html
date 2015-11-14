@@ -34,7 +34,8 @@
                         <h4 class="panel-title">
                             <a data-toggle="collapse" data-parent="#filters_accordion" href="#collapseFilter"
                                aria-expanded="false" aria-controls="collapseFilter">
-                                Catalog Tool
+                                Catalog
+                                <Tool></Tool>
                             </a>
                         </h4>
                     </div>
@@ -68,7 +69,8 @@
                                            role="button">Resources</a>
                                     </div>
                                     <div id="diff_button" class="btn-group" role="group" aria-label="...">
-                                        <a href="#" id="compare" class="btn btn-default btn-xs"
+                                        <a onclick='compare(); return false;' href="#" id="compare"
+                                           class="btn btn-default btn-xs"
                                            role="button">Diff View</a>
                                     </div>
                                 </div>
@@ -79,12 +81,56 @@
             </div>
         </div>
     </div>
-    <div class="row">
+    <div class="row" id="diff-div-add-rem" hidden>
         <div class="col-md-12">
-            <table id="diff-table" class="table table-condensed table-striped">
-                <tbody id="diff-tbody" style="font-size: 11px;">
-                </tbody>
-            </table>
+            <!-- Added Resources -->
+            <div class="col-md-6">
+                <div class="row col-margin">
+                    <div class="page-header" style="margin-top: 0">
+                        <h3>Additions</h3>
+                    </div>
+                </div>
+                <div class="row col-margin" id="diff-added" style="word-wrap: break-word;">
+                </div>
+            </div>
+            <!-- Removed Resources -->
+            <div class="col-md-6">
+                <div class="row col-margin">
+                    <div class="page-header" style="margin-top: 0">
+                        <h3>Removals</h3>
+                    </div>
+                </div>
+                <div class="row col-margin" id="diff-removed" style="word-wrap: break-word;">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" id="diff-div-change" hidden>
+        <div class="col-md-12">
+            <!-- Changed Resources -->
+            <div class="col-md-12">
+                <div class="row col-margin">
+                    <div class="page-header" style="margin-top: 0">
+                        <h3>Changes</h3>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="row col-margin" id="diff-changed-from" style="word-wrap: break-word;">
+                            <div class="bs-callout bs-callout-info">
+                                <samp class="text-info">swag changed from</samp>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="row col-margin" id="diff-changed-to" style="word-wrap: break-word;">
+                            <div class="bs-callout bs-callout-warning">
+                                <samp class="text-warning">swag changed to</samp>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     <div class="row">
