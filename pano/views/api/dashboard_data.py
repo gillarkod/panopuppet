@@ -97,7 +97,7 @@ def dashboard_status_json(request):
     avg_resource_node = puppetdb_results['avg_resource']
     # Information about all active nodes in puppet
     all_nodes_list = puppetdb_results['all_nodes']
-    all_nodes_dict = {item['certname']: item for item in all_nodes_list}
+
     # All available events for the latest puppet reports
     event_list = puppetdb_results['event_counts']
     event_dict = {item['subject']['title']: item for item in event_list}
@@ -105,7 +105,7 @@ def dashboard_status_json(request):
     reports_list = puppetdb_results['reports']
     reports_dict = {item['certname']: item for item in reports_list}
 
-    failed_list, changed_list, unreported_list, mismatch_list, pending_list = dictstatus(all_nodes_dict,
+    failed_list, changed_list, unreported_list, mismatch_list, pending_list = dictstatus(all_nodes_list,
                                                                                          reports_dict,
                                                                                          event_dict,
                                                                                          sort=True,
@@ -230,7 +230,6 @@ def dashboard_nodes_json(request):
     puppetdb_results = run_puppetdb_jobs(jobs)
     # Information about all active nodes in puppet
     all_nodes_list = puppetdb_results['all_nodes']
-    all_nodes_dict = {item['certname']: item for item in all_nodes_list}
     # All available events for the latest puppet reports
     event_list = puppetdb_results['event_counts']
     event_dict = {item['subject']['title']: item for item in event_list}
@@ -239,9 +238,8 @@ def dashboard_nodes_json(request):
     reports_dict = {item['certname']: item for item in reports_list}
     # 25 Nodes
     node_list = puppetdb_results['nodes']
-    node_dict = {item['certname']: item for item in node_list}
 
-    failed_list, changed_list, unreported_list, mismatch_list, pending_list = dictstatus(all_nodes_dict,
+    failed_list, changed_list, unreported_list, mismatch_list, pending_list = dictstatus(all_nodes_list,
                                                                                          reports_dict,
                                                                                          event_dict,
                                                                                          sort=True,
@@ -256,7 +254,7 @@ def dashboard_nodes_json(request):
 
     if dashboard_show == 'recent':
         merged_nodes_list = dictstatus(
-            node_dict, reports_dict, event_dict, sort=False, get_status="all", puppet_run_time=puppet_run_time)
+            node_list, reports_dict, event_dict, sort=False, get_status="all", puppet_run_time=puppet_run_time)
     elif dashboard_show == 'failed':
         merged_nodes_list = failed_list
     elif dashboard_show == 'unreported':
@@ -269,7 +267,7 @@ def dashboard_nodes_json(request):
         merged_nodes_list = pending_list
     else:
         merged_nodes_list = dictstatus(
-            node_dict, reports_dict, event_dict, sort=False, get_status="all", puppet_run_time=puppet_run_time)
+            node_list, reports_dict, event_dict, sort=False, get_status="all", puppet_run_time=puppet_run_time)
 
     context['node_list'] = merged_nodes_list
     context['selected_view'] = dashboard_show
@@ -383,7 +381,6 @@ def dashboard_json(request):
     avg_resource_node = puppetdb_results['avg_resource']
     # Information about all active nodes in puppet
     all_nodes_list = puppetdb_results['all_nodes']
-    all_nodes_dict = {item['certname']: item for item in all_nodes_list}
     # All available events for the latest puppet reports
     event_list = puppetdb_results['event_counts']
     event_dict = {item['subject']['title']: item for item in event_list}
@@ -392,9 +389,8 @@ def dashboard_json(request):
     reports_dict = {item['certname']: item for item in reports_list}
     # 25 Nodes
     node_list = puppetdb_results['nodes']
-    node_dict = {item['certname']: item for item in node_list}
 
-    failed_list, changed_list, unreported_list, mismatch_list, pending_list = dictstatus(all_nodes_dict,
+    failed_list, changed_list, unreported_list, mismatch_list, pending_list = dictstatus(all_nodes_list,
                                                                                          reports_dict,
                                                                                          event_dict,
                                                                                          sort=True,
@@ -416,7 +412,7 @@ def dashboard_json(request):
 
     if dashboard_show == 'recent':
         merged_nodes_list = dictstatus(
-            node_dict, reports_dict, event_dict, sort=False, get_status="all", puppet_run_time=puppet_run_time)
+            node_list, reports_dict, event_dict, sort=False, get_status="all", puppet_run_time=puppet_run_time)
     elif dashboard_show == 'failed':
         merged_nodes_list = failed_list
     elif dashboard_show == 'unreported':
@@ -429,7 +425,7 @@ def dashboard_json(request):
         merged_nodes_list = pending_list
     else:
         merged_nodes_list = dictstatus(
-            node_dict, reports_dict, event_dict, sort=False, get_status="all", puppet_run_time=puppet_run_time)
+            node_list, reports_dict, event_dict, sort=False, get_status="all", puppet_run_time=puppet_run_time)
 
     context['node_list'] = merged_nodes_list
     context['selected_view'] = dashboard_show

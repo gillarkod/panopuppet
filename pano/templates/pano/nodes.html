@@ -169,7 +169,7 @@
                 $('#nodePaneTitle').html('Query Results - Number of results: ' + response[0]['total_nodes']);
 
                 // update glyphicons
-                var sortfield = ['certname', 'catalog-timestamp', 'facts-timestamp', 'report-timestamp', 'successes', 'failures', 'noops', 'skips'];
+                var sortfield = ['certname', 'catalog_timestamp', 'facts_timestamp', 'report_timestamp', 'successes', 'failures', 'noops', 'skips'];
 
                 sortfield.forEach(function (field) {
                     var fieldHeader = $('#' + field + '-header');
@@ -392,17 +392,17 @@
                                 <a id="certname-link" onclick="refresh_data(this).done(); return false;"
                                    href="?sortfield=certname">Certname <span class="glyphicon glyphicon"></span></a>
                             </th>
-                            <th id="catalog-timestamp-header">
-                                <a id="catalog-timestamp-link" onclick="refresh_data(this).done(); return false;"
+                            <th id="catalog_timestamp-header">
+                                <a id="catalog_timestamp-link" onclick="refresh_data(this).done(); return false;"
                                    href="?sortfield=catalog_timestamp">Catalog Timestamp <span class="glyphicon"></span></a>
                             </th>
-                            <th id="report-timestamp-header">
-                                <a id="report-timestamp-link" onclick="refresh_data(this).done(); return false;"
+                            <th id="report_timestamp-header">
+                                <a id="report_timestamp-link" onclick="refresh_data(this).done(); return false;"
                                    href="?sortfield=report_timestamp">Report Timestamp <span
                                         class="glyphicon"></span></a>
                             </th>
-                            <th id="facts-timestamp-header">
-                                <a id="facts-timestamp-link" onclick="refresh_data(this).done(); return false;"
+                            <th id="facts_timestamp-header">
+                                <a id="facts_timestamp-link" onclick="refresh_data(this).done(); return false;"
                                    href="?sortfield=facts_timestamp">Facts Timestamp <span class="glyphicon"></span></a>
                             </th>
                             <th id="successes-header">
