@@ -86,7 +86,7 @@ DATABASES = {
 # Authentication
 # Ldap authentication
 from pano.settings import AUTH_METHOD, LDAP_SERVER, LDAP_BIND_DN, LDAP_BIND_PW, LDAP_ALLOW_GRP, LDAP_USEARCH_PATH, \
-    LDAP_GSEARCH_PATH, STAFF_GRP, SUPERUSER_GRP
+    LDAP_GSEARCH_PATH, STAFF_GRP, SUPERUSER_GRP, ACTIVE_GRP
 
 if AUTH_METHOD == 'ldap':
     import ldap
@@ -105,10 +105,13 @@ if AUTH_METHOD == 'ldap':
                                         ldap.SCOPE_SUBTREE, "(objectClass=Group)")
     AUTH_LDAP_GROUP_TYPE = ActiveDirectoryGroupType()
 
-    AUTH_LDAP_USER_FLAGS_BY_GROUP = {
-        "is_staff": STAFF_GRP,
-        "is_superuser": SUPERUSER_GRP
-    }
+    AUTH_LDAP_USER_FLAGS_BY_GROUP = dict()
+    if ACTIVE_GRP:
+        AUTH_LDAP_USER_FLAGS_BY_GROUP['is_active'] = ACTIVE_GRP
+    if STAFF_GRP:
+        AUTH_LDAP_USER_FLAGS_BY_GROUP['is_staff'] = STAFF_GRP
+    if SUPERUSER_GRP:
+        AUTH_LDAP_USER_FLAGS_BY_GROUP['is_superuser'] = SUPERUSER_GRP
 
     AUTH_LDAP_CACHE_GROUPS = True
     AUTH_LDAP_GROUP_CACHE_TIMEOUT = 3600
@@ -137,7 +140,7 @@ if AUTH_METHOD == 'ldap':
                 'class': 'django.utils.log.AdminEmailHandler'
             },
             'stream_to_console': {
-                'level': 'ERROR',
+                'level': 'DEBUG',
                 'class': 'logging.StreamHandler'
             },
         },
@@ -149,7 +152,7 @@ if AUTH_METHOD == 'ldap':
             },
             'django_auth_ldap': {
                 'handlers': ['stream_to_console'],
-                'level': 'ERROR',
+                'level': 'DEBUG',
                 'propagate': True,
             },
         }
