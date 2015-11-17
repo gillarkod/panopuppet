@@ -12,10 +12,10 @@ def sort_table(table, col=0, order=False):
     return sorted(table, reverse=order, key=lambda field: field[col])
 
 
-def dictstatus(node_dict, reports_dict, status_dict, sort=True, sortby=None, asc=False, get_status="all",
+def dictstatus(node_list, reports_dict, status_dict, sort=True, sortby=None, asc=False, get_status="all",
                puppet_run_time=PUPPET_RUN_INTERVAL):
     """
-    :param node_dict: dict
+    :param node_list: dict
     :param status_dict: dict
     :param sortby: Takes a field name to sort by 'certname', 'latestCatalog', 'latestReport', 'latestFacts', 'success', 'noop', 'failure', 'skipped'
     :param get_status: Status type to return. all, changed, failed, unreported, noops
@@ -136,20 +136,20 @@ def dictstatus(node_dict, reports_dict, status_dict, sort=True, sortby=None, asc
     # if sort field is certname or catalog/report/facts_timestamp then we will sort this way
     # or if the get_status is set to "not_all" indicating that the dashboard wants info.
     if get_status != 'all':
-        for node_name, data in node_dict.items():
+        for node in node_list:
             node_is_unreported = False
             node_has_mismatching_timestamps = False
             # Check if its unreported.
-            if is_unreported(data['report_timestamp']):
+            if is_unreported(node['report_timestamp']):
                 node_is_unreported = True
-            if check_failed_compile(report_timestamp=data.get('report_timestamp', None),
-                                    fact_timestamp=data.get('facts_timestamp', None),
-                                    catalog_timestamp=data.get('catalog_timestamp', None)):
+            if check_failed_compile(report_timestamp=node.get('report_timestamp', None),
+                                    fact_timestamp=node.get('facts_timestamp', None),
+                                    catalog_timestamp=node.get('catalog_timestamp', None)):
                 node_has_mismatching_timestamps = True
             # Check for the latest report.
-            if node_name in reports_dict:
+            if node['certname'] in reports_dict:
                 # Check which status the run is.
-                report_status = reports_dict[node_name]['status']
+                report_status = reports_dict[node['certname']]['status']
 
                 """
                 Can be used later but right now we just utilize the event-counts response.
@@ -159,38 +159,37 @@ def dictstatus(node_dict, reports_dict, status_dict, sort=True, sortby=None, asc
                 """
 
                 # Collect the number of events for each node in its latest report.
-                if node_name in status_dict:
+                if node['certname'] in status_dict:
                     # If the puppet status is changed but there are noop events set to pending.
-                    if report_status == 'unchanged' and status_dict[node_name]['noops'] > 0:
+                    if report_status == 'unchanged' and status_dict[node['certname']]['noops'] > 0:
                         report_status = 'pending'
                 # If there is no status events for the latest report then send an empty list to append_list function
                 else:
                     # Add an empty status_dict for the node.
-                    status_dict[node_name] = {}
+                    status_dict[node['certname']] = {}
 
                 # If theres no report for this node ... panic no idea how to handle this yet. If it can even happen?
                 # Check if its an unreported longer than the unreported time.
                 if node_is_unreported is True:
                     # Append to the unreported list.
-                    unreported_list = append_list(data, status_dict[node_name], unreported_list, report_status)
+                    unreported_list = append_list(node, status_dict[node['certname']], unreported_list, report_status)
                 # If its got mismatching timestamps put it in the mismatching list
                 if node_has_mismatching_timestamps is True:
-                    mismatch_list = append_list(data, status_dict[node_name], mismatch_list, report_status)
+                    mismatch_list = append_list(node, status_dict[node['certname']], mismatch_list, report_status)
                 # If the node is not unreported or has mismatching timestamps.. proceed to put in the correct lists.
                 if report_status == 'changed':
-                    changed_list = append_list(data, status_dict[node_name], changed_list, report_status)
+                    changed_list = append_list(node, status_dict[node['certname']], changed_list, report_status)
                 elif report_status == 'failed':
-                    failed_list = append_list(data, status_dict[node_name], failed_list, report_status)
+                    failed_list = append_list(node, status_dict[node['certname']], failed_list, report_status)
                 elif report_status == 'pending':
-                    pending_list = append_list(data, status_dict[node_name], pending_list, report_status)
+                    pending_list = append_list(node, status_dict[node['certname']], pending_list, report_status)
 
     elif sortbycol <= 3 and get_status == 'all':
-        for node_name, data in node_dict.items():
+        for node in node_list:
             # Check for the latest report.
-            if node_name in reports_dict:
+            if node['certname'] in reports_dict:
                 # Check which status the run is.
-                report_status = reports_dict[node_name]['status']
-
+                report_status = reports_dict[node['certname']]['status']
                 """
                 Can be used later but right now we just utilize the event-counts response.
                 # Dictify the metrics for the report.
@@ -198,24 +197,26 @@ def dictstatus(node_dict, reports_dict, status_dict, sort=True, sortby=None, asc
                                 reports_dict[node_name]['metrics']['data']}
                 """
             # Collect the number of events for each node in its latest report.
-            if node_name in status_dict:
+            if node['certname'] in status_dict:
                 # If the puppet status is changed but there are noop events set to pending.
-                if status_dict[node_name]:
-                    if report_status == 'unchanged' and status_dict[node_name]['noops'] > 0:
+                if status_dict[node['certname']]:
+                    if report_status == 'unchanged' and status_dict[node['certname']]['noops'] > 0:
                         report_status = 'pending'
             # If there is no status events for the latest report then send an empty list to append_list function
             else:
                 # Add an empty status_dict for the node.
-                status_dict[node_name] = {}
-            merged_list = append_list(data, status_dict[node_name], merged_list, report_status)
+                status_dict[node['certname']] = {}
+            merged_list = append_list(node, status_dict[node['certname']], merged_list, report_status)
     # Only used when orderby is a status field.
     elif sortbycol >= 4 and get_status == 'all':
-        for status in status_dict:
-            if status['subject']['title'] in reports_dict:
+        sort = True
+        node_dict = {item['certname']: item for item in node_list}
+        for status, value in status_dict.items():
+            if value['subject']['title'] in reports_dict:
                 # Check which status the run is.
-                report_status = reports_dict[status['subject']['title']]['status']
-            if status['subject']['title'] in node_dict:
-                merged_list = append_list(node_dict[status['subject']['title']], status, merged_list, report_status)
+                report_status = reports_dict[value['subject']['title']]['status']
+            if value['subject']['title'] in node_dict and report_status:
+                merged_list = append_list(node_dict[value['subject']['title']], value, merged_list, report_status)
 
     # Sort the lists if sort is True
     if sort and get_status == 'all':

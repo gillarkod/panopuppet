@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+
 from django.template import defaultfilters as filters
 from django.test import TestCase
 from django.utils.timezone import localtime
@@ -54,8 +55,8 @@ class MergeNodeEventData(TestCase):
             },
         }
 
-        nodes_data = {
-            'failed-node.example.com': {
+        nodes_data = [
+            {
                 'catalog_environment': 'production',
                 'catalog_timestamp': nodes_timestamps['failed-node']['catalog'],
                 'certname': 'failed-node.example.com',
@@ -65,7 +66,7 @@ class MergeNodeEventData(TestCase):
                 'report_environment': 'production',
                 'report_timestamp': nodes_timestamps['failed-node']['report']
             },
-            'missmatch-node1.example.com': {
+            {
                 'catalog_environment': 'production',
                 'catalog_timestamp': nodes_timestamps['missmatch-node1']['catalog'],
                 'certname': 'missmatch-node1.example.com',
@@ -75,7 +76,7 @@ class MergeNodeEventData(TestCase):
                 'report_environment': 'production',
                 'report_timestamp': nodes_timestamps['missmatch-node1']['report']
             },
-            'missmatch-node2.example.com': {
+            {
                 'catalog_environment': 'production',
                 'catalog_timestamp': nodes_timestamps['missmatch-node2']['catalog'],
                 'certname': 'missmatch-node2.example.com',
@@ -85,7 +86,7 @@ class MergeNodeEventData(TestCase):
                 'report_environment': 'production',
                 'report_timestamp': nodes_timestamps['missmatch-node2']['report']
             },
-            'missmatch-node3.example.com': {
+            {
                 'catalog_environment': 'production',
                 'catalog_timestamp': nodes_timestamps['missmatch-node3']['catalog'],
                 'certname': 'missmatch-node3.example.com',
@@ -95,7 +96,7 @@ class MergeNodeEventData(TestCase):
                 'report_environment': 'production',
                 'report_timestamp': nodes_timestamps['missmatch-node3']['report']
             },
-            'unreported-node.example.com': {
+            {
                 'catalog_environment': 'production',
                 'catalog_timestamp': nodes_timestamps['unreported-node']['catalog'],
                 'certname': 'unreported-node.example.com',
@@ -105,7 +106,7 @@ class MergeNodeEventData(TestCase):
                 'report_environment': 'production',
                 'report_timestamp': nodes_timestamps['unreported-node']['report']
             },
-            'changed-node.example.com': {
+            {
                 'catalog_environment': 'production',
                 'catalog_timestamp': nodes_timestamps['changed-node']['catalog'],
                 'certname': 'changed-node.example.com',
@@ -115,7 +116,7 @@ class MergeNodeEventData(TestCase):
                 'report_environment': 'production',
                 'report_timestamp': nodes_timestamps['changed-node']['report']
             },
-            'unchanged-node.example.com': {
+            {
                 'catalog_environment': 'production',
                 'catalog_timestamp': nodes_timestamps['unchanged-node']['catalog'],
                 'certname': 'unchanged-node.example.com',
@@ -125,7 +126,7 @@ class MergeNodeEventData(TestCase):
                 'report_environment': 'production',
                 'report_timestamp': nodes_timestamps['unchanged-node']['report'],
             },
-            'pending-node.example.com': {
+            {
                 'catalog_environment': 'production',
                 'catalog_timestamp': nodes_timestamps['pending-node']['catalog'],
                 'certname': 'pending-node.example.com',
@@ -134,7 +135,7 @@ class MergeNodeEventData(TestCase):
                 'facts_timestamp': nodes_timestamps['pending-node']['facts'],
                 'report_environment': 'production',
                 'report_timestamp': nodes_timestamps['pending-node']['report'],
-            }}
+            }]
 
         events_data = {
             'changed-node.example.com': {
@@ -414,8 +415,8 @@ class MergeNodeEventData(TestCase):
             },
         }
 
-        nodes_data = {
-            'failed-node.example.com': {
+        nodes_data = [
+            {
                 'catalog_environment': 'production',
                 'catalog_timestamp': nodes_timestamps['failed-node']['catalog'],
                 'certname': 'failed-node.example.com',
@@ -425,7 +426,7 @@ class MergeNodeEventData(TestCase):
                 'report_environment': 'production',
                 'report_timestamp': nodes_timestamps['failed-node']['report']
             },
-            'missmatch-node1.example.com': {
+            {
                 'catalog_environment': 'production',
                 'catalog_timestamp': nodes_timestamps['missmatch-node1']['catalog'],
                 'certname': 'missmatch-node1.example.com',
@@ -435,7 +436,7 @@ class MergeNodeEventData(TestCase):
                 'report_environment': 'production',
                 'report_timestamp': nodes_timestamps['missmatch-node1']['report']
             },
-            'missmatch-node2.example.com': {
+            {
                 'catalog_environment': 'production',
                 'catalog_timestamp': nodes_timestamps['missmatch-node2']['catalog'],
                 'certname': 'missmatch-node2.example.com',
@@ -445,7 +446,7 @@ class MergeNodeEventData(TestCase):
                 'report_environment': 'production',
                 'report_timestamp': nodes_timestamps['missmatch-node2']['report']
             },
-            'missmatch-node3.example.com': {
+            {
                 'catalog_environment': 'production',
                 'catalog_timestamp': nodes_timestamps['missmatch-node3']['catalog'],
                 'certname': 'missmatch-node3.example.com',
@@ -455,7 +456,7 @@ class MergeNodeEventData(TestCase):
                 'report_environment': 'production',
                 'report_timestamp': nodes_timestamps['missmatch-node3']['report']
             },
-            'unreported-node.example.com': {
+            {
                 'catalog_environment': 'production',
                 'catalog_timestamp': nodes_timestamps['unreported-node']['catalog'],
                 'certname': 'unreported-node.example.com',
@@ -465,7 +466,7 @@ class MergeNodeEventData(TestCase):
                 'report_environment': 'production',
                 'report_timestamp': nodes_timestamps['unreported-node']['report']
             },
-            'changed-node.example.com': {
+            {
                 'catalog_environment': 'production',
                 'catalog_timestamp': nodes_timestamps['changed-node']['catalog'],
                 'certname': 'changed-node.example.com',
@@ -475,7 +476,7 @@ class MergeNodeEventData(TestCase):
                 'report_environment': 'production',
                 'report_timestamp': nodes_timestamps['changed-node']['report']
             },
-            'unchanged-node.example.com': {
+            {
                 'catalog_environment': 'production',
                 'catalog_timestamp': nodes_timestamps['unchanged-node']['catalog'],
                 'certname': 'unchanged-node.example.com',
@@ -485,7 +486,7 @@ class MergeNodeEventData(TestCase):
                 'report_environment': 'production',
                 'report_timestamp': nodes_timestamps['unchanged-node']['report'],
             },
-            'pending-node.example.com': {
+            {
                 'catalog_environment': 'production',
                 'catalog_timestamp': nodes_timestamps['pending-node']['catalog'],
                 'certname': 'pending-node.example.com',
@@ -495,7 +496,7 @@ class MergeNodeEventData(TestCase):
                 'report_environment': 'production',
                 'report_timestamp': nodes_timestamps['pending-node']['report'],
             }
-        }
+        ]
 
         events_data = {
             'changed-node.example.com': {
