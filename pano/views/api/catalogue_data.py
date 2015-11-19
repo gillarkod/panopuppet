@@ -1,13 +1,13 @@
 import json
-import difflib
 
 from django.contrib.auth.decorators import login_required
-
+from django.http import HttpResponseBadRequest
 from django.shortcuts import HttpResponse
 
+from pano.methods.dictfuncs import DictDiffer
+from pano.models import SavedCatalogs
 from pano.puppetdb import puppetdb
 from pano.puppetdb.puppetdb import get_server
-from pano.methods.dictfuncs import DictDiffer
 
 __author__ = 'etaklar'
 
@@ -15,6 +15,7 @@ __author__ = 'etaklar'
 @login_required
 def catalogue_json(request, certname=None):
     context = dict()
+    data = dict()
     if not certname:
         context['error'] = 'Must specify certname.'
         return HttpResponse(json.dumps(context), content_type="application/json")
@@ -22,13 +23,16 @@ def catalogue_json(request, certname=None):
 
     # Redirects to the events page if GET param latest is true..
     show = request.GET.get('show', None)
-    reports_params = {}
+    save_catalog = request.GET.get('save', 'false')
+
+    catalogue_params = {}
+
     if show is not None and show in ['edges', 'resources']:
         if show == 'edges':
             sort_field = 'source_title'
         elif show == 'resources':
             sort_field = 'title'
-        reports_params = {
+        catalogue_params = {
             'order_by':
                 {
                     'order_field':
@@ -42,14 +46,74 @@ def catalogue_json(request, certname=None):
     else:
         path = '/catalogs/%s' % certname
 
-    reports_list = puppetdb.api_get(
+    catalogue = puppetdb.api_get(
         path=path,
         api_url=source_url,
         api_version='v4',
-        params=puppetdb.mk_puppetdb_query(reports_params, request),
+        params=puppetdb.mk_puppetdb_query(catalogue_params, request),
     )
-    data = {'data': reports_list}
-    return HttpResponse(json.dumps(data, indent=2), content_type="application/json")
+    if 'error' not in catalogue and save_catalog == 'true':
+        report_param = {
+            'query':
+                {
+                    'operator': 'and',
+                    1: '["=","latest_report?",true]',
+                    2: '["=","certname","%s"]' % certname
+                }
+        }
+        report_url = '/reports'
+        latest_report = puppetdb.api_get(
+            path=report_url,
+            api_url=source_url,
+            api_version='v4',
+            params=puppetdb.mk_puppetdb_query(report_param, request),
+        )
+
+        report_hash = latest_report[0]['hash']
+        catalogue_hash = catalogue['hash']
+        catalogue_timestamp = catalogue['producer_timestamp']
+
+        try:
+            saved_catalogue = SavedCatalogs.objects.get(hostname=certname, catalogue_id=catalogue_hash)
+
+            if saved_catalogue.linked_report != report_hash:
+                # Grab the linked report from the result set.
+                old_linked_report = saved_catalogue.linked_report
+
+                # Update the data.
+                saved_catalogue.linked_report = report_hash
+                saved_catalogue.timestamp = catalogue_timestamp
+
+                # Save the new data.
+                saved_catalogue.save()
+
+                data['success'] = 'Catalogue hash updated.'
+                data['certname'] = certname
+                data['old_linked_report'] = old_linked_report
+                data['new_linked_report'] = report_hash
+                return HttpResponse(json.dumps(data, indent=2), content_type='application/json')
+            else:
+                data['error'] = 'Catalogue hash already exists.'
+                data['certname'] = certname
+                data['catalogue_hash'] = catalogue_hash
+                data['linked_report'] = saved_catalogue.linked_report
+                return HttpResponseBadRequest(json.dumps(data, indent=2), content_type='application/json')
+
+        except SavedCatalogs.DoesNotExist:
+            # since we couldnt find it in the db its safe to asusme that we can create it!
+            SavedCatalogs.objects.create(hostname=certname,
+                                         catalogue_id=catalogue_hash,
+                                         linked_report=report_hash,
+                                         timestamp=catalogue_timestamp,
+                                         catalogue=catalogue)
+            data['success'] = 'Saved catalogue.'
+            data['certname'] = certname
+            data['catalogue_hash'] = catalogue_hash
+            data['linked_report'] = report_hash
+            return HttpResponse(json.dumps(data, indent=2), content_type='application/json')
+
+    data['data'] = catalogue
+    return HttpResponse(json.dumps(data, indent=2), content_type='application/json')
 
 
 @login_required

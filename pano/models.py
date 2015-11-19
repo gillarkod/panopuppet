@@ -23,9 +23,10 @@ class SavedQueries(models.Model):
 
 
 @python_2_unicode_compatible
-class SavedCatlaogs(models.Model):
+class SavedCatalogs(models.Model):
     id = models.AutoField(primary_key=True)
-    username = models.CharField(max_length=24)
-    catalog_id = models.CharField(max_length=50)
+    hostname = models.CharField(max_length=255)
+    catalogue_id = models.CharField(max_length=50)
+    linked_report = models.CharField(max_length=50)
     timestamp = models.DateTimeField()
-    catalog = models.TextField()
+    catalogue = models.TextField()
