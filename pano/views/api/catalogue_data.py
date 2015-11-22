@@ -3,6 +3,8 @@ import json
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseBadRequest
 from django.shortcuts import HttpResponse
+from django.template import defaultfilters as filters
+from django.utils.timezone import localtime
 
 from pano.methods.dictfuncs import DictDiffer
 from pano.models import SavedCatalogs
@@ -105,7 +107,7 @@ def catalogue_json(request, certname=None):
                                          catalogue_id=catalogue_hash,
                                          linked_report=report_hash,
                                          timestamp=catalogue_timestamp,
-                                         catalogue=catalogue)
+                                         catalogue=json.dumps(catalogue))
             data['success'] = 'Saved catalogue.'
             data['certname'] = certname
             data['catalogue_hash'] = catalogue_hash
@@ -120,6 +122,9 @@ def catalogue_json(request, certname=None):
 def catalogue_compare_json(request, certname1=None, certname2=None):
     source_url, source_certs, source_verify = get_server(request)
     show = request.GET.get('show', 'edges')
+    data = dict()
+    certname1_hash = request.GET.get('certname1_hash', False)
+    certname2_hash = request.GET.get('certname2_hash', False)
 
     if show is not None and show in ['edges', 'resources']:
         if show == 'edges':
@@ -147,27 +152,50 @@ def catalogue_compare_json(request, certname1=None, certname2=None):
                     },
             }
     }
-    certname1_data = puppetdb.api_get(
-        path='/catalogs/%s/%s' % (certname1, show),
-        api_url=source_url,
-        api_version='v4',
-        params=puppetdb.mk_puppetdb_query(certname1_params, request),
-    )
-    certname2_data = puppetdb.api_get(
-        path='/catalogs/%s/%s' % (certname2, show),
-        api_url=source_url,
-        api_version='v4',
-        params=puppetdb.mk_puppetdb_query(certname2_params, request),
-    )
+
+    if certname1_hash:
+        try:
+            certname1_result = SavedCatalogs.objects.get(hostname=certname1, catalogue_id=certname1_hash)
+            certname1_data = json.loads(certname1_result.catalogue)[show]['data']
+        except SavedCatalogs.DoesNotExist:
+            data['error'] = 'Catalogue hash not found in DB.'
+            data['hash_not_found'] = certname1_hash
+            data['certname'] = certname1
+            HttpResponseBadRequest()
+    else:
+        certname1_data = puppetdb.api_get(
+            path='/catalogs/%s/%s' % (certname1, show),
+            api_url=source_url,
+            api_version='v4',
+            params=puppetdb.mk_puppetdb_query(certname1_params, request),
+        )
+    if certname2_hash:
+        try:
+            certname2_result = SavedCatalogs.objects.get(hostname=certname2, catalogue_id=certname2_hash)
+            certname2_data = json.loads(certname2_result.catalogue)[show]['data']
+        except SavedCatalogs.DoesNotExist:
+            data['error'] = 'Catalogue hash not found in DB.'
+            data['hash_not_found'] = certname2_hash
+            data['certname'] = certname2
+            HttpResponseBadRequest()
+    else:
+        certname2_data = puppetdb.api_get(
+            path='/catalogs/%s/%s' % (certname2, show),
+            api_url=source_url,
+            api_version='v4',
+            params=puppetdb.mk_puppetdb_query(certname2_params, request),
+        )
 
     node_for = dict()
     node_agn = dict()
 
     if show == "edges":
-
         for edge in certname1_data:
             # remove the certname tag.
-            edge.pop('certname')
+            try:
+                edge.pop('certname')
+            except:
+                pass
             source_type = edge['source_type']
             source_title = edge['source_title']
             relationship = edge['relationship']
@@ -177,7 +205,10 @@ def catalogue_compare_json(request, certname1=None, certname2=None):
 
         for edge in certname2_data:
             # remove the certname tag.
-            edge.pop('certname')
+            try:
+                edge.pop('certname')
+            except:
+                pass
             source_type = edge['source_type']
             source_title = edge['source_title']
             relationship = edge['relationship']
@@ -188,13 +219,19 @@ def catalogue_compare_json(request, certname1=None, certname2=None):
     elif show == "resources":
         for resource in certname1_data:
             # remove the certname tag.
-            resource.pop('certname')
+            try:
+                resource.pop('certname')
+            except:
+                pass
             resource_id = resource['resource']
             node_for[resource_id] = resource
 
         for resource in certname2_data:
-            # remove the certname tag.
-            resource.pop('certname')
+            try:
+                # remove the certname tag.
+                resource.pop('certname')
+            except:
+                pass
             resource_id = resource['resource']
             node_agn[resource_id] = resource
 
@@ -226,3 +263,51 @@ def catalogue_compare_json(request, certname1=None, certname2=None):
     }
 
     return HttpResponse(json.dumps(output, indent=2), content_type="application/json")
+
+
+@login_required
+def catalogue_history_list(request, certname=None):
+    data = dict()
+    catalogues = SavedCatalogs.objects.filter(hostname=certname)
+    if not catalogues:
+        data['error'] = 'No saved catalogues available'
+        data['certname'] = certname
+        return HttpResponseBadRequest(json.dumps(data, indent=2), content_type='application/json')
+    data['catalogues'] = list()
+    for catalogue in catalogues:
+        data['catalogues'].append(
+            {'hostname': catalogue.hostname,
+             'catalogue_id': catalogue.catalogue_id,
+             'linked_report': catalogue.linked_report,
+             'catalogue_timestamp': filters.date(localtime(catalogue.timestamp), 'Y-m-d H:i:s')
+             }
+        )
+    return HttpResponse(json.dumps(data, indent=2), content_type='application/json')
+
+
+@login_required
+def catalogue_history_fetch(request, certname=None, catalogue_hash=None):
+    data = dict()
+    show = request.GET.get('show', None)
+    try:
+        catalogue = SavedCatalogs.objects.get(hostname=certname, catalogue_id=catalogue_hash)
+        data['catalogue'] = {
+            'hostname': catalogue.hostname,
+            'catalogue_id': catalogue.catalogue_id,
+            'linked_report': catalogue.linked_report,
+            'catalogue_timestamp': filters.date(localtime(catalogue.timestamp), 'Y-m-d H:i:s'),
+        }
+        if show == 'edges':
+            data['data'] = json.loads(catalogue.catalogue)['edges']['data']
+        elif show == 'resources':
+            data['data'] = json.loads(catalogue.catalogue)['resources']['data']
+        else:
+            data['data'] = json.loads(catalogue.catalogue)
+
+    except SavedCatalogs.DoesNotExist:
+        data['error'] = "Could not find catalogue with specfied certname and report hash."
+        data['certname'] = certname
+        data['linked_report'] = catalogue_hash
+        return HttpResponseBadRequest(json.dumps(data, indent=2), 'application/json')
+    return HttpResponse(json.dumps(data, indent=2), 'application/json')
+

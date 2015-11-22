@@ -7,10 +7,12 @@ function format(t) {
         e += "<tr>", e += "<td></td>", e += "<td><strong>" + t + ":</strong> " + a + "</td>", e += "<tr>"
     }), e += "</table>"
 }
+
 function update_tables() {
     var t = $("#node-1"), e = $("#node-2"), a = $(t).val(), r = $(t).attr("certname"), o = $(e).val(), n = $(e).attr("certname");
     a == r && get_catalogue(a, "with"), o == n && get_catalogue(o, "against")
 }
+
 function get_catalogue(t, e) {
     var a = "#compare-" + e + "-table", r = $("#targets a.active").attr("id");
     if ($.fn.dataTable.isDataTable(a)) {
@@ -18,16 +20,17 @@ function get_catalogue(t, e) {
         o.destroy(), $(a).empty()
     }
     if ("edges" == r)$(a).DataTable({
-        ajax: "/pano/api/catalogue/" + t + "?show=edges",
+        ajax: "/pano/api/catalogue/get/" + t + "?show=edges",
         columnDefs: [{title: "Source Type", targets: 0}, {title: "Source Title", targets: 1}, {
             title: "Relationship",
             targets: 2
         }, {title: "Target Type", targets: 3}, {title: "Target Title", targets: 4}],
         columns: [{data: "source_type"}, {data: "source_title"}, {data: "relationship"}, {data: "target_type"}, {data: "target_title"}],
         order: [[1, "asc"]]
-    }); else if ("resources" == r) {
+    });
+    else if ("resources" == r) {
         var n = $(a).DataTable({
-            ajax: "/pano/api/catalogue/" + t + "?show=resources",
+            ajax: "/pano/api/catalogue/get/" + t + "?show=resources",
             columnDefs: [{title: "Title", targets: 0}, {title: "Type", targets: 1}, {title: "Resource", targets: 2}],
             columns: [{data: "title"}, {data: "type"}, {data: "resource"}],
             order: [[0, "asc"]]
@@ -37,6 +40,28 @@ function get_catalogue(t, e) {
             e.child.isShown() ? (e.child.hide(), t.removeClass("shown")) : "undefined" != typeof e.data() && (e.child(format(e.data())).show(), t.addClass("shown"))
         })
     }
+}
+
+function get_saved_catalogues(certname) {
+    var backgroundTask = $.Deferred();
+
+    // Build URL
+    var url = '../api/catalogue/saved/list/' + certname;
+
+    $.get(url, function (json) {
+            var response = $(jQuery(json));
+            var cats = response[0]['catalogues'];
+            if (cats) {
+                console.log("meow!")
+            }
+            else {
+                console.log('woof!')
+            }
+        })
+        .error(function () {
+            // do some error handling here like status code != 200...
+
+        });
 }
 
 function repeat(pattern, count) {
@@ -59,7 +84,7 @@ function get_data(node_1, node_2, catalog_type) {
     var backgroundTask = $.Deferred();
 
     // Build URL
-    var url = '../api/catalogues/' + node_1 + '/' + node_2 + '/?show=' + catalog_type;
+    var url = '../api/catalogue/compare/' + node_1 + '/' + node_2 + '/?show=' + catalog_type;
 
     $.get(url, function (json) {
             var response = $(jQuery(json));
@@ -151,7 +176,6 @@ function get_data(node_1, node_2, catalog_type) {
     return backgroundTask;
 }
 
-
 function compare() {
     var diff_div_add_rem = "#diff-div-add-rem";
     var diff_div_change = "#diff-div-change";
@@ -190,16 +214,30 @@ function compare() {
 
 $(document).ready(function () {
     $("#edges").click(function () {
-        $(this).addClass("active").siblings().removeClass("active"), update_tables()
-    }), $("#resources").click(function () {
-        $(this).addClass("active").siblings().removeClass("active"), update_tables()
+        $(this).addClass("active").siblings().removeClass("active");
+        update_tables();
+    });
+    $("#resources").click(function () {
+        $(this).addClass("active").siblings().removeClass("active");
+        update_tables();
     });
 
-    var t = $("#node-1"), e = $("#node-2");
+    var t = $("#node-1");
+    var e = $("#node-2");
+
     $(t).bind("typeahead:select", function (t, e) {
-        $("#node-1").attr("certname", e.certname), get_catalogue(e.certname, "with"), $("#form-certname1").removeClass("has-error");
-    }), $(e).bind("typeahead:select", function (t, e) {
-        $("#node-2").attr("certname", e.certname), get_catalogue(e.certname, "against"), $("#form-certname2").removeClass("has-error");
+        $("#node-1").attr("certname", e.certname);
+        // Get the resources/edges as soon as something is selected
+        get_catalogue(e.certname, "with");
+
+        $("#form-certname1").removeClass("has-error");
+    });
+
+    $(e).bind("typeahead:select", function (t, e) {
+        $("#node-2").attr("certname", e.certname);
+        // Get the resources/edges as soon as something is selected
+        get_catalogue(e.certname, "against");
+        $("#form-certname2").removeClass("has-error");
     });
     var a = new Bloodhound({
         datumTokenizer: Bloodhound.tokenizers.obj.whitespace("certname"),
@@ -210,5 +248,6 @@ $(document).ready(function () {
         name: "node-1",
         display: "certname",
         source: a
-    }), $(e).typeahead({highlight: !0}, {name: "node-2", display: "certname", source: a})
+    });
+    $(e).typeahead({highlight: !0}, {name: "node-2", display: "certname", source: a});
 });
