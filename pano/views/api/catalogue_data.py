@@ -161,7 +161,7 @@ def catalogue_compare_json(request, certname1=None, certname2=None):
             data['error'] = 'Catalogue hash not found in DB.'
             data['hash_not_found'] = certname1_hash
             data['certname'] = certname1
-            HttpResponseBadRequest()
+            return HttpResponseBadRequest(json.dumps(data, indent=2), content_type="application/json")
     else:
         certname1_data = puppetdb.api_get(
             path='/catalogs/%s/%s' % (certname1, show),
@@ -177,7 +177,7 @@ def catalogue_compare_json(request, certname1=None, certname2=None):
             data['error'] = 'Catalogue hash not found in DB.'
             data['hash_not_found'] = certname2_hash
             data['certname'] = certname2
-            HttpResponseBadRequest()
+            return HttpResponseBadRequest(json.dumps(data, indent=2), content_type="application/json")
     else:
         certname2_data = puppetdb.api_get(
             path='/catalogs/%s/%s' % (certname2, show),
