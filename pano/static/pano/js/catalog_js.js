@@ -99,13 +99,12 @@ function get_compare_data(node_1, node1_hash, node_2, node2_hash, catalog_type) 
 
     // Build URL
     var url = '../api/catalogue/compare/' + node_1 + '/' + node_2 + '/?show=' + catalog_type;
-    if (node1_hash  && node1_hash != "false") {
+    if (node1_hash && node1_hash != "false") {
         url += "&certname1_hash=" + node1_hash;
     }
     if (node2_hash && node2_hash != "false") {
         url += "&certname2_hash=" + node2_hash;
     }
-    console.log(url);
 
     $.get(url, function (json) {
             var response = $(jQuery(json));
@@ -185,9 +184,36 @@ function get_compare_data(node_1, node1_hash, node_2, node2_hash, catalog_type) 
                 });
             }
 
+            if (changed) {
+                changed.forEach(function (change) {
+                    // From data
+                    changed_data += '<div class="row">';
+                    changed_data += '<div class="col-md-12">';
+                    changed_data += '<div class="col-md-6">';
+                    changed_data += '<div class="row col-margin" id="diff-changed-from" style="word-wrap: break-word;">';
+                    changed_data += '<div class="bs-callout bs-callout-info">';
+                    changed_data += textGen(change['from'], catalog_type, 'info');
+                    changed_data += '</div>';
+                    changed_data += '</div>';
+                    changed_data += '</div>';
+
+                    // Against data
+                    changed_data += '<div class="col-md-6">';
+                    changed_data += '<div class="row col-margin" id="diff-changed-to" style="word-wrap: break-word;">';
+                    changed_data += '<div class="bs-callout bs-callout-warning">';
+                    changed_data += textGen(change['against'], catalog_type, 'warning');
+                    changed_data += '</div>';
+                    changed_data += '</div>';
+                    changed_data += '</div>';
+                    changed_data += '</div>';
+                    changed_data += '</div>';
+                });
+            }
+
             // added data into the div
             $("#diff-added").html(added_data);
             $("#diff-removed").html(removed_data);
+            $("#diff-changed").html(changed_data);
         })
         .fail(function () {
             var data = '<tr><td colspan="8">Can not connect to PuppetDB.</td></tr>';

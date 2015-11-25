@@ -24,29 +24,12 @@ def catalogue_json(request, certname=None):
     source_url, source_certs, source_verify = get_server(request)
 
     # Redirects to the events page if GET param latest is true..
-    show = request.GET.get('show', None)
+    show = request.GET.get('show', 'edges')
     save_catalog = request.GET.get('save', 'false')
 
     catalogue_params = {}
 
-    if show is not None and show in ['edges', 'resources']:
-        if show == 'edges':
-            sort_field = 'source_title'
-        elif show == 'resources':
-            sort_field = 'title'
-        catalogue_params = {
-            'order_by':
-                {
-                    'order_field':
-                        {
-                            'field': sort_field,
-                            'order': 'asc',
-                        },
-                }
-        }
-        path = '/catalogs/%s/%s' % (certname, show)
-    else:
-        path = '/catalogs/%s' % certname
+    path = '/catalogs/%s' % certname
 
     catalogue = puppetdb.api_get(
         path=path,
@@ -114,7 +97,13 @@ def catalogue_json(request, certname=None):
             data['linked_report'] = report_hash
             return HttpResponse(json.dumps(data, indent=2), content_type='application/json')
 
-    data['data'] = catalogue
+    if show == 'edges':
+        data['data'] = catalogue['edges']['data']
+    elif show == 'resources':
+        data['data'] = catalogue['resources']['data']
+    else:
+        data['data'] = catalogue
+
     return HttpResponse(json.dumps(data, indent=2), content_type='application/json')
 
 
@@ -126,32 +115,7 @@ def catalogue_compare_json(request, certname1=None, certname2=None):
     certname1_hash = request.GET.get('certname1_hash', False)
     certname2_hash = request.GET.get('certname2_hash', False)
 
-    if show is not None and show in ['edges', 'resources']:
-        if show == 'edges':
-            sort_field = 'source_title'
-        elif show == 'resources':
-            sort_field = 'title'
-
-    certname1_params = {
-        'order_by':
-            {
-                'order_field':
-                    {
-                        'field': sort_field,
-                        'order': 'asc',
-                    },
-            }
-    }
-    certname2_params = {
-        'order_by':
-            {
-                'order_field':
-                    {
-                        'field': sort_field,
-                        'order': 'asc',
-                    },
-            }
-    }
+    cata_params = dict()
 
     if certname1_hash:
         try:
@@ -163,12 +127,13 @@ def catalogue_compare_json(request, certname1=None, certname2=None):
             data['certname'] = certname1
             return HttpResponseBadRequest(json.dumps(data, indent=2), content_type="application/json")
     else:
-        certname1_data = puppetdb.api_get(
-            path='/catalogs/%s/%s' % (certname1, show),
+        certname1_result = puppetdb.api_get(
+            path='/catalogs/%s' % certname1,
             api_url=source_url,
             api_version='v4',
-            params=puppetdb.mk_puppetdb_query(certname1_params, request),
+            params=puppetdb.mk_puppetdb_query(cata_params, request),
         )
+        certname1_data = certname1_result[show]['data']
     if certname2_hash:
         try:
             certname2_result = SavedCatalogs.objects.get(hostname=certname2, catalogue_id=certname2_hash)
@@ -179,12 +144,13 @@ def catalogue_compare_json(request, certname1=None, certname2=None):
             data['certname'] = certname2
             return HttpResponseBadRequest(json.dumps(data, indent=2), content_type="application/json")
     else:
-        certname2_data = puppetdb.api_get(
-            path='/catalogs/%s/%s' % (certname2, show),
+        certname2_result = puppetdb.api_get(
+            path='/catalogs/%s' % certname2,
             api_url=source_url,
             api_version='v4',
-            params=puppetdb.mk_puppetdb_query(certname2_params, request),
+            params=puppetdb.mk_puppetdb_query(cata_params, request),
         )
+        certname2_data = certname2_result[show]['data']
 
     node_for = dict()
     node_agn = dict()
@@ -223,8 +189,8 @@ def catalogue_compare_json(request, certname1=None, certname2=None):
                 resource.pop('certname')
             except:
                 pass
-            resource_id = resource['resource']
-            node_for[resource_id] = resource
+            resource_title = resource['title']
+            node_for[resource_title] = resource
 
         for resource in certname2_data:
             try:
@@ -232,8 +198,8 @@ def catalogue_compare_json(request, certname1=None, certname2=None):
                 resource.pop('certname')
             except:
                 pass
-            resource_id = resource['resource']
-            node_agn[resource_id] = resource
+            resource_title = resource['title']
+            node_agn[resource_title] = resource
 
     diff = DictDiffer(node_agn, node_for)
 
