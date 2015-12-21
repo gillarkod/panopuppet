@@ -6,8 +6,7 @@
 {% block head %}
     {% load static %}
     <!-- table sorter stuff -->
-    <link rel="stylesheet"
-          href="{% static 'pano/tablesorter/theme.bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'pano/tablesorter/theme.bootstrap.min.css' %}">
     <script src="{% static 'pano/tablesorter/jquery.tablesorter.min.js' %}"></script>
     <script src="{% static 'pano/tablesorter/jquery.tablesorter.widgets.min.js' %}"></script>
     <link href="{% static 'pano/css/c3.min.css' %}" rel="stylesheet" type="text/css">
@@ -93,68 +92,68 @@
         </div>
     </div>
     {% if events_list %}
-    <div class="row">
-        <div class="col-md-12">
-            <div class="panel-group" id="events_accordion" role="tablist" aria-multiselectable="true">
-                <div class="panel panel-primary">
-                    <div role="tab" class="panel-heading" id="headingGraph">
-                        <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#events_accordion" href="#collapseGraph"
-                               aria-expanded="false" aria-controls="collapseGraph">
-                                Execution Times (10 Highest)
-                            </a>
-                        </h4>
-                    </div>
-                    <div id="collapseGraph" class="panel-collapse collapse" role="tabpanel"
-                         aria-labelledby="headingGraph">
-                        <div class="panel-body">
-                            <div class="row" id="exec_times"></div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel-group" id="events_accordion" role="tablist" aria-multiselectable="true">
+                    <div class="panel panel-primary">
+                        <div role="tab" class="panel-heading" id="headingGraph">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#events_accordion" href="#collapseGraph"
+                                   aria-expanded="false" aria-controls="collapseGraph">
+                                    Execution Times (10 Highest)
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="collapseGraph" class="panel-collapse collapse" role="tabpanel"
+                             aria-labelledby="headingGraph">
+                            <div class="panel-body">
+                                <div class="row" id="exec_times"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    <script id="js_exec_times">
-        var chart = c3.generate({
-                    bindto: '#exec_times',
-                    data: {
-                        columns: [
-                            {% for event in event_durations %}
-                                ['{{ event.0 }}', {{ event.1|decimal_to_point }}],
-                            {% endfor    %}
-                        ],
-                        type: 'bar'
-                    },
-                    padding: {
-                        right: 20
-                    },
-                    grid: {
-                        y: {
-                            show: true
-                        }
-                    },
-                    tooltip: {
-                        grouped: false
-                    },
-                    axis: {
-                        x: {
-                            tick: {
-                                values: ["Events"]
+        <script id="js_exec_times">
+            var chart = c3.generate({
+                        bindto: '#exec_times',
+                        data: {
+                            columns: [
+                                {% for event in event_durations %}
+                                    ['{{ event.0 }}', {{ event.1|decimal_to_point }}],
+                                {% endfor    %}
+                            ],
+                            type: 'bar'
+                        },
+                        padding: {
+                            right: 20
+                        },
+                        grid: {
+                            y: {
+                                show: true
                             }
                         },
-                        y: {
-                            label: 'Seconds'
+                        tooltip: {
+                            grouped: false
+                        },
+                        axis: {
+                            x: {
+                                tick: {
+                                    values: ["Events"]
+                                }
+                            },
+                            y: {
+                                label: 'Seconds'
+                            }
+                        },
+                        bar: {
+                            width: {
+                                ratio: 0.5 // this makes bar width 50% of length between ticks
+                            }
                         }
-                    },
-                    bar: {
-                        width: {
-                            ratio: 0.5 // this makes bar width 50% of length between ticks
-                        }
-                    }
-                })
-                ;
-    </script>
+                    })
+                    ;
+        </script>
     {% endif %}
     <div class="row">
         <div class="col-md-12">

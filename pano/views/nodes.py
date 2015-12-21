@@ -23,6 +23,11 @@ def nodes(request):
         elif 'load_query' in request.GET:
             request.session['search'] = request.GET.get('load_query', request.session['search'])
             return redirect('nodes')
+        elif 'quick_search' in request.GET:
+            node_name = request.GET.get('quick_search')
+            if node_name:
+                request.session['search'] = '["and",["in","certname",["extract","certname",["select_nodes",["and",["~","certname","%s"]]]]]]' % node_name.strip()
+                return redirect('nodes')
     elif request.method == 'POST':
         if 'timezone' in request.POST:
             request.session['django_timezone'] = request.POST['timezone']

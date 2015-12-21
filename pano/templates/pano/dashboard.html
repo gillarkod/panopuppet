@@ -13,13 +13,7 @@
     <script>
         $(document).ready(function () {
             get_data();
-            var selector = '.nav li';
-            $(selector).on('click', function () {
-                $(selector).removeClass('active');
-                $(this).addClass('active');
-            });
         });
-
 
         $(document).on({
             ajaxStart: function () {
@@ -61,69 +55,64 @@
 {% endblock %}
 {% block content %}
     <script>
-        function get_data(obj) {
+        function get_data() {
             var backgroundTask = $.Deferred();
             var url = '../api/dashboard/';
-            if (obj) {
-                if ($(obj).attr('href')) {
-                    var params = $(obj).attr('href');
-                    url = url + params;
-                }
-            }
+            var recent = $('#recent');
+            $(recent).addClass("active").prependTo($(recent).parent()).siblings().removeClass("active");
             $.get(url, function (json) {
-                var response = $(jQuery(json));
-                var nodes = response[0]['node_list'];
-                var data = '';
-                $("#failed_nodes").html(response[0]['failed_nodes']);
-                $("#changed_nodes").html(response[0]['changed_nodes']);
-                $("#pending_nodes").html(response[0]['pending_nodes']);
-                $("#unreported_nodes").html(response[0]['unreported_nodes']);
-                $("#node_population").html(response[0]['population']);
-                $("#total_resources").html(response[0]['total_resource']);
-                $("#average_resources").html(response[0]['avg_resource']);
-                $("#mismatching_timestamps").html(response[0]['mismatching_timestamps']);
-                var num_nodes = nodes.length;
-                if (num_nodes === 0) {
-                    data = '<tr><td colspan="8">No nodes found for query.</td></tr>';
-                }
-                else {
-                    //('certname', 'latestCatalog', 'latestReport', 'latestFacts', 'success', 'noop', 'failure', 'skipped'),
-                    nodes.forEach(function (node) {
-                        data += '<tr>';
-                        //Certname
-                        data += '<td><a href="../reports/' + node[0] + '">' + node[0] + '</a></td>';
-                        //latest catalog
-                        data += '<td>' + node[1] + '</td>';
-                        //latest report
-                        if (node[4] > 0 || node[5] > 0 || node[6] > 0 || node[7] > 0) {
-                            data += '<td><a href="../reports/' + node[0] + '?latest=true&report_timestamp=' + node[2] + '">' + node[2] + '</a></td>';
-                        } else {
-                            data += '<td>' + node[2] + '</td>';
+                        var response = $(jQuery(json));
+                        var nodes = response[0]['node_list'];
+                        var data = '';
+                        $("#failed_nodes").html(response[0]['failed_nodes']);
+                        $("#changed_nodes").html(response[0]['changed_nodes']);
+                        $("#pending_nodes").html(response[0]['pending_nodes']);
+                        $("#unreported_nodes").html(response[0]['unreported_nodes']);
+                        $("#node_population").html(response[0]['population']);
+                        $("#total_resources").html(response[0]['total_resource']);
+                        $("#average_resources").html(response[0]['avg_resource']);
+                        $("#mismatching_timestamps").html(response[0]['mismatching_timestamps']);
+                        var num_nodes = nodes.length;
+                        if (num_nodes === 0) {
+                            data = '<tr><td colspan="8">No nodes found for query.</td></tr>';
                         }
-                        //latest facts
-                        data += '<td>' + node[3] + '</td>';
-                        //failed events
-                        data += '<td style="text-align: center"><p style="margin-bottom: 0" class="bg-success img-rounded"><strong>' + node[4] + '</strong></p></td>';
-                        //skipped events
-                        data += '<td style="text-align: center"><p style="margin-bottom: 0" class="bg-info img-rounded"><strong>' + node[5] + '</strong></p></td>';
-                        //successful events
-                        data += '<td style="text-align: center"><p style="margin-bottom: 0" class="bg-danger img-rounded"><strong>' + node[6] + '</strong></p></td>';
-                        //noop events
-                        data += '<td style="text-align: center"><p style="margin-bottom: 0" class="bg-warning img-rounded"><strong>' + node[7] + '</strong></p></td>';
-                        data += '</tr>';
-                    });
-                }
+                        else {
+                            //('certname', 'latestCatalog', 'latestReport', 'latestFacts', 'success', 'noop', 'failure', 'skipped'),
+                            nodes.forEach(function (node) {
+                                data += '<tr>';
+                                //Certname
+                                data += '<td><a href="../reports/' + node[0] + '">' + node[0] + '</a></td>';
+                                //latest catalog
+                                data += '<td>' + node[1] + '</td>';
+                                //latest report
+                                if (node[4] > 0 || node[5] > 0 || node[6] > 0 || node[7] > 0) {
+                                    data += '<td><a href="../reports/' + node[0] + '?latest=true&report_timestamp=' + node[2] + '">' + node[2] + '</a></td>';
+                                } else {
+                                    data += '<td>' + node[2] + '</td>';
+                                }
+                                //latest facts
+                                data += '<td>' + node[3] + '</td>';
+                                //failed events
+                                data += '<td style="text-align: center"><p style="margin-bottom: 0" class="bg-success img-rounded"><strong>' + node[4] + '</strong></p></td>';
+                                //skipped events
+                                data += '<td style="text-align: center"><p style="margin-bottom: 0" class="bg-info img-rounded"><strong>' + node[5] + '</strong></p></td>';
+                                //successful events
+                                data += '<td style="text-align: center"><p style="margin-bottom: 0" class="bg-danger img-rounded"><strong>' + node[6] + '</strong></p></td>';
+                                //noop events
+                                data += '<td style="text-align: center"><p style="margin-bottom: 0" class="bg-warning img-rounded"><strong>' + node[7] + '</strong></p></td>';
+                                data += '</tr>';
+                            });
+                        }
 
-                // update table with the new json data to the table body
-                $("#dashboard_nodes").html(data);
-                // Triger tablesorter to resort
-                $("table").trigger("updateAll", [true]);
-            })
+                        // update table with the new json data to the table body
+                        $("#dashboard_nodes").html(data);
+                        // Triger tablesorter to resort
+                        $("table").trigger("updateAll", [true]);
+                    })
                     .fail(function () {
                         var data = '<tr><td colspan="8">Can not connect to PuppetDB.</td></tr>';
                         $("#dashboard_nodes").html(data);
                     });
-
             backgroundTask.resolve();
             return backgroundTask;
         }
@@ -131,16 +120,16 @@
             var backgroundTask = $.Deferred();
             var url = '../api/dashboard/';
             $.get(url, function (json) {
-                var response = $(jQuery(json));
-                $("#failed_nodes").html(response[0]['failed_nodes']);
-                $("#changed_nodes").html(response[0]['changed_nodes']);
-                $("#pending_nodes").html(response[0]['pending_nodes']);
-                $("#unreported_nodes").html(response[0]['unreported_nodes']);
-                $("#node_population").html(response[0]['population']);
-                $("#total_resources").html(response[0]['total_resource']);
-                $("#average_resources").html(response[0]['avg_resource']);
-                $("#mismatching_timestamps").html(response[0]['mismatching_timestamps']);
-            })
+                        var response = $(jQuery(json));
+                        $("#failed_nodes").html(response[0]['failed_nodes']);
+                        $("#changed_nodes").html(response[0]['changed_nodes']);
+                        $("#pending_nodes").html(response[0]['pending_nodes']);
+                        $("#unreported_nodes").html(response[0]['unreported_nodes']);
+                        $("#node_population").html(response[0]['population']);
+                        $("#total_resources").html(response[0]['total_resource']);
+                        $("#average_resources").html(response[0]['avg_resource']);
+                        $("#mismatching_timestamps").html(response[0]['mismatching_timestamps']);
+                    })
                     .fail(function () {
                         var data = '<tr><td colspan="2">Can not connect to PuppetDB.</td></tr>';
                         $("inventoryfactsbody").html(data);
@@ -151,6 +140,8 @@
         function get_nodes(obj) {
             var backgroundTask = $.Deferred();
             var url = '../api/dashboard/nodes/';
+            $(obj).parent().parent().find('a').removeClass("active");
+            $(obj).addClass("active");
             if (obj) {
                 if ($(obj).attr('href')) {
                     var params = $(obj).attr('href');
@@ -158,46 +149,46 @@
                 }
             }
             $.get(url, function (json) {
-                var response = $(jQuery(json));
-                var nodes = response[0]['node_list'];
-                var data = '';
-                var num_nodes = nodes.length;
-                if (num_nodes === 0) {
-                    data = '<tr><td colspan="8">No nodes found for query.</td></tr>';
-                }
-                else {
-                    //('certname', 'latestCatalog', 'latestReport', 'latestFacts', 'success', 'noop', 'failure', 'skipped'),
-                    nodes.forEach(function (node) {
-                        data += '<tr>';
-                        //Certname
-                        data += '<td><a href="../reports/' + node[0] + '">' + node[0] + '</a></td>';
-                        //latest catalog
-                        data += '<td>' + node[1] + '</td>';
-                        //latest report
-                        if (node[4] > 0 || node[5] > 0 || node[6] > 0 || node[7] > 0) {
-                            data += '<td><a href="../reports/' + node[0] + '?latest=true&report_timestamp=' + node[2] + '">' + node[2] + '</a></td>';
-                        } else {
-                            data += '<td>' + node[2] + '</td>';
+                        var response = $(jQuery(json));
+                        var nodes = response[0]['node_list'];
+                        var data = '';
+                        var num_nodes = nodes.length;
+                        if (num_nodes === 0) {
+                            data = '<tr><td colspan="8">No nodes found for query.</td></tr>';
                         }
-                        //latest facts
-                        data += '<td>' + node[3] + '</td>';
-                        //failed events
-                        data += '<td style="text-align: center"><p style="margin-bottom: 0" class="bg-success img-rounded"><strong>' + node[4] + '</strong></p></td>';
-                        //skipped events
-                        data += '<td style="text-align: center"><p style="margin-bottom: 0" class="bg-info img-rounded"><strong>' + node[5] + '</strong></p></td>';
-                        //successful events
-                        data += '<td style="text-align: center"><p style="margin-bottom: 0" class="bg-danger img-rounded"><strong>' + node[6] + '</strong></p></td>';
-                        //noop events
-                        data += '<td style="text-align: center"><p style="margin-bottom: 0" class="bg-warning img-rounded"><strong>' + node[7] + '</strong></p></td>';
-                        data += '</tr>';
-                    });
-                }
+                        else {
+                            //('certname', 'latestCatalog', 'latestReport', 'latestFacts', 'success', 'noop', 'failure', 'skipped'),
+                            nodes.forEach(function (node) {
+                                data += '<tr>';
+                                //Certname
+                                data += '<td><a href="../reports/' + node[0] + '">' + node[0] + '</a></td>';
+                                //latest catalog
+                                data += '<td>' + node[1] + '</td>';
+                                //latest report
+                                if (node[4] > 0 || node[5] > 0 || node[6] > 0 || node[7] > 0) {
+                                    data += '<td><a href="../reports/' + node[0] + '?latest=true&report_timestamp=' + node[2] + '">' + node[2] + '</a></td>';
+                                } else {
+                                    data += '<td>' + node[2] + '</td>';
+                                }
+                                //latest facts
+                                data += '<td>' + node[3] + '</td>';
+                                //failed events
+                                data += '<td style="text-align: center"><p style="margin-bottom: 0" class="bg-success img-rounded"><strong>' + node[4] + '</strong></p></td>';
+                                //skipped events
+                                data += '<td style="text-align: center"><p style="margin-bottom: 0" class="bg-info img-rounded"><strong>' + node[5] + '</strong></p></td>';
+                                //successful events
+                                data += '<td style="text-align: center"><p style="margin-bottom: 0" class="bg-danger img-rounded"><strong>' + node[6] + '</strong></p></td>';
+                                //noop events
+                                data += '<td style="text-align: center"><p style="margin-bottom: 0" class="bg-warning img-rounded"><strong>' + node[7] + '</strong></p></td>';
+                                data += '</tr>';
+                            });
+                        }
 
-                // update table with the new json data to the table body
-                $("#dashboard_nodes").html(data);
-                // Triger tablesorter to resort
-                $("table").trigger("updateAll", [true]);
-            })
+                        // update table with the new json data to the table body
+                        $("#dashboard_nodes").html(data);
+                        // Triger tablesorter to resort
+                        $("table").trigger("updateAll", [true]);
+                    })
                     .fail(function () {
                         var data = '<tr><td colspan="8">Can not connect to PuppetDB.</td></tr>';
                         $("#dashboard_nodes").html(data);
@@ -254,19 +245,6 @@
         </div>
     </div>
     <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-12">
-                <ul id="node_pages" class="nav nav-tabs">
-                    <li class="active"><a onclick="get_nodes(this).done(); return false;" href="?show=recent">Recent</a></li>
-                    <li><a onclick="get_nodes(this).done(); return false;" href="?show=failed">Failed</a></li>
-                    <li><a onclick="get_nodes(this).done(); return false;" href="?show=changed">Changed</a></li>
-                    <li><a onclick="get_nodes(this).done(); return false;" href="?show=pending">Pending</a></li>
-                    <li><a onclick="get_nodes(this).done(); return false;" href="?show=unreported">Unreported</a></li>
-                    <li><a onclick="get_nodes(this).done(); return false;" href="?show=mismatch">Mismatching
-                        Timestamps</a></li>
-                </ul>
-            </div>
-        </div>
         <div class="row">
             <div class="col-md-12">
                 <table class="table table-condensed tablesorter">
