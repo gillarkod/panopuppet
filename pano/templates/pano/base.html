@@ -76,12 +76,17 @@
             <div class="sidebar-nav navbar-collapse">
                 <ul class="nav" id="side-menu">
                     <li class="sidebar-search">
-                        <div class="input-group custom-search-form">
-                            <form action="{% url 'nodes' %}" method="get">
-                                <input type="text" name="quick_search" class="btn btn-default form-control"
+                        <form action="{% url 'nodes' %}" method="get">
+                            <div class="input-group custom-search-form">
+                                <input type="text" name="quick_search" class="form-control"
                                        placeholder="Node Search...">
-                            </form>
-                        </div>
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default" type="submit">
+                                        <i class="fa fa-search"></i>
+                                    </button>
+                                </span>
+                            </div>
+                        </form>
                     </li>
                     <li>
                         <a href="#">Dashboard<span class="fa arrow"></span></a>
