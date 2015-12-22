@@ -143,23 +143,6 @@
                             </ul>
                         </li>
                     {% endif %}
-
-                    <li class="sidebar-search">
-                        {{ requests }}
-                        {% get_current_timezone as TIME_ZONE %}
-                        <form action="{% url 'index' %}" method="POST">
-                            {% csrf_token %}
-                            <input type="hidden" name="url" value="{{ request.path|urlencode }}"/>
-                            <label for="timezone">
-                                <select class="btn btn-default form-control" name="timezone" onchange="this.form.submit()">
-                                    {% for tz in timezones %}
-                                        <option value="{{ tz }}"{% if tz == TIME_ZONE %}
-                                                selected="selected"{% endif %}>{{ tz }}</option>
-                                    {% endfor %}
-                                </select>
-                            </label>
-                        </form>
-                    </li>
                     <li>
                         <a href="#">Links<span class="fa arrow"></span></a>
                         <ul class="nav nav-second-level">
@@ -179,6 +162,23 @@
                                     Issue Tracker</a>
                             </li>
                         </ul>
+                    </li>
+                    <li class="sidebar-search">
+                        {{ requests }}
+                        {% get_current_timezone as TIME_ZONE %}
+                        <form action="{% url 'index' %}" method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="url" value="{{ request.path|urlencode }}"/>
+                            <label for="timezone">
+                                <select class="btn btn-default form-control" name="timezone"
+                                        onchange="this.form.submit()">
+                                    {% for tz in timezones %}
+                                        <option value="{{ tz }}"{% if tz == TIME_ZONE %}
+                                                selected="selected"{% endif %}>{{ tz }}</option>
+                                    {% endfor %}
+                                </select>
+                            </label>
+                        </form>
                     </li>
                 </ul>
             </div>
