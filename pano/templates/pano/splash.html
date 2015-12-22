@@ -5,31 +5,33 @@
     {% if username %}
         <h3>Welcome {{ username }}</h3>
     {% else %}
-        <div class="container-fluid">
-            <div class="col-md-5"></div>
-            <div class="col-md-2">
-                <form action="{% url 'index' %}" class="form-signin" method="post">
-                    {% csrf_token %}
-                    <div class="alert-warning">{{ login_error }}</div>
-                    <br>
-                    <label for="username">Username: </label>
-                    <input type="text" name="username" id="username" class="form-control" required autofocus>
-                    <label for="password">Password: </label>
-                    <input type="password" name="password" id="password" class="form-control" required>
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" value="remember-me"> Remember me
-                        </label>
-                    </div>
-                    {% if nexturl %}
-                        <input type="text" name="nexturl" id="nexturl" class="hidden" value="{{ nexturl }}">
-                    {% else %}
-                        <input type="text" name="nexturl" id="nexturl" class="hidden" value="{{ request.GET.next }}">
-                    {% endif %}
-                    <button class="btn btn-sm btn-primary btn-block" type="submit">Sign in</button>
-                </form>
+        <div class="row">
+            <div class="container-fluid">
+                <div class="col-md-2 col-md-offset-5">
+                    <form action="{% url 'index' %}" class="form-signin" method="post">
+                        {% csrf_token %}
+                        <div class="alert-warning">{{ login_error }}</div>
+                        <br>
+                        <label for="username">Username: </label>
+                        <input type="text" name="username" id="username" class="form-control" required autofocus>
+                        <label for="password">Password: </label>
+                        <input type="password" name="password" id="password" class="form-control" required>
+
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" value="remember-me"> Remember me
+                            </label>
+                        </div>
+                        {% if nexturl %}
+                            <input type="text" name="nexturl" id="nexturl" class="hidden" value="{{ nexturl }}">
+                        {% else %}
+                            <input type="text" name="nexturl" id="nexturl" class="hidden"
+                                   value="{{ request.GET.next }}">
+                        {% endif %}
+                        <button class="btn btn-sm btn-primary btn-block" type="submit">Sign in</button>
+                    </form>
+                </div>
             </div>
-            <div class="col-md-5"></div>
         </div>
     {% endif %}
 {% endblock %}
