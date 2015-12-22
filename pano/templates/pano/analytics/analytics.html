@@ -11,15 +11,10 @@
 {% block content %}
     <div class="row">
         <div class="col-md-12">
-            <div class="panel panel-info">
-                <div align="center" class="panel-heading">Puppet Statistics</div>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-12">
             <div class="panel panel-default">
-                <div class="panel-heading">Average Puppet Run Time ({{ run_num }} Last Runs)</div>
+                <div class="panel-heading">
+                    <h3 class="panel-title">Average Puppet Run Time ({{ run_num }} Last Runs)</h3>
+                </div>
                 <div class="panel-body">
                     <div id="run_times"></div>
                 </div>
@@ -27,16 +22,11 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-md-12">
-            <div class="panel panel-info">
-                <div align="center" class="panel-heading">Latest reports</div>
-            </div>
-        </div>
-    </div>
-    <div class="row">
         <div class="col-md-4">
             <div class="panel panel-default">
-                <div class="panel-heading">Class Events</div>
+                <div class="panel-heading">
+                    <h3 class="panel-title">Class Events</h3>
+                </div>
                 <div class="panel-body">
                     <div id="class_events"></div>
                 </div>
@@ -44,7 +34,9 @@
         </div>
         <div class="col-md-4">
             <div class="panel panel-default">
-                <div class="panel-heading">Resource Events</div>
+                <div class="panel-heading">
+                     <h3 class="panel-title">Resource Events</h3>
+                </div>
                 <div class="panel-body">
                     <div id="resource_events"></div>
                 </div>
@@ -52,7 +44,9 @@
         </div>
         <div class="col-md-4">
             <div class="panel panel-default">
-                <div class="panel-heading">Status Events</div>
+                <div class="panel-heading">
+                    <h3 class="panel-title">Status Events </h3>
+                </div>
                 <div class="panel-body">
                     <div id="status_events"></div>
                 </div>
