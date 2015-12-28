@@ -36,9 +36,6 @@
                     <li{% if "pano/nodes" in request.path %} class="active"{% endif %}>
                         <a href="{% url 'nodes' %}">Nodes</a>
                     </li>
-                    <li{% if "pano/catalog" in request.path %} class="active"{% endif %}>
-                        <a href="{% url 'catalog' %}">Catalogues</a>
-                    </li>
                     <li {% if "pano/analytics" in request.path or "pano/eventanalytics" in request.path %}
                         class="active"{% elif "pano/event_analytics" in request.path %} class="active" {% endif %}
                         class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown"
@@ -113,7 +110,7 @@
                                 <a id="pending"
                                         {% if "pano/dashboard" in request.path %} onclick="get_nodes(this).done(); return false;{% endif %}"
                                    href="{% if "pano/dashboard" not in request.path %}{% url 'dashboard' %}{% endif %}?show=pending">
-                                    <i class="text-info fa fa-info-circle fa-fw"></i></span> Pending</a>
+                                    <i class="text-info fa fa-info-circle fa-fw"></i> Pending</a>
                             </li>
                             <li>
                                 <a id="unreported"
