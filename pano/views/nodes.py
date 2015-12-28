@@ -26,7 +26,7 @@ def nodes(request):
         elif 'quick_search' in request.GET:
             node_name = request.GET.get('quick_search')
             if node_name:
-                request.session['search'] = '["and",["in","certname",["extract","certname",["select_nodes",["and",["~","certname","%s"]]]]]]' % node_name.strip()
+                request.session['search'] = '["and",["in","certname",["extract","certname",["select-nodes",["and",["~","certname","%s"]]]]]]' % node_name.strip()
                 return redirect('nodes')
     elif request.method == 'POST':
         if 'timezone' in request.POST:
