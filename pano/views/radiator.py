@@ -10,7 +10,6 @@ import pytz
 __author__ = 'etaklar'
 
 
-@login_required
 @cache_page(CACHE_TIME)
 def radiator(request, certname=None):
     context = {'timezones': pytz.common_timezones,
