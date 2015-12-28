@@ -21,7 +21,7 @@ def nodes(request):
             source = request.GET.get('source')
             set_server(request, source)
         elif 'load_query' in request.GET:
-            request.session['search'] = request.GET.get('load_query', request.session['search'])
+            request.session['search'] = request.GET.get('load_query', '')
             return redirect('nodes')
         elif 'quick_search' in request.GET:
             node_name = request.GET.get('quick_search')
