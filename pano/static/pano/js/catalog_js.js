@@ -116,7 +116,7 @@ function get_compare_data(node_1, node1_hash, node_2, node2_hash, catalog_type) 
             var changed_data = '';
             var removed_data = '';
 
-            function textGen(text, dType, sType, indent, tBuffer) {
+            function textGen(text, dType, sType, indent) {
                 indent = indent || 0;
                 var tBuffer = '';
                 if (dType == 'edges') {
@@ -136,6 +136,13 @@ function get_compare_data(node_1, node1_hash, node_2, node2_hash, catalog_type) 
                     tBuffer += '<br>';
                     tBuffer += '<strong>Resource: </strong>' + text.resource;
                     tBuffer += '<br>';
+                    tBuffer += '<strong>File Line: </strong>' + text.file + ':' + text.line;
+                    tBuffer += '<br>';
+                    tBuffer += '<strong>Exported: </strong>' + text.exported;
+                    tBuffer += '<br>';
+                    tBuffer += '<strong>Tags: </strong>' + text.tags;
+                    tBuffer += '<br>';
+
                     if (Object.keys(text.parameters).length > 0) {
                         tBuffer += '<strong>Parameters:</strong>';
                         tBuffer += '<br>';
