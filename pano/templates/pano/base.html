@@ -140,6 +140,9 @@
                                 <li>
                                     <a href="{% url 'facts' certname %}"><i class="fa fa-bar-chart fa-fw"></i> Facts</a>
                                 </li>
+                                <li>
+                                    <a target="_blank" href="{% url 'api_catalogues' certname %}?save=true"><i class="fa fa-floppy-o fa-fw"></i> Save latest catalogue</a>
+                                </li>
                             </ul>
                         </li>
                     {% endif %}
