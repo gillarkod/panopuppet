@@ -7,14 +7,12 @@
     {% load staticfiles %}
     <script src="{% static 'pano/js/typeahead.js' %}"></script>
     <link rel="stylesheet" href="{% static 'pano/css/typeahead.css' %}">
-    <script src="{% static 'pano/js/jquery.dataTables.min.js' %}"></script>
-    <script src="{% static 'pano/js/bootstrap.dataTables.min.js' %}"></script>
-    <link rel="stylesheet" href="{% static 'pano/css/dataTables.bootstrap.min.css' %}">
+    <script src="{% static 'pano/js/dataTables.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'pano/css/dataTables.min.css' %}">
     <script src="{% static 'pano/js/catalog_js.js' %}"></script>
     <!-- make sure table does not go bonkers.. -->
     <style>
         .table {
-            max-width: none;
             table-layout: fixed;
             word-wrap: break-word;
         }
@@ -35,7 +33,6 @@
                             <a data-toggle="collapse" data-parent="#filters_accordion" href="#collapseFilter"
                                aria-expanded="false" aria-controls="collapseFilter">
                                 Catalog
-                                <Tool></Tool>
                             </a>
                         </h4>
                     </div>

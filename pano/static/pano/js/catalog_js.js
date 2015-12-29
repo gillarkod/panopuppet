@@ -21,8 +21,38 @@ function get_catalogue(t, e) {
         o.destroy();
         $(a).empty();
     }
-    if ("edges" == r)$(a).DataTable({
-        ajax: "/pano/api/catalogue/get/" + t + "?show=edges",
+    var diff_div_add_rem = "#diff-div-add-rem";
+    var diff_div_change = "#diff-div-change";
+    var is_shown = $(diff_div_add_rem).is(':visible') || $(diff_div_change).is(':visible');
+
+    var type = $("#targets a.active").attr("id");
+    var node1 = $("#node-1");
+    var node1_hash = $("#certname-1-hash");
+    var node2 = $("#node-2");
+    var node2_hash = $("#certname-2-hash");
+    var certname_compare = $(node1).attr("certname");
+    var certname_from_hash = node1_hash.val();
+    var certname_against = $(node2).attr("certname");
+    var certname_against_hash = node2_hash.val();
+    if (is_shown && type && certname_compare && certname_from_hash && certname_against && certname_against_hash) {
+        get_compare_data(certname_compare, certname_from_hash, certname_against, certname_against_hash, type);
+    }
+
+    var data_url = "/pano/api/catalogue/get/" + t;
+
+    if (e == 'with') {
+        if (certname_from_hash && certname_from_hash != 'false') {
+            data_url = '/pano/api/catalogue/saved/fetch/' + t + '/' + certname_from_hash;
+        }
+    }
+    else if (e == 'against') {
+        if (certname_against_hash && certname_against_hash != 'false') {
+            data_url = '/pano/api/catalogue/saved/fetch/' + t + '/' + certname_against_hash;
+        }
+    }
+    if ('edges' == r)$(a).DataTable({
+        ajax: data_url + '?show=edges',
+        "autoWidth": false,
         columnDefs: [{title: "Source Type", targets: 0}, {title: "Source Title", targets: 1}, {
             title: "Relationship",
             targets: 2
@@ -30,9 +60,10 @@ function get_catalogue(t, e) {
         columns: [{data: "source_type"}, {data: "source_title"}, {data: "relationship"}, {data: "target_type"}, {data: "target_title"}],
         order: [[1, "asc"]]
     });
-    else if ("resources" == r) {
+    else if ('resources' == r) {
         var n = $(a).DataTable({
-            ajax: "/pano/api/catalogue/get/" + t + "?show=resources",
+            ajax: data_url + '?show=resources',
+            "autoWidth": false,
             columnDefs: [{title: "Title", targets: 0}, {title: "Type", targets: 1}, {title: "Resource", targets: 2}],
             columns: [{data: "title"}, {data: "type"}, {data: "resource"}],
             order: [[0, "asc"]]
@@ -337,5 +368,21 @@ $(document).ready(function () {
         display: "certname",
         source: a
     });
-    $(e).typeahead({highlight: !0}, {name: "node-2", display: "certname", source: a});
+    $(e).typeahead({highlight: !0}, {
+        name: "node-2",
+        display: "certname",
+        source: a
+    });
+
+    // Update stuff when a saved catalogue is selected/changed...
+    $('#certname-1-hash').bind("change", function () {
+        var certname = $("#node-1").attr('certname');
+        get_catalogue(certname, "with");
+
+    });
+    $("#certname-2-hash").bind("change", function () {
+        var certname = $("#node-1").attr('certname');
+        get_catalogue(certname, "against");
+
+    });
 });
