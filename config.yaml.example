@@ -5,7 +5,7 @@
 sources:
   'PuppetDB Production':
     'DEFAULT': true
-    'PUPPETDB_HOST': 'http://puppetdb.production.example.com/'
+    'PUPPETDB_HOST': 'http://puppetdb.production.example.com:8080/'
     'PUPPETMASTER_CLIENTBUCKET_SHOW': true
     'PUPPETMASTER_FILESERVER_SHOW': true
     # Filebucket configuraion for the PuppetDB Production
@@ -25,7 +25,7 @@ sources:
     'PUPPET_RUN_INTERVAL': 30
 
   'PuppetDB Staging':
-    'PUPPETDB_HOST': 'http://puppetdb.staging.example.com/'
+    'PUPPETDB_HOST': 'http://puppetdb.staging.example.com:8080/'
     'PUPPETMASTER_CLIENTBUCKET_SHOW': false
     'PUPPETMASTER_FILESERVER_SHOW': false
     'PUPPET_RUN_INTERVAL': 30
