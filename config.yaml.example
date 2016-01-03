@@ -23,7 +23,7 @@ sources:
       - '/path/to/public.key'
       - '/path/to/private.key'
     'PUPPETMASTER_CLIENTBUCKET_VERIFY_SSL': '/path/to/ca.pem'
-    # Fileserver configuraion for the PuppetDB Production
+    # Fileserver configuration for the PuppetDB Production
     'PUPPETMASTER_FILESERVER_SHOW': true
     'PUPPETMASTER_FILESERVER_HOST': 'https://puppetmaster.example.com:8140/'
     'PUPPETMASTER_FILESERVER_CERTIFICATES':
