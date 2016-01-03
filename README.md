@@ -535,7 +535,7 @@ Create a local superuser to log in as
 ```
 $ python manage.py createsuperuser
 ```
-You are able to create some other users in the admin page located at http://pp.your.domain.com/admin
+You are able to create some other users in the admin page located at http://pp.your.domain.com/puppetadmin
 
 12) chown the /srv/repo/panopuppet directory recursively to the http user you want running panopuppet.
 This is to make sure that the panopuppet application can access the local database containing users etc.
