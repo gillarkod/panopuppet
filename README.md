@@ -68,6 +68,7 @@ will need to make a wrapper that enables SCL python3.
 - [Installation](#installation)
   - [Problems with python-ldap python 3 fork.](#problems-with-python-ldap-python-3-fork)
   - [RHEL/CentOS 6](#rhelcentos-6)
+  - [CentOS 7](#centos-7)
 - [Upgrading](#upgrading)
 - [Configuration Options](#configuration-options)
 - [Available branches](#available-branches)
@@ -383,6 +384,175 @@ You are able to create some other users in the admin page located at http://pano
 
 15) Restart Httpd service and it should work.
 `/etc/init.d/httpd restart`
+
+## CentOS 7
+```
+This installation "guide" assumes that panopuppet has been extracted to /srv/repo
+$ sudo yum install git
+$ sudo mkdir -p /srv/repo
+$ sudo chown -R <user> /srv
+$ cd /srv/repo
+$ git clone https://github.com/propyless/panopuppet.git panopuppet  
+```
+
+1) Install the Software Collections repositories for rh-pyhton34 and httpd24.
+```
+$ sudo yum install scl-utils
+$ sudo yum install https://www.softwarecollections.org/en/scls/rhscl/rh-python34/epel-7-x86_64/download/rhscl-rh-python34-epel-7-x86_64.noarch.rpm
+$ sudo yum install https://www.softwarecollections.org/en/scls/rhscl/httpd24/epel-7-x86_64/download/rhscl-httpd24-epel-7-x86_64.noarch.rpm
+```
+
+2) Install rh-python34 and the dependencies for the python-ldap module.
+```
+$ sudo yum install rh-python34 libyaml-devel openldap-devel cyrus-sasl-devel gcc make
+$ sudo scl enable rh-python34 'easy_install pip'
+```
+
+3) Install httpd24.
+```
+$ sudo yum install httpd24 httpd24-httpd-devel
+```
+Enable rh-python34 in httpd24;
+```
+$ sudo vim /opt/rh/httpd24/service-environment
+```
+Add rh-python34 to HTTPD24_HTTPD_SCLS_ENABLED;
+```
+HTTPD24_HTTPD_SCLS_ENABLED="httpd24 rh-python34"
+```
+Enable/start httpd24-httpd service;
+```
+$ sudo systemctl enable httpd24-httpd
+$ sudo systemctl start httpd24-httpd
+$ sudo systemctl status httpd24-httpd
+```
+Configure firewall for httpd24;
+```
+$ sudo firewall-cmd --permanent --add-service=http
+$ sudo firewall-cmd --add-service=http
+```
+
+4) Compile mod_wsgi for rh-python34.  
+rh-python34-mod_wsgi contains a 'bug' which will segfault panopuppet, that's why we compile the latest version.
+```
+$ cd
+$ scl enable rh-python34 bash
+$ scl enable httpd24 bash
+$ sudo yum install wget
+$ wget https://pypi.python.org/packages/source/m/mod_wsgi/mod_wsgi-4.4.21.tar.gz
+$ tar -xzvf mod_wsgi-4.4.21.tar.gz
+$ cd mod_wsgi-4.4.21
+```
+Determine location of rh-pyhton34 version;
+```
+$ which python
+```
+Use this location in the configure of mod_wsgi;
+```
+$ ./configure --with-python=/opt/rh/rh-python34/root/usr/bin/python
+$ make 
+$ sudo make install
+```
+Configure mod_wsgi module for httpd24;
+```
+$ sudo vim /opt/rh/httpd24/root/etc/httpd/conf.modules.d/10-mod_wsgi-4421.conf
+```
+Contents;
+```
+LoadModule wsgi_module modules/mod_wsgi.so
+```
+
+5) Create a virtualenv instance for panopuppet.
+```
+$ sudo mkdir /srv/.virtualenvs
+$ sudo chown <user> /srv/.virtualenvs
+$ cd /srv/.virtualenvs
+$ virtualenv panopuppet
+$ cd panopuppet/
+$ source bin/activate
+```
+
+6) Install the python modules needed for panopuppet to function.
+```
+$ cd /srv/repo/panopuppet
+$ pip install -r requirements.txt
+```
+
+7) Create Panopuppet config for httpd24.
+```
+sudo vim /opt/rh/httpd24/root/etc/httpd/conf.d/panopuppet.conf
+```
+Contents;
+```
+WSGISocketPrefix /var/run/wsgi
+<VirtualHost *:80>
+    ServerName pp.your.domain.com
+    WSGIDaemonProcess panopuppet user=apache group=apache threads=5 python-path=/srv/repo/panopuppet:/srv/.virtualenvs/panopuppet/lib/python3.4/site-packages
+    WSGIScriptAlias / /srv/repo/panopuppet/puppet/wsgi.py
+    ErrorLog /var/log/httpd24/panopuppet.error.log
+    CustomLog /var/log/httpd24/panopuppet.access.log combined
+
+    Alias /static /srv/staticfiles/
+    <Directory /srv/staticfiles>
+	    Require all granted
+    </Directory>
+    <Directory /srv/repo/panopuppet>
+        Require all granted
+    </Directory>
+
+    <Directory /srv/repo/panopuppet/>
+        WSGIProcessGroup panopuppet
+    </Directory>
+</VirtualHost>
+```
+
+8) Configure PanoPuppet config.yaml file.
+```
+$ cp /srv/repo/panopuppet/config.yaml.example /srv/repo/panopuppet/config.yaml
+```
+Use your favourite text editor to modify the file with the correct values for your envionrment.
+Please note that the example configuration file contains an example for puppetdb connection with and without SSL.
+
+Depending on your puppet infrastructure you may or may not need to specify public, private and cacert to authenticate
+with puppetdb, puppetmaster filebucket and fileserver.
+
+9) Populate the /srv/staticfiles directory with the staticfiles.
+```
+$ sudo mkdir /srv/staticfiles
+$ sudo chown <user> /srv/staticfiles 
+$ cd /srv/repo/panopuppet
+$ python manage.py collectstatic
+```
+Say 'yes' to the question it might ask about overwriting files in the /srv/collectstatic folder.
+
+10) Populate the django database so that users logging in with LDAP or local users are populated into django.
+```
+$ python manage.py migrate
+```
+
+11) OPTIONAL STEP IF YOU DON'T WANT TO USE LDAP AND YOU ARE JUST TESTING.  
+Create a local superuser to log in as
+```
+$ python manage.py createsuperuser
+```
+You are able to create some other users in the admin page located at http://pp.your.domain.com/admin
+
+12) chown the /srv/repo/panopuppet directory recursively to the http user you want running panopuppet.
+This is to make sure that the panopuppet application can access the local database containing users etc.
+Support for other databases will be added at a later time.
+Make sure to replace 'apache' with the appropriate user and group.
+```
+$ sudo chown -R apache:apache /srv/repo/panopuppet
+```
+
+13) Restart httpd24-httpd service and it should work.
+```
+$ sudo systemctl restart httpd24-httpd
+```
+Ouch (for now)...
+```
+$ sudo setenforce 0
+```
 
 # Upgrading
 Upgrading PanoPuppet should be no harder than doing a git pull origin/master in the /srv/repo/panopuppet directory.
