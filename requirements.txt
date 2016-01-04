@@ -1,5 +1,5 @@
 arrow
-Django==1.8
+Django==1.8.8
 django-auth-ldap==1.2.7
 pytz
 pyyaml
