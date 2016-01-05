@@ -405,7 +405,6 @@ $ sudo yum install https://www.softwarecollections.org/en/scls/rhscl/httpd24/epe
 2) Install rh-python34 and the dependencies for the python-ldap module.
 ```
 $ sudo yum install rh-python34 libyaml-devel openldap-devel cyrus-sasl-devel gcc make
-$ sudo scl enable rh-python34 'easy_install pip'
 ```
 
 3) Install httpd24.
