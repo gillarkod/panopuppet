@@ -1,0 +1,552 @@
+{% extends 'pano/analytics/events_summary.html' %}
+{% load puppetdb_extras %}
+{% load common %}
+
+{% block details %}
+    <div class="panel-heading">
+        <h1 class="panel-title">
+            Details - {{ show_title }}
+        </h1>
+    </div>
+    <div class="table-responsive">
+        <table id="details_table" style="border-collapse: separate"
+               class="table table-condensed table-striped tablesorter">
+            <colgroup>
+                <col span="1" style="width: 40%;">
+                <col span="1" style="width: 15%;">
+                <col span="1" style="width: 15%;">
+                <col span="1" style="width: 15%;">
+                <col span="1" style="width: 15%;">
+            </colgroup>
+            <thead>
+            <tr>
+                <th style="text-align: left">Title</th>
+                <th style="text-align: center">Failures</th>
+                <th style="text-align: center">Skipped</th>
+                <th style="text-align: center">Changes</th>
+                <th style="text-align: center">Noops</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            <!-- NODES -->
+
+            {% if request.GET.show_summary == 'nodes' %}
+                <!-- show successes -->
+                {% if request.GET.show_status == 'success' %}
+                    {% for key, value  in summary.nodes_success.items %}
+                        <tr class="clickable-row" data-href='{% url 'event_analytics' view='nodes' %}?value={{ key }}'>
+                            <!-- title -->
+                            <td><strong>{{ key }}</strong></td>
+                            <!-- failure -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-danger img-rounded">
+                                {% if summary.nodes_failure|get_item:key %}
+                                    {{ summary.nodes_failure|get_item:key }}{% else %}0{% endif %}</p>
+                            </td>
+                            <!-- Skips -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-warning img-rounded">
+                                {% if summary.nodes_skipped|get_item:key %}
+                                    {{ summary.nodes_skipped|get_item:key }}{% else %}0{% endif %}</p>
+                            </td>
+                            <!-- Changes -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-success img-rounded">{{ value }}</p>
+                            </td>
+                            <!-- Noops -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-info img-rounded">
+                                {% if summary.nodes_noop|get_item:key %}
+                                    {{ summary.nodes_noop|get_item:key }}{% else %}0{% endif %}</p>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    <!-- show noops -->
+                {% elif request.GET.show_status == 'noop' %}
+                    {% for key, value  in summary.nodes_noop.items %}
+                        <tr class="clickable-row" data-href='{% url 'event_analytics' view='nodes' %}?value={{ key }}'>
+                            <!-- title -->
+                            <td><strong>{{ key }}</strong></td>
+                            <!-- Failure -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-danger img-rounded">
+                                {% if summary.nodes_failure|get_item:key %}
+                                    {{ summary.nodes_failure|get_item:key }}{% else %}0{% endif %}</p>
+                            </td>
+                            <!-- Skips -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-warning img-rounded">
+                                {% if summary.nodes_skipped|get_item:key %}
+                                    {{ summary.nodes_skipped|get_item:key }}{% else %}0{% endif %}</p>
+                            </td>
+                            <!-- Changes -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-success img-rounded">
+                                {% if summary.nodes_success|get_item:key %}
+                                    {{ summary.nodes_success|get_item:key }}{% else %}0{% endif %}</p>
+                            </td>
+                            <!-- Noops -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-info img-rounded">{{ value }}</p>
+                            </td>
+
+                        </tr>
+                    {% endfor %}
+                {% elif request.GET.show_status == 'skipped' %}
+                    {% for key, value  in summary.nodes_skipped.items %}
+                        <tr class="clickable-row" data-href='{% url 'event_analytics' view='nodes' %}?value={{ key }}'>
+                            <!-- title -->
+                            <td><strong>{{ key }}</strong></td>
+                            <!-- failure -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-danger img-rounded">
+                                {% if summary.nodes_failure|get_item:key %}
+                                    {{ summary.nodes_failure|get_item:key }}{% else %}0{% endif %}</p>
+                            </td>
+                            <!-- Skips -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-warning img-rounded">{{ value }}</p>
+                            </td>
+
+                            <!-- Changes -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-success img-rounded">
+                                {% if summary.nodes_success|get_item:key %}
+                                    {{ summary.nodes_success|get_item:key }}{% else %}0{% endif %}</p>
+                            </td>
+                            <!-- Noops -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-info img-rounded">
+                                {% if summary.nodes_noop|get_item:key %}
+                                    {{ summary.nodes_noop|get_item:key }}{% else %}0{% endif %}</p>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    <!-- show failures if anything other value is given. -->
+                {% else %}
+                    {% for key, value  in summary.nodes_failure.items %}
+                        <tr class="clickable-row" data-href='{% url 'event_analytics' view='nodes' %}?value={{ key }}'>
+                            <!-- title -->
+                            <td><strong>{{ key }}</strong></td>
+                            <!-- failure -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-danger img-rounded">{{ value }}</p>
+                            </td>
+                            <!-- Skips -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-warning img-rounded">
+                                {% if summary.nodes_skipped|get_item:key %}
+                                    {{ summary.nodes_skipped|get_item:key }}{% else %}0{% endif %}</p>
+                            </td>
+                            <!-- Changes -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-success img-rounded">
+                                {% if summary.nodes_success|get_item:key %}
+                                    {{ summary.nodes_success|get_item:key }}{% else %}0{% endif %}</p>
+                            </td>
+                            <!-- Noops -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-info img-rounded">
+                                {% if summary.nodes_noop|get_item:key %}
+                                    {{ summary.nodes_noop|get_item:key }}{% else %}0{% endif %}</p>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% endif %}
+
+                <!-- RESOURCES -->
+
+            {% elif request.GET.show_summary == 'resources' %}
+                <!-- show successes -->
+                {% if request.GET.show_status == 'success' %}
+                    {% for key, value  in summary.resources_success.items %}
+                        <tr class="clickable-row"
+                            data-href='{% url 'event_analytics' view='resources' %}?value={{ key }}'>
+                            <!-- title -->
+                            <td><strong>{{ key }}</strong></td>
+                            <!-- failure -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-danger img-rounded">
+                                {% if summary.resources_failure|get_item:key %}
+                                    {{ summary.resources_failure|get_item:key }}{% else %}
+                                    0{% endif %}</p>
+                            </td>
+                            <!-- Skips -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-warning img-rounded">
+                                {% if summary.resources_skipped|get_item:key %}
+                                    {{ summary.resources_skipped|get_item:key }}{% else %}
+                                    0{% endif %}</p>
+                            </td>
+                            <!-- Changes -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-success img-rounded">{{ value }}</p>
+                            </td>
+                            <!-- Noops -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-info img-rounded">
+                                {% if summary.resources_noop|get_item:key %}
+                                    {{ summary.resources_noop|get_item:key }}{% else %}0{% endif %}</p>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    <!-- show noops -->
+                {% elif request.GET.show_status == 'noop' %}
+                    {% for key, value  in summary.resources_noop.items %}
+                        <tr class="clickable-row"
+                            data-href='{% url 'event_analytics' view='resources' %}?value={{ key }}'>
+                            <!-- title -->
+                            <td><strong>{{ key }}</strong></td>
+                            <!-- Failure -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-danger img-rounded">
+                                {% if summary.resources_failure|get_item:key %}
+                                    {{ summary.resources_failure|get_item:key }}{% else %}
+                                    0{% endif %}</p>
+                            </td>
+                            <!-- Skips -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-warning img-rounded">
+                                {% if summary.resources_skipped|get_item:key %}
+                                    {{ summary.resources_skipped|get_item:key }}{% else %}
+                                    0{% endif %}</p>
+                            </td>
+                            <!-- Changes -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-success img-rounded">
+                                {% if summary.resources_success|get_item:key %}
+                                    {{ summary.resources_success|get_item:key }}{% else %}
+                                    0{% endif %}</p>
+                            </td>
+                            <!-- Noops -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-info img-rounded">{{ value }}</p>
+                            </td>
+
+                        </tr>
+                    {% endfor %}
+                {% elif request.GET.show_status == 'skipped' %}
+                    {% for key, value  in summary.resources_skipped.items %}
+                        <tr class="clickable-row"
+                            data-href='{% url 'event_analytics' view='resources' %}?value={{ key }}'>
+                            <!-- title -->
+                            <td><strong>{{ key }}</strong></td>
+                            <!-- failure -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-danger img-rounded">
+                                {% if summary.resources_failure|get_item:key %}
+                                    {{ summary.resources_failure|get_item:key }}{% else %}0{% endif %}</p>
+                            </td>
+                            <!-- Skips -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-warning img-rounded">{{ value }}</p>
+                            </td>
+
+                            <!-- Changes -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-success img-rounded">
+                                {% if summary.resources_success|get_item:key %}
+                                    {{ summary.resources_success|get_item:key }}{% else %}0{% endif %}</p>
+                            </td>
+                            <!-- Noops -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-info img-rounded">
+                                {% if summary.resources_noop|get_item:key %}
+                                    {{ summary.resources_noop|get_item:key }}{% else %}0{% endif %}</p>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    <!-- show failures if anything other value is given. -->
+                {% else %}
+                    {% for key, value  in summary.resources_failure.items %}
+                        <tr class="clickable-row"
+                            data-href='{% url 'event_analytics' view='resources' %}?value={{ key }}'>
+                            <!-- title -->
+                            <td><strong>{{ key }}</strong></td>
+                            <!-- failure -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-danger img-rounded">{{ value }}</p>
+                            </td>
+                            <!-- Skips -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-warning img-rounded">
+                                {% if summary.resources_skipped|get_item:key %}
+                                    {{ summary.resources_skipped|get_item:key }}{% else %}0{% endif %}</p>
+                            </td>
+                            <!-- Changes -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-success img-rounded">
+                                {% if summary.resources_success|get_item:key %}
+                                    {{ summary.resources_success|get_item:key }}{% else %}0{% endif %}</p>
+                            </td>
+                            <!-- Noops -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-info img-rounded">
+                                {% if summary.resources_noop|get_item:key %}
+                                    {{ summary.resources_noop|get_item:key }}{% else %}0{% endif %}</p>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% endif %}
+
+                <!-- TYPES -->
+
+            {% elif request.GET.show_summary == 'types' %}
+                <!-- show successes -->
+                {% if request.GET.show_status == 'success' %}
+                    {% for key, value  in summary.types_success.items %}
+                        <tr class="clickable-row" data-href='{% url 'event_analytics' view='types' %}?value={{ key }}'>
+                            <!-- title -->
+                            <td><strong>{{ key }}</strong></td>
+                            <!-- failure -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-danger img-rounded">
+                                {% if summary.types_failure|get_item:key %}
+                                    {{ summary.types_failure|get_item:key }}{% else %}0{% endif %}</p>
+                            </td>
+                            <!-- Skips -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-warning img-rounded">
+                                {% if summary.types_skipped|get_item:key %}
+                                    {{ summary.types_skipped|get_item:key }}{% else %}0{% endif %}</p>
+                            </td>
+                            <!-- Changes -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-success img-rounded">{{ value }}</p>
+                            </td>
+                            <!-- Noops -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-info img-rounded">
+                                {% if summary.types_noop|get_item:key %}
+                                    {{ summary.types_noop|get_item:key }}{% else %}0{% endif %}</p>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    <!-- show noops -->
+                {% elif request.GET.show_status == 'noop' %}
+                    {% for key, value  in summary.types_noop.items %}
+                        <tr class="clickable-row" data-href='{% url 'event_analytics' view='types' %}?value={{ key }}'>
+                            <!-- title -->
+                            <td><strong>{{ key }}</strong></td>
+                            <!-- Failure -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-danger img-rounded">
+                                {% if summary.types_failure|get_item:key %}
+                                    {{ summary.types_failure|get_item:key }}{% else %}0{% endif %}</p>
+                            </td>
+                            <!-- Skips -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-warning img-rounded">
+                                {% if summary.types_skipped|get_item:key %}
+                                    {{ summary.types_skipped|get_item:key }}{% else %}0{% endif %}</p>
+                            </td>
+                            <!-- Changes -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-success img-rounded">
+                                {% if summary.types_success|get_item:key %}
+                                    {{ summary.types_success|get_item:key }}{% else %}0{% endif %}</p>
+                            </td>
+                            <!-- Noops -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-info img-rounded">{{ value }}</p>
+                            </td>
+
+                        </tr>
+                    {% endfor %}
+                {% elif request.GET.show_status == 'skipped' %}
+                    {% for key, value  in summary.types_skipped.items %}
+                        <tr class="clickable-row" data-href='{% url 'event_analytics' view='types' %}?value={{ key }}'>
+                            <!-- title -->
+                            <td><strong>{{ key }}</strong></td>
+                            <!-- failure -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-danger img-rounded">
+                                {% if summary.types_failure|get_item:key %}
+                                    {{ summary.types_failure|get_item:key }}{% else %}0{% endif %}</p>
+                            </td>
+                            <!-- Skips -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-warning img-rounded">{{ value }}</p>
+                            </td>
+
+                            <!-- Changes -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-success img-rounded">
+                                {% if summary.types_success|get_item:key %}
+                                    {{ summary.types_success|get_item:key }}{% else %}0{% endif %}</p>
+                            </td>
+                            <!-- Noops -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-info img-rounded">
+                                {% if summary.types_noop|get_item:key %}
+                                    {{ summary.types_noop|get_item:key }}{% else %}0{% endif %}</p>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    <!-- show failures if anything other value is given. -->
+                {% else %}
+                    {% for key, value  in summary.types_failure.items %}
+                        <tr class="clickable-row" data-href='{% url 'event_analytics' view='types' %}?value={{ key }}'>
+                            <!-- title -->
+                            <td><strong>{{ key }}</strong></td>
+                            <!-- failure -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-danger img-rounded">{{ value }}</p>
+                            </td>
+                            <!-- Skips -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-warning img-rounded">
+                                {% if summary.types_skipped|get_item:key %}
+                                    {{ summary.types_skipped|get_item:key }}{% else %}0{% endif %}</p>
+                            </td>
+                            <!-- Changes -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-success img-rounded">
+                                {% if summary.types_success|get_item:key %}
+                                    {{ summary.types_success|get_item:key }}{% else %}0{% endif %}</p>
+                            </td>
+                            <!-- Noops -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-info img-rounded">
+                                {% if summary.types_noop|get_item:key %}
+                                    {{ summary.types_noop|get_item:key }}{% else %}0{% endif %}</p>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% endif %}
+
+                <!-- SHOW CLASSES IF NONE OF THE ABOVE -->
+
+            {% else %}
+                <!-- show successes -->
+                {% if request.GET.show_status == 'success' %}
+                    {% for key, value  in summary.classes_success.items %}
+                        <tr class="clickable-row"
+                            data-href='{% url 'event_analytics' view='classes' %}?value={{ key }}'>
+                            <!-- title -->
+                            <td><strong>{{ key }}</strong></td>
+                            <!-- failure -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-danger img-rounded">
+                                {% if summary.classes_failure|get_item:key %}
+                                    {{ summary.classes_failure|get_item:key }}{% else %}0{% endif %}</p>
+                            </td>
+                            <!-- Skips -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-warning img-rounded">
+                                {% if summary.classes_skipped|get_item:key %}
+                                    {{ summary.classes_skipped|get_item:key }}{% else %}0{% endif %}</p>
+                            </td>
+                            <!-- Changes -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-success img-rounded">{{ value }}</p>
+                            </td>
+                            <!-- Noops -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-info img-rounded">
+                                {% if summary.classes_noop|get_item:key %}
+                                    {{ summary.classes_noop|get_item:key }}{% else %}0{% endif %}</p>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    <!-- show noops -->
+                {% elif request.GET.show_status == 'noop' %}
+                    {% for key, value  in summary.classes_noop.items %}
+                        <tr class="clickable-row"
+                            data-href='{% url 'event_analytics' view='classes' %}?value={{ key }}'>
+                            <!-- title -->
+                            <td><strong>{{ key }}</strong></td>
+                            <!-- Failure -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-danger img-rounded">
+                                {% if summary.classes_failure|get_item:key %}
+                                    {{ summary.classes_failure|get_item:key }}{% else %}0{% endif %}</p>
+                            </td>
+                            <!-- Skips -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-warning img-rounded">
+                                {% if summary.classes_skipped|get_item:key %}
+                                    {{ summary.classes_skipped|get_item:key }}{% else %}0{% endif %}</p>
+                            </td>
+                            <!-- Changes -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-success img-rounded">
+                                {% if summary.classes_success|get_item:key %}
+                                    {{ summary.classes_success|get_item:key }}{% else %}0{% endif %}</p>
+                            </td>
+                            <!-- Noops -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"§
+                                                              class="bg-info img-rounded">{{ value }}</p>
+                            </td>
+
+                        </tr>
+                    {% endfor %}
+                {% elif request.GET.show_status == 'skipped' %}
+                    {% for key, value  in summary.classes_skipped.items %}
+                        <tr class="clickable-row"
+                            data-href='{% url 'event_analytics' view='classes' %}?value={{ key }}'>
+                            <!-- title -->
+                            <td><strong>{{ key }}</strong></td>
+                            <!-- failure -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-danger img-rounded">
+                                {% if summary.classes_failure|get_item:key %}
+                                    {{ summary.classes_failure|get_item:key }}{% else %}0{% endif %}</p>
+                            </td>
+                            <!-- Skips -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-warning img-rounded">{{ value }}</p>
+                            </td>
+
+                            <!-- Changes -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-success img-rounded">
+                                {% if summary.classes_success|get_item:key %}
+                                    {{ summary.classes_success|get_item:key }}{% else %}0{% endif %}</p>
+                            </td>
+                            <!-- Noops -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-info img-rounded">
+                                {% if summary.classes_noop|get_item:key %}
+                                    {{ summary.classes_noop|get_item:key }}{% else %}0{% endif %}</p>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    <!-- show failures if anything other value is given. -->
+                {% else %}
+                    {% for key, value  in summary.classes_failure.items %}
+                        <tr class="clickable-row"
+                            data-href='{% url 'event_analytics' view='classes' %}?value={{ key }}'>
+                            <!-- title -->
+                            <td><strong>{{ key }}</strong></td>
+                            <!-- failure -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-danger img-rounded">{{ value }}</p>
+                            </td>
+                            <!-- Skips -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-warning img-rounded">
+                                {% if summary.classes_skipped|get_item:key %}
+                                    {{ summary.classes_skipped|get_item:key }}{% else %}0{% endif %}</p>
+                            </td>
+                            <!-- Changes -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-success img-rounded">
+                                {% if summary.classes_success|get_item:key %}
+                                    {{ summary.classes_success|get_item:key }}{% else %}0{% endif %}</p>
+                            </td>
+                            <!-- Noops -->
+                            <td style="text-align: center"><p style="margin-bottom: 0"
+                                                              class="bg-info img-rounded">
+                                {% if summary.classes_noop|get_item:key %}
+                                    {{ summary.classes_noop|get_item:key }}{% else %}0{% endif %}</p>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% endif %}
+            {% endif %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

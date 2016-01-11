@@ -1,0 +1,472 @@
+{% extends "pano/base.html" %}
+
+{% load puppetdb_extras %}
+{% load common %}
+
+{% block head %}
+    {% load staticfiles %}
+    <script src="{% static 'pano/js/query-builder.min.js' %}"></script>
+    <script src="{% static 'pano/js/bootbox.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'pano/css/query-filter.min.css' %}">
+    <script>
+        $(document).ready(function () {
+            refresh_data();
+        });
+        $(document).on({
+            ajaxStart: function () {
+                bootbox.dialog({
+                    title: "Loading...",
+                    message: "Fetching data from PuppetDB.",
+                    show: true,
+                    backdrop: false,
+                    closeButton: true,
+                    animate: false
+                });
+            },
+            ajaxStop: function () {
+                bootbox.hideAll()
+            }
+        });
+    </script>
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel-group" id="filters_accordion" role="tablist" aria-multiselectable="true">
+                <div class="panel panel-default">
+                    <div role="tab" class="panel-heading" id="headingFilter">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#filters_accordion" href="#collapseFilter"
+                               aria-expanded="false" aria-controls="collapseFilter">
+                                Query Builder
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapseFilter" class="panel-collapse collapse in" role="tabpanel"
+                         aria-labelledby="headingFilter">
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div id="builder-nodes"></div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <form id="searchform">
+                                        <input type="hidden" id="search" name="search" value=""/>
+                                    </form>
+                                    <div class="btn-group">
+                                        <button id="searchbutton" class="btn btn-primary search-puppet"
+                                                data-target="nodes">
+                                            Search
+                                        </button>
+                                        <button class="btn btn-primary search-refresh" data-target="nodes">Refresh
+                                        </button>
+                                        <button class="btn btn-info parse-puppet" data-target="nodes">Generate</button>
+                                        <button class="btn btn-danger search-clear" data-target="nodes">Reset</button>
+                                    </div>
+                                    <div class="btn-group">
+                                        <button class="btn btn-success save-query" data-target="nodes">Save Query
+                                        </button>
+                                    </div>
+                                    <div class="btn-group">
+                                        <button class="btn btn-default dropdown-toggle" type="button"
+                                                data-toggle="dropdown" formaction="{% url 'nodes' %}">
+                                            Load Query <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu" role="menu" aria-labelledby="menu_querys">
+                                            {% if saved_queries %}
+                                                {% for query in saved_queries %}
+                                                    <li class="hz">
+                                                        <a role="menuitem" tabindex="-1"
+                                                           href="{% url 'api_filter' %}?delete_query={{ query.id }}&next_url={% url 'nodes' %}"><span class="glyphicon glyphicon-remove text-danger"></span></a>
+                                                        <a role="menuitem" tabindex="-1"
+                                                           href="{% url 'nodes' %}?load_query={{ query.filter }}">{{ query.identifier }}</a>
+                                                    </li>
+                                                {% endfor %}
+                                            {% else %}
+                                                <li class="disabled">
+                                                    <a role="menuitem" tabindex="-1"
+                                                       href="#">No saved queries</a>
+                                                </li>
+                                            {% endif %}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function refresh_data(obj) {
+            var backgroundTask = $.Deferred();
+            var url = '../api/nodes/';
+            var query = '';
+            var params = '';
+            if (obj) {
+                if ($(obj).attr('href')) {
+                    params = $(obj).attr('href');
+                    url = "../api/nodes/" + params;
+                }
+                else if ($(obj).attr('id') == 'searchform') {
+                    $("form#searchform :input").each(function () {
+                        query = $(this).val(); // This is the jquery object of the input
+                        url = "../api/nodes/?search=" + query;
+                    });
+                }
+                else if ($(obj).attr('id') == 'limits') {
+                    var limits = $('#limits').find(":selected").val();
+                    url = "../api/nodes/?limits=" + limits;
+                }
+            }
+            $.get(url, function (json) {
+                var response = $(jQuery(json));
+                nodes = response[0]['nodeList'];
+                if (!nodes) {
+                    var url = "{% url 'login' %}?next={% url 'nodes' %}";
+                    if (query) {
+                        url = "{% url 'login' %}?next={% url 'nodes' %}?load_query=" + query;
+                    }
+                    window.location.replace(url);
+                }
+                else if (nodes.length === 0) {
+                    var data = '<tr><td colspan="8">No matches for query.</td></tr>';
+                }
+                else {
+                    var nodes = response[0]['nodeList'];
+                    //('certname', 'latestCatalog', 'latestReport', 'latestFacts', 'success', 'noop', 'failure', 'skipped'),
+                    nodes.forEach(function (node) {
+                        data += '<tr>';
+                        //Certname
+                        data += '<td><a href="../reports/' + node[0] + '">' + node[0] + '</a></td>';
+                        //latest catalog
+                        data += '<td>' + node[1] + '</td>';
+                        //latest report
+                        if (node[4] > 0 || node[5] > 0 || node[6] > 0 || node[7] > 0) {
+                            data += '<td><a href="../reports/' + node[0] + '?latest=true&report_timestamp=' + node[2] + '">' + node[2] + '</a></td>';
+                        } else {
+                            data += '<td>' + node[2] + '</td>';
+                        }
+                        //latest facts
+                        data += '<td>' + node[3] + '</td>';
+                        //failed events
+                        data += '<td style="text-align: center"><p style="margin-bottom: 0" class="bg-success img-rounded"><strong>' + node[4] + '</strong></p></td>';
+                        //skipped events
+                        data += '<td style="text-align: center"><p style="margin-bottom: 0" class="bg-info img-rounded"><strong>' + node[5] + '</strong></p></td>';
+                        //successful events
+                        data += '<td style="text-align: center"><p style="margin-bottom: 0" class="bg-danger img-rounded"><strong>' + node[6] + '</strong></p></td>';
+                        //noop events
+                        data += '<td style="text-align: center"><p style="margin-bottom: 0" class="bg-warning img-rounded"><strong>' + node[7] + '</strong></p></td>';
+                        data += '</tr>';
+                    });
+                }
+                // update table with the new json data to the table body
+                $("table tbody").html(data);
+                $('#nodePaneTitle').html('Query Results - Number of results: ' + response[0]['total_nodes']);
+
+                // update glyphicons
+                var sortfield = ['certname', 'catalog_timestamp', 'facts_timestamp', 'report_timestamp', 'successes', 'failures', 'noops', 'skips'];
+
+                sortfield.forEach(function (field) {
+                    var fieldHeader = $('#' + field + '-header');
+                    var fieldLink = $('#' + field + '-link');
+                    $(fieldHeader).find('span').removeAttr('class');
+                    // if field is active
+                    if (response[0]['c_r_sfield'] == field) {
+                        var url = '?sortfield=' + field + '&sortfieldby=' + response[0]['c_r_sfieldby_o'];
+                        if (response[0]['c_r_sfieldby'] == 'desc') {
+                            $(fieldHeader).find('span').removeClass('glyphicon glyphicon-chevron-up');
+                            $(fieldHeader).find('span').addClass('glyphicon glyphicon-chevron-down');
+                            $(fieldLink).attr('href', url);
+                        }
+                        else if (response[0]['c_r_sfieldby'] == 'asc') {
+                            $(fieldHeader).find('span').removeClass('glyphicon glyphicon-chevron-down');
+                            $(fieldHeader).find('span').addClass('glyphicon glyphicon-chevron-up');
+                            $(fieldLink).prop('href', url);
+                        }
+                        // if field is not the active sort field
+                    }
+                });
+                // update pager buttons TODO: concat if there is lots of pages.
+                var pager_buttons = '';
+                for (var i = 1; i <= response[0]['tot_pages']; i++) {
+                    if (response[0]['c_r_page'] === i) {
+                        pager_buttons += '<li class="active"><a onclick="refresh_data(this); return false;" href="?page=' + i + '">' + i + '</a></li>';
+                    }
+                    else {
+                        pager_buttons += '<li><a onclick="refresh_data(this); return false;" href="?page=' + i + '">' + i + '</a></li>';
+                    }
+                }
+                // Set selected limits value
+                $("#limits").val(response[0]['c_r_limit']);
+                $('#footPager').html(pager_buttons);
+            })
+                    .fail(function () {
+                        var data = '<tr><td colspan="8">Can not connect to PuppetDB.</td></tr>';
+                        $("table tbody").html(data);
+                    });
+
+            backgroundTask.resolve();
+            return backgroundTask;
+        }
+    </script>
+    <script>
+        {% if request.session.search %}
+            {% with request.session.search|query_to_rules as rules %}
+                {% autoescape off %}
+                    var rules ={{ rules }};
+                {% endautoescape %}
+            {% endwith %}
+        {% endif %}
+        $('#builder-nodes').queryBuilder({
+            plugins: [
+                'bt-tooltip-errors',
+                'filter-description'],
+
+            filters: [
+                {
+                    id: 'nodes',
+                    label: 'Nodes',
+                    type: 'string',
+                    description: 'Enter the FQDN for a node in Puppet.',
+                    operators: ['puppet_equal', 'puppet_re_match'],
+                    placeholder: 'host.example.com',
+                    input: function (rule, name) {
+                        return '\
+                        <select class="form-control" name="' + name + '_1"> \
+        <option value="None">-</option> \
+        <option value="&quot;certname&quot;">Certname</option> \
+        <option value="&quot;report_environment&quot;">Report Environment</option> \
+        <option value="&quot;catalog_environment&quot;">Catalog Environment</option> \
+        <option value="&quot;facts_environment&quot;">Facts Environment</option> \
+        <option value="&quot;report_timestamp&quot;">Report Timestamp Environment</option> \
+        <option value="&quot;catalog_timestamp&quot;">Catalog Timestamp</option> \
+        <option value="&quot;facts_timestamp&quot;">Facts Timestamp</option> \
+      </select>\
+      <input class="form-control" type="text" name="' + name + '_2">';
+                    },
+                    valueGetter: function (rule) {
+                        return [rule.$el.find('.rule-value-container [name$=_1]').val(), rule.$el.find('.rule-value-container [name$=_2]').val()];
+                    },
+                    valueSetter: function (rule, value) {
+                        if (rule.operator.nb_inputs > 0) {
+                            rule.$el.find('.rule-value-container [name$=_1]').val(value[0]).trigger('change');
+                            rule.$el.find('.rule-value-container [name$=_2]').val(value[1]).trigger('change');
+                        }
+                    }
+                },
+                {
+                    id: 'facts',
+                    label: 'Fact',
+                    type: 'string',
+                    description: 'Each fact query in the same GROUP will all be put in the same SUBQUERY.' +
+                    'If you wish to create a new subquery to the facts endpoint you must add a new group first.',
+                    operators: ['puppet_equal', 'puppet_nequal', 'puppet_g', 'puppet_ge', 'puppet_l', 'puppet_le', 'puppet_re_match'],
+                    input: function (rule, name) {
+                        return '\
+                        <select class="form-control" name="' + name + '_1"> \
+        <option value="None">-</option> \
+        <option value="&quot;name&quot;">Name</option> \
+        <option value="&quot;value&quot;">Value</option> \
+      </select>\
+      <input class="form-control" type="text" name="' + name + '_2">';
+                    },
+                    valueGetter: function (rule) {
+                        return [rule.$el.find('.rule-value-container [name$=_1]').val(), rule.$el.find('.rule-value-container [name$=_2]').val()];
+                    },
+                    valueSetter: function (rule, value) {
+                        if (rule.operator.nb_inputs > 0) {
+                            rule.$el.find('.rule-value-container [name$=_1]').val(value[0]).trigger('change');
+                            rule.$el.find('.rule-value-container [name$=_2]').val(value[1]).trigger('change');
+                        }
+                    }
+                },
+                {
+                    id: 'resources',
+                    label: 'Resource',
+                    type: 'string',
+                    description: 'Each resource query in the same GROUP will all be put in the same SUBQUERY.' +
+                    'If you wish to create a new subquery to the resource endpoint you must add a new group first.',
+                    operators: ['puppet_equal', 'puppet_nequal', 'puppet_g', 'puppet_ge', 'puppet_l', 'puppet_le', 'puppet_re_match'],
+                    input: function (rule, name) {
+                        return '\
+                        <select class="form-control" name="' + name + '_1"> \
+                            <option value="None">-</option> \
+                            <option value="&quot;title&quot;">Title</option> \
+                            <option value="&quot;type&quot;">Type</option> \
+                            <option value="[&quot;parameter&quot;, &quot;ensure&quot;]">Parameter - Ensure</option>\
+                            <option value="[&quot;parameter&quot;, &quot;owner&quot;]">Parameter - Owner</option>\
+                            <option value="[&quot;parameter&quot;, &quot;group&quot;]">Parameter - Group</option>\
+                            <option value="[&quot;parameter&quot;, &quot;content&quot;]">Parameter - Content</option>\
+                            <option value="[&quot;parameter&quot;, &quot;source&quot;]">Parameter - Source</option>\
+                            <option value="[&quot;parameter&quot;, &quot;path&quot;]">Parameter - Path</option>\
+                            <option value="[&quot;parameter&quot;, &quot;alias&quot;]">Parameter - Alias</option>\
+                            <option value="[&quot;parameter&quot;, &quot;command&quot;]">Parameter - Command</option>\
+                        </select>\
+                        <input class="form-control" type="text" name="' + name + '_2">';
+                    },
+                    valueGetter: function (rule) {
+                        return [rule.$el.find('.rule-value-container [name$=_1]').val(), rule.$el.find('.rule-value-container [name$=_2]').val()];
+                    },
+                    valueSetter: function (rule, value) {
+                        if (rule.operator.nb_inputs > 0) {
+                            rule.$el.find('.rule-value-container [name$=_1]').val(value[0]).trigger('change');
+                            rule.$el.find('.rule-value-container [name$=_2]').val(value[1]).trigger('change');
+                        }
+                    }
+                }
+            ],
+            {% if request.session.search %}
+                rules: rules
+            {% endif %}
+        });
+    </script>
+    <script>
+        // refresh table
+        $('.search-refresh').on('click', function () {
+            refresh_data();
+        });
+        // get rules
+        $('.parse-puppet').on('click', function () {
+            var res = $('#builder-' + $(this).data('target')).queryBuilder('getPuppet');
+            if (!$.isEmptyObject(res)) {
+                bootbox.alert({
+                    title: $(this).text(),
+                    message: '<pre class="code-popup">' + res + '</pre>'
+                });
+            }
+        });
+        // save filter
+        $('.save-query').on('click', function () {
+            var res = $('#builder-' + $(this).data('target')).queryBuilder('getPuppet');
+            if (!$.isEmptyObject(res)) {
+                var ident = prompt("Please enter an identifying name for the query.");
+                if (!$.isEmptyObject(ident)) {
+                    $.post("{% url 'api_filter' %}", {
+                                "puppetdb_filter": res,
+                                "identifier": ident,
+                                "csrfmiddlewaretoken": document.getElementsByName('csrfmiddlewaretoken')[0].value
+                            }
+                    );
+                }
+            }
+        });
+        // send the query refresh_data(this).done(refresh_data(this))
+        $('.search-puppet').on('click', function () {
+            var res = $('#builder-' + $(this).data('target')).queryBuilder('getPuppet');
+            if (!$.isEmptyObject(res)) {
+                $('#search').val(res);
+                refresh_data(document.getElementById('searchform')).done();
+                return false;
+            }
+        });
+        // clear the query
+        $('.search-clear').on('click', function () {
+            $('#search').val("clear_rules");
+            $('#builder-nodes').queryBuilder('reset');
+            refresh_data(document.getElementById('searchform')).done();
+            return false;
+        });
+        function csv_facts() {
+            var facts = $('#include_facts').val();
+            var url = "../api/nodes/?dl_csv=true&include_facts=" + facts;
+            $('#csvfacts').prop('href', url);
+            return false;
+        }
+    </script>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h1 id="nodePaneTitle" class="panel-title"></h1>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-condensed table-striped">
+                        <thead>
+                        <tr>
+                            <th id="certname-header">
+                                <a id="certname-link" onclick="refresh_data(this).done(); return false;"
+                                   href="?sortfield=certname">Certname <span class="glyphicon glyphicon"></span></a>
+                            </th>
+                            <th id="catalog_timestamp-header">
+                                <a id="catalog_timestamp-link" onclick="refresh_data(this).done(); return false;"
+                                   href="?sortfield=catalog_timestamp">Catalog Timestamp <span class="glyphicon"></span></a>
+                            </th>
+                            <th id="report_timestamp-header">
+                                <a id="report_timestamp-link" onclick="refresh_data(this).done(); return false;"
+                                   href="?sortfield=report_timestamp">Report Timestamp <span
+                                        class="glyphicon"></span></a>
+                            </th>
+                            <th id="facts_timestamp-header">
+                                <a id="facts_timestamp-link" onclick="refresh_data(this).done(); return false;"
+                                   href="?sortfield=facts_timestamp">Facts Timestamp <span class="glyphicon"></span></a>
+                            </th>
+                            <th id="successes-header">
+                                <a id="successes-link" onclick="refresh_data(this).done(); return false;    "
+                                   href="?sortfield=successes">Successes <span class="glyphicon"></span></a>
+                            </th>
+                            <th id="noops-header">
+                                <a id="noops-link" onclick="refresh_data(this).done(); return false;"
+                                   href="?sortfield=noops">Noops <span class="glyphicon"></span></a>
+                            </th>
+                            <th id="failures-header">
+                                <a id="failure-link" onclick="refresh_data(this).done(); return false;"
+                                   href="?sortfield=failures">Failures <span class="glyphicon"></span></a>
+                            </th>
+                            <th id="skips-header">
+                                <a id="skips-link" onclick="refresh_data(this).done(); return false;"
+                                   href="?sortfield=skips">Skipped <span class="glyphicon"></span></a>
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                            <td colspan="1"><strong>Download as: </strong>
+                                <a id="csv" href="{% url 'api_nodes' %}?dl_csv=true" download>CSV</a> | <a id="csvfacts"
+                                                                                                           onclick="csv_facts()"
+                                                                                                           href="#"
+                                                                                                           download>CSV
+                                    with
+                                    Facts</a> <input type="text" placeholder="Example: osfamily,kernel,kernelversion"
+                                                     class="form-control input-sm" id="include_facts"
+                                                     name="include_facts">
+                            </td>
+                            <td colspan="7">
+                            </td>
+                        </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                <div class="panel-footer">
+                    <ul id="footPager" class="pagination pagination-sm" style="margin:0;">
+                        <li><a onclick="refresh_data(this).done(); return false;" href="?page="></a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+        </div>
+        <div class="col-md-8" align="right">
+            <form>
+            <span class="dropdown-header">Page Size:<br>
+                <label for="req_limit">
+                    <select id="limits" onchange="refresh_data(this).done(); return false;">
+                        {% mkrange 50 3050 50 as limitrange %}
+                        {% for range in limitrange %}
+                            <option value="{{ range }}">{{ range }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+            </span>
+            </form>
+        </div>
+    </div>
+{% endblock %}
