@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    {% load common %}
+</head>
+<body>
+{% if isdiff == False %}
+    <pre>{{ content }}</pre>
+{% else %}
+    {% if content %}
+        <pre>{{ content|colorizediff|safe }}</pre>
+        {% else %}
+        <pre>No diff is available.</pre>
+    {% endif %}
+{% endif %}
+</body>
+</html>

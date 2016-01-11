@@ -1,0 +1,23 @@
+
+WSGISocketPrefix /var/run/wsgi
+WSGIPythonHome /opt/gk-labs #FIXME: add your path to the virtualenv here!
+
+<VirtualHost *:80>
+    ServerName YOUR-DOMAIN-NAME-HERE.com
+    WSGIDaemonProcess panopuppet user=apache group=apache threads=5
+    WSGIScriptAlias / /usr/share/panopuppet/wsgi/wsgi.py
+    ErrorLog /var/log/httpd/panopuppet.error.log
+    CustomLog /var/log/httpd/panopuppet.access.log combined
+
+    Alias /static /usr/share/panopuppet/static
+
+    <Directory /usr/share/panopuppet/static>
+        Require all granted
+    </Directory>
+
+    <Directory /usr/share/panopuppet>
+        Satisfy Any
+        Allow from all
+    </Directory>
+
+</VirtualHost>
