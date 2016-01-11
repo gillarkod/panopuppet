@@ -1,0 +1,3 @@
+include LICENSE
+recursive-include panopuppet/pano/static *
+recursive-include panopuppet/pano/templates *
