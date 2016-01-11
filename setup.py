@@ -16,7 +16,7 @@ staticInstallPrefix = '/usr/share/panopuppet/static'
 
 def getDataFileList():
   if not os.path.exists(staticFullPath):
-    raise Exception, 'ERROR: Unable to find static files at %s' % staticFullPath
+    raise Exception('ERROR: Unable to find static files at %s' % staticFullPath)
 
   rootPathLen = len(repoRootPath)
   staticDirList = []
