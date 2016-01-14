@@ -17,7 +17,7 @@ def getDataFileList():
     raise Exception('ERROR: Unable to find static files at %s' % staticFullPath)
 
   rootPathLen = len(repoRootPath)
-  etcCfgTuple = ('/etc/panopuppet', ['panopuppet/puppet/settings.py'] )
+  etcCfgTuple = ('/etc/panopuppet', ['panopuppet/puppet/settings.py', 'config.yaml.example'] )
   wsgiShare = ('/usr/share/panopuppet/wsgi', ['panopuppet/puppet/wsgi.py'] )
   staticDirList = [etcCfgTuple, wsgiShare]
 
