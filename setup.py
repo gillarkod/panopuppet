@@ -18,7 +18,8 @@ def getDataFileList():
 
   rootPathLen = len(repoRootPath)
   etcCfgTuple = ('/etc/panopuppet', ['panopuppet/puppet/settings.py'] )
-  staticDirList = [etcCfgTuple]
+  wsgiShare = ('/usr/share/panopuppet/wsgi', ['panopuppet/puppet/wsgi.py'] )
+  staticDirList = [etcCfgTuple, wsgiShare]
 
 
   for dirpath, dirnames, filenames in os.walk(staticFullPath):
