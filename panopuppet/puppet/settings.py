@@ -12,7 +12,8 @@ import os
 import yaml
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-config_file = os.path.join(BASE_DIR, 'config.yaml')
+#config_file = os.path.join(BASE_DIR, 'config.yaml')
+config_file = '/etc/panopuppet/config.yaml'
 with open(config_file, 'r') as ymlfile:
     cfg = yaml.load(ymlfile)
 

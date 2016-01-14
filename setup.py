@@ -7,9 +7,7 @@ repoRootPath = os.path.dirname( os.path.abspath(__file__) )
 staticRelPath='panopuppet/pano/static/pano'
 staticFullPath = os.path.join(repoRootPath, staticRelPath)
 
-pkgList = ['python33', 'python33-devel', 'openldap-devel', 'cyrus-sasl', 'gcc', 
-   'make', 'httpd', 'python33-mod_wsgi'
-] 
+pkgList = ['openldap-devel', 'cyrus-sasl', 'gcc', 'make', 'httpd'] 
 rpmReq = {'requires': pkgList }
 
 staticInstallPrefix = '/usr/share/panopuppet/static'
@@ -19,7 +17,8 @@ def getDataFileList():
     raise Exception('ERROR: Unable to find static files at %s' % staticFullPath)
 
   rootPathLen = len(repoRootPath)
-  staticDirList = []
+  etcCfgTuple = ('/etc/panopuppet', ['panopuppet/puppet/settings.py'] )
+  staticDirList = [etcCfgTuple]
 
 
   for dirpath, dirnames, filenames in os.walk(staticFullPath):
