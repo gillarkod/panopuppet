@@ -1,3 +1,4 @@
 include LICENSE
+include config.yaml.example
 recursive-include panopuppet/pano/static *
 recursive-include panopuppet/pano/templates *
