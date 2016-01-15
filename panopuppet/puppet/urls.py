@@ -6,6 +6,6 @@ urlpatterns = patterns('',
                        # url(r'^$', 'puppet.views.home', name='home'),
                        # url(r'^blog/', include('blog.urls')),
                        url(r'^$', include('panopuppet.pano.urls')),
-                       url(r'^pano/', include('panopupet.pano.urls')),
+                       url(r'^pano/', include('panopuppet.pano.urls')),
                        url(r'^puppetadmin/', include(admin.site.urls)),
 )
