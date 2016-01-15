@@ -1,5 +1,5 @@
 import yaml
-from puppet.settings import config_file
+from panopuppet.puppet.settings import config_file
 
 # Load config file for panopuppet
 with open(config_file, 'r') as ymlfile:
