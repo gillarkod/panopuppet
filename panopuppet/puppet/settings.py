@@ -43,7 +43,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'pano',
+    'panopuppet.pano',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -55,7 +55,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     # timezone awareness
-    'puppet.middlewares.TimezoneMiddleware',
+    'panopuppet.puppet.middlewares.TimezoneMiddleware',
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (
@@ -68,9 +68,9 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "django.core.context_processors.request",
 )
 
-ROOT_URLCONF = 'puppet.urls'
+ROOT_URLCONF = 'panopuppet.puppet.urls'
 
-WSGI_APPLICATION = 'puppet.wsgi.application'
+WSGI_APPLICATION = 'panopuppet.puppet.wsgi.application'
 
 
 # Database
@@ -185,7 +185,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = cfg.get('STATIC_ROOT', '/srv/staticfiles')
+STATIC_ROOT = cfg.get('STATIC_ROOT', '/usr/share/panopuppet/static/')
 
 TEMPLATE_DIRS = (
     os.path.join(BASE_DIR, 'templates'),
