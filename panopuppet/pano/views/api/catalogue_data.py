@@ -5,8 +5,8 @@ from django.contrib.auth.decorators import login_required
 
 from django.shortcuts import HttpResponse
 
-from pano.puppetdb import puppetdb
-from pano.puppetdb.puppetdb import get_server
+from panopuppet.pano.puppetdb import puppetdb
+from panopuppet.pano.puppetdb.puppetdb import get_server
 
 __author__ = 'etaklar'
 

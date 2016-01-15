@@ -4,8 +4,8 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 from django.views.decorators.cache import cache_page
 
-from pano.puppetdb.puppetdb import set_server
-from pano.settings import AVAILABLE_SOURCES, CACHE_TIME
+from panopuppet.pano.puppetdb.puppetdb import set_server
+from panopuppet.pano.settings import AVAILABLE_SOURCES, CACHE_TIME
 
 __author__ = 'etaklar'
 

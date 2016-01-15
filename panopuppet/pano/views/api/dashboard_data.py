@@ -4,10 +4,10 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import HttpResponse, redirect
 from django.views.decorators.cache import cache_page
 
-from pano.methods.dictfuncs import dictstatus as dictstatus
-from pano.puppetdb.pdbutils import run_puppetdb_jobs
-from pano.puppetdb.puppetdb import set_server, get_server
-from pano.settings import CACHE_TIME
+from panopuppet.pano.methods.dictfuncs import dictstatus as dictstatus
+from panopuppet.pano.puppetdb.pdbutils import run_puppetdb_jobs
+from panopuppet.pano.puppetdb.puppetdb import set_server, get_server
+from panopuppet.pano.settings import CACHE_TIME
 
 __author__ = 'etaklar'
 

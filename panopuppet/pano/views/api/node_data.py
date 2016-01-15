@@ -7,11 +7,11 @@ from django.http import HttpResponseBadRequest, HttpResponse, StreamingHttpRespo
 from django.shortcuts import redirect
 from django.views.decorators.csrf import ensure_csrf_cookie
 
-from pano.methods.dictfuncs import dictstatus as dictstatus
-from pano.puppetdb import puppetdb
-from pano.puppetdb.pdbutils import generate_csv
-from pano.puppetdb.puppetdb import set_server, get_server
-from pano.views import Echo
+from panopuppet.pano.methods.dictfuncs import dictstatus as dictstatus
+from panopuppet.pano.puppetdb import puppetdb
+from panopuppet.pano.puppetdb.pdbutils import generate_csv
+from panopuppet.pano.puppetdb.puppetdb import set_server, get_server
+from panopuppet.pano.views import Echo
 
 __author__ = 'etaklar'
 

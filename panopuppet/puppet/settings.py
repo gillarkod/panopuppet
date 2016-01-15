@@ -86,7 +86,7 @@ DATABASES = {
 
 # Authentication
 # Ldap authentication
-from pano.settings import AUTH_METHOD, LDAP_SERVER, LDAP_BIND_DN, LDAP_BIND_PW, LDAP_ALLOW_GRP, LDAP_USEARCH_PATH, \
+from panopuppet.pano.settings import AUTH_METHOD, LDAP_SERVER, LDAP_BIND_DN, LDAP_BIND_PW, LDAP_ALLOW_GRP, LDAP_USEARCH_PATH, \
     LDAP_GSEARCH_PATH, STAFF_GRP, SUPERUSER_GRP, ACTIVE_GRP
 
 if AUTH_METHOD == 'ldap':

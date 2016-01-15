@@ -3,7 +3,7 @@ import queue
 
 from threading import Thread
 
-from pano.puppetdb import puppetdb
+from panopuppet.pano.puppetdb import puppetdb
 
 
 class UTC(datetime.tzinfo):

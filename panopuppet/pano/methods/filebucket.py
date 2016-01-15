@@ -2,7 +2,7 @@ import requests
 import hashlib
 import difflib
 
-from pano.puppetdb.puppetdb import api_get as pdb_api_get, get_server, mk_puppetdb_query
+from panopuppet.pano.puppetdb.puppetdb import api_get as pdb_api_get, get_server, mk_puppetdb_query
 
 __author__ = 'takeshi'
 

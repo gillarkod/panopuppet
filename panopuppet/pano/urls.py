@@ -1,27 +1,27 @@
 from django.conf.urls import patterns, url
 
-from pano.views.analytics import analytics
-from pano.views.dashboard import dashboard
-from pano.views.event_analytics import event_analytics
-from pano.views.filebucket import filebucket
-from pano.views.logout import logout_view
-from pano.views.node_facts import facts
-from pano.views.nodes import nodes
-from pano.views.report_events import detailed_events
-from pano.views.reports import reports
-from pano.views.report_agent_logs import agent_logs
-from pano.views.splash import splash
-from pano.views.catalogue import catalog
-from pano.views.radiator import radiator
+from panopuppet.pano.views.analytics import analytics
+from panopuppet.pano.views.dashboard import dashboard
+from panopuppet.pano.views.event_analytics import event_analytics
+from panopuppet.pano.views.filebucket import filebucket
+from panopuppet.pano.views.logout import logout_view
+from panopuppet.pano.views.node_facts import facts
+from panopuppet.pano.views.nodes import nodes
+from panopuppet.pano.views.report_events import detailed_events
+from panopuppet.pano.views.reports import reports
+from panopuppet.pano.views.report_agent_logs import agent_logs
+from panopuppet.pano.views.splash import splash
+from panopuppet.pano.views.catalogue import catalog
+from panopuppet.pano.views.radiator import radiator
 
 # API Imports
-from pano.views.api.node_data import nodes_json, search_nodes_json
-from pano.views.api.fact_data import facts_json
-from pano.views.api.dashboard_data import dashboard_status_json, dashboard_nodes_json, dashboard_json
-from pano.views.api.report_data import reports_json, reports_search_json
-from pano.views.api.catalogue_data import catalogue_json, catalogue_compare_json
-from pano.views.api.report_agent_log import report_log_json
-from pano.views.api.query_filters import filter_json
+from panopuppet.pano.views.api.node_data import nodes_json, search_nodes_json
+from panopuppet.pano.views.api.fact_data import facts_json
+from panopuppet.pano.views.api.dashboard_data import dashboard_status_json, dashboard_nodes_json, dashboard_json
+from panopuppet.pano.views.api.report_data import reports_json, reports_search_json
+from panopuppet.pano.views.api.catalogue_data import catalogue_json, catalogue_compare_json
+from panopuppet.pano.views.api.report_agent_log import report_log_json
+from panopuppet.pano.views.api.query_filters import filter_json
 
 __author__ = 'etaklar'
 

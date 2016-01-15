@@ -4,8 +4,8 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 from django.http import HttpResponseBadRequest
 
-from pano.puppetdb.puppetdb import set_server
-from pano.settings import AVAILABLE_SOURCES
+from panopuppet.pano.puppetdb.puppetdb import set_server
+from panopuppet.pano.settings import AVAILABLE_SOURCES
 
 __author__ = 'etaklar'
 

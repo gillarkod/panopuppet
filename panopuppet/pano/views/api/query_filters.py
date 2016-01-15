@@ -5,8 +5,8 @@ from django.http import HttpResponseBadRequest, HttpResponse
 from django.shortcuts import get_list_or_404, redirect
 from django.views.decorators.cache import cache_page
 
-from pano.models import SavedQueries
-from pano.settings import CACHE_TIME
+from panopuppet.pano.models import SavedQueries
+from panopuppet.pano.settings import CACHE_TIME
 
 __author__ = 'etaklar'
 

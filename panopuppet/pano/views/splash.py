@@ -3,9 +3,9 @@ import pytz
 from django.contrib.auth import authenticate, login
 from django.shortcuts import redirect, render
 
-from pano.models import LdapGroupPermissions
-from pano.puppetdb.puppetdb import set_server
-from pano.settings import AVAILABLE_SOURCES, AUTH_METHOD, ENABLE_PERMISSIONS
+from panopuppet.pano.models import LdapGroupPermissions
+from panopuppet.pano.puppetdb.puppetdb import set_server
+from panopuppet.pano.settings import AVAILABLE_SOURCES, AUTH_METHOD, ENABLE_PERMISSIONS
 
 __author__ = 'etaklar'
 

@@ -2,8 +2,8 @@ from datetime import timedelta
 from django.template import defaultfilters as filters
 from django.utils.timezone import localtime
 
-from pano.puppetdb.pdbutils import json_to_datetime, is_unreported
-from pano.settings import PUPPET_RUN_INTERVAL
+from panopuppet.pano.puppetdb.pdbutils import json_to_datetime, is_unreported
+from panopuppet.pano.settings import PUPPET_RUN_INTERVAL
 
 __author__ = 'etaklar'
 

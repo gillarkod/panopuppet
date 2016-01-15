@@ -5,9 +5,9 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, HttpResponse
 from django.views.decorators.cache import cache_page
 
-from pano.puppetdb import puppetdb
-from pano.puppetdb.puppetdb import set_server, get_server
-from pano.settings import CACHE_TIME
+from panopuppet.pano.puppetdb import puppetdb
+from panopuppet.pano.puppetdb.puppetdb import set_server, get_server
+from panopuppet.pano.settings import CACHE_TIME
 
 __author__ = 'etaklar'
 
