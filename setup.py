@@ -10,7 +10,7 @@ staticFullPath = os.path.join(repoRootPath, staticRelPath)
 pkgList = ['openldap-devel', 'cyrus-sasl', 'gcc', 'make', 'httpd'] 
 rpmReq = {'requires': pkgList }
 
-staticInstallPrefix = '/usr/share/panopuppet/static'
+staticInstallPrefix = '/usr/share/panopuppet/static/pano'
 
 def getDataFileList():
   if not os.path.exists(staticFullPath):
