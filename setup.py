@@ -18,7 +18,7 @@ def getDataFileList():
 
   rootPathLen = len(repoRootPath)
   etcCfgTuple = ('/etc/panopuppet', ['panopuppet/puppet/settings.py', 'config.yaml.example'] )
-  wsgiShare = ('/usr/share/panopuppet/wsgi', ['panopuppet/puppet/wsgi.py'] )
+  wsgiShare = ('/usr/share/panopuppet/wsgi', ['panopuppet/puppet/wsgi.py', 'panopuppet/puppet/manage.py'] )
   staticDirList = [etcCfgTuple, wsgiShare]
 
 
