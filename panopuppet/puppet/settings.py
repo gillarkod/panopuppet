@@ -80,7 +80,7 @@ DATABASES = {
 
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(cfg.get('SQLITE_DIR'), 'db.sqlite3'),
+        'NAME': os.path.join(cfg.get('SQLITE_DIR'), 'panopuppet.db.sqlite3'),
     }
 }
 
