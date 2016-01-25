@@ -206,6 +206,7 @@ def dictstatus(node_list, reports_dict, status_dict, sort=True, sortby=None, asc
             else:
                 # Add an empty status_dict for the node.
                 status_dict[node['certname']] = {}
+                report_status = 'unknown' #FIXME: what's the correct status
             merged_list = append_list(node, status_dict[node['certname']], merged_list, report_status)
     # Only used when orderby is a status field.
     elif sortbycol >= 4 and get_status == 'all':
