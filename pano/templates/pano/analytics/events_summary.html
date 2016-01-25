@@ -6,10 +6,14 @@
 {% block head %}
     {% load static %}
     <!-- table sorter stuff -->
-    <link rel="stylesheet"
-          href="{% static 'pano/tablesorter/theme.bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'pano/tablesorter/theme.bootstrap.min.css' %}">
     <script src="{% static 'pano/tablesorter/jquery.tablesorter.min.js' %}"></script>
     <script src="{% static 'pano/tablesorter/jquery.tablesorter.widgets.min.js' %}"></script>
+
+    <!-- dateTime widget -->
+    <link rel="stylesheet" href="{% static 'pano/css/bootstrap-datetimepicker.min.css' %}">
+    <script src="{% static 'pano/js/moment.js' %}"></script>
+    <script src="{% static 'pano/js/bootstrap-datetimepicker.min.js' %}"></script>
     <script id="js">$(function () {
 
         // NOTE: $.tablesorter.theme.bootstrap is ALREADY INCLUDED in the jquery.tablesorter.widgets.js
@@ -39,7 +43,7 @@
         };
 
         // call the tablesorter plugin and apply the uitheme widget
-        $("table").tablesorter({
+        $("#details_table").tablesorter({
             // this will apply the bootstrap theme if "uitheme" widget is included
             // the widgetOptions.uitheme is no longer required to be set
             theme: "bootstrap",
@@ -79,11 +83,101 @@
             }
         })
     });</script>
+    <!-- datetimepicker & clickable row logics -->
     <script>
-        jQuery(document).ready(function ($) {
-            $(".clickable-row").click(function () {
-                window.document.location = $(this).data("href");
+        $(document).ready(function () {
+            $(function () {
+                var dt_from_url = GetURLParameter('dt_from');
+                var dt_to_url = GetURLParameter('dt_to');
+                var dtp_from = $('#dtp_from');
+                var dtp_to = $('#dtp_to');
+                dtp_from.datetimepicker(
+                        {
+                            format: 'YYYY-MM-DD HH:mm',
+                            sideBySide: true,
+                            stepping: 5,
+                            toolbarPlacement: 'top',
+                            showClear: true,
+                            showTodayButton: true
+                        }
+                );
+                dtp_to.datetimepicker(
+                        {
+                            format: 'YYYY-MM-DD HH:mm',
+                            sideBySide: true,
+                            stepping: 5,
+                            toolbarPlacement: 'top',
+                            showClear: true,
+                            showTodayButton: true,
+                            useCurrent: false //Important! See issue #1075
+                        }
+                );
+                // Prevent user from specifying bad dates
+                dtp_from.on("dp.change", function (e) {
+                    // Bind to the dtp event "update"
+                    dtp_to.data("DateTimePicker").minDate(e.date);
+                    dtp_from.removeClass('has-error');
+                });
+                dtp_to.on("dp.change", function (e) {
+                    dtp_from.data("DateTimePicker").maxDate(e.date);
+                    dtp_to.removeClass('has-error');
+                });
+
+                if (typeof dt_from_url != 'undefined' && typeof dt_to_url != 'undefined') {
+                    dtp_from.data("DateTimePicker").date(decodeURIComponent(dt_from_url));
+                    dtp_to.data("DateTimePicker").date(decodeURIComponent(dt_to_url));
+                }
             });
+
+            $(".clickable-row").click(function () {
+                var dt_from = GetURLParameter('dt_from');
+                var dt_to = GetURLParameter('dt_to');
+                if (typeof dt_from == 'undefined' || typeof dt_to == 'undefined') {
+                    window.document.location = $(this).data("href");
+                }
+                else if (typeof dt_from != 'undefined' && typeof dt_to != 'undefined') {
+                    window.document.location = $(this).data("href") + '&dt_from=' + dt_from + '&dt_to=' + dt_to;
+                }
+            });
+
+            $("#dt_submit").click(function () {
+                var dtp_from = $('#dtp_from');
+                var dtp_to = $('#dtp_to');
+                var dtp_from_input = $('#dtp_from_input').val();
+                var dtp_to_input = $('#dtp_to_input').val();
+
+                if (dtp_from_input == '') {
+                    dtp_from.addClass('has-error');
+                }
+                if (dtp_to_input == '') {
+                    dtp_to.addClass('has-error');
+                }
+                if (dtp_to_input != '' && dtp_from_input != '') {
+                    var url_path = window.location.origin + window.location.pathname + '?';
+                    var dt_from = GetURLParameter('dt_from');
+                    var dt_to = GetURLParameter('dt_to');
+
+                    // If value is assigned use the value parameter.
+                    var show_value = GetURLParameter('value');
+                    if (typeof show_value != 'undefined') {
+                        url_path += 'value=' + show_value + '&';
+                    }
+
+                    // If value is undefined and show_summary is not.. use show_summary.
+                    var show_summary = GetURLParameter('show_summary');
+                    var show_status = GetURLParameter('show_status');
+                    if (typeof show_summary != 'undefined' && typeof show_value == 'undefined') {
+                        url_path += 'show_summary=' + show_summary + '&';
+                        if (typeof show_status != 'undefined') {
+                            url_path += 'show_status=' + show_status + '&';
+                        }
+                    }
+                    url_path += 'dt_from=' + dtp_from_input + '&';
+                    url_path += 'dt_to=' + dtp_to_input;
+                    window.document.location = url_path;
+                }
+            });
+
         });
     </script>
     <!-- Hide rows -->
@@ -103,7 +197,7 @@
     <!-- open events -->
     <script id="js">
         $(document).ready(function () {
-            $('#detailsTable').find('tr.parent').click(function () {
+            $('#details_table').find('tr.parent').click(function () {
                 // use "nextUntil" to toggle multiple child rows
                 // toggle table cells instead of the row
                 $(this).closest('tr').nextUntil('tr:not(.tablesorter-childRow)').find('td').toggle();
@@ -115,6 +209,46 @@
 
 {% block content %}
     <div class="container-fluid">
+        <div class="row">
+            <!-- Details Pane -->
+            <div class="col-md-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h1 class="panel-title">Query Params</h1>
+                    </div>
+                    <div class="panel-body">
+                        <form class="form-horizontal">
+                            <div class="form-group" id="dtp_from_form" style="margin-bottom: 0">
+                                <label class="control-label col-md-1">Reports From</label>
+
+                                <div class="col-md-2">
+                                    <div name='dtp_from' class='input-group date' id='dtp_from'>
+                                        <div class="input-group-addon">
+                                            <span class="glyphicon glyphicon-calendar"></span>
+                                        </div>
+                                        <input name="dt_from" id="dtp_from_input" type='text' class="form-control">
+                                    </div>
+                                </div>
+                                <label class="control-label col-md-1">Reports To</label>
+
+                                <div class="col-md-2">
+                                    <div name='dtp_to' class='input-group date' id='dtp_to'>
+                                        <div class="input-group-addon">
+                                            <span class="glyphicon glyphicon-calendar"></span>
+                                        </div>
+                                        <input name="dt_to" id="dtp_to_input" type='text' class="form-control">
+                                    </div>
+                                </div>
+                                <div class="form-group" id="dtp_submit_form">
+                                    <button id="dt_submit" type="button" class="btn btn-success">Filter</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
         <div class="row">
             <!-- Events Summary Pane -->
             <div class="col-md-3">

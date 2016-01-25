@@ -3,3 +3,4 @@ django-auth-ldap==1.2.7
 pytz==2014.10
 requests==2.5.1
 pyyaml
+arrow
