@@ -1,5 +1,6 @@
 include LICENSE
 include VERSION
+include requirements.txt
 include config.yaml.example
 recursive-include panopuppet *
 recursive-include panopuppet/pano/static *
