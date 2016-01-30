@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
@@ -19,3 +20,13 @@ class SavedQueries(models.Model):
     username = models.CharField(max_length=24)
     identifier = models.CharField(max_length=32, default='Saved Query')
     filter = models.TextField()
+
+
+@python_2_unicode_compatible
+class SavedCatalogs(models.Model):
+    id = models.AutoField(primary_key=True)
+    hostname = models.CharField(max_length=255)
+    catalogue_id = models.CharField(max_length=50)
+    linked_report = models.CharField(max_length=50)
+    timestamp = models.DateTimeField()
+    catalogue = models.TextField()

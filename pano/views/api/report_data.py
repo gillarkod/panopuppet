@@ -125,7 +125,7 @@ def reports_json(request, certname=None):
     context['reports_list'] = report_status
     context['curr_page'] = request.session['report_page']
     context['tot_pages'] = "{:.0f}".format(num_pages)
-    return HttpResponse(json.dumps(context), content_type="application/json")
+    return HttpResponse(json.dumps(context, indent=2), content_type="application/json")
 
 
 def reports_search_json(request):
@@ -137,7 +137,7 @@ def reports_search_json(request):
             certname = request.GET.get('certname')
         if not certname or not search:
             context['error'] = 'Must specify both certname and search query.'
-            return HttpResponse(json.dumps(context), content_type="application/json")
+            return HttpResponse(json.dumps(context, indent=2), content_type="application/json")
     source_url, source_certs, source_verify = get_server(request)
     # Redirects to the events page if GET param latest is true..
     reports_params = {
@@ -163,4 +163,4 @@ def reports_search_json(request):
         api_version='v4',
         params=puppetdb.mk_puppetdb_query(reports_params, request),
     )
-    return HttpResponse(json.dumps(reports_list), content_type="application/json")
+    return HttpResponse(json.dumps(reports_list, indent=2), content_type="application/json")

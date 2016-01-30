@@ -7,14 +7,12 @@
     {% load staticfiles %}
     <script src="{% static 'pano/js/typeahead.js' %}"></script>
     <link rel="stylesheet" href="{% static 'pano/css/typeahead.css' %}">
-    <script src="{% static 'pano/js/jquery.dataTables.min.js' %}"></script>
-    <script src="{% static 'pano/js/bootstrap.dataTables.min.js' %}"></script>
-    <link rel="stylesheet" href="{% static 'pano/css/dataTables.bootstrap.min.css' %}">
+    <script src="{% static 'pano/js/dataTables.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'pano/css/dataTables.min.css' %}">
     <script src="{% static 'pano/js/catalog_js.js' %}"></script>
     <!-- make sure table does not go bonkers.. -->
     <style>
         .table {
-            max-width: none;
             table-layout: fixed;
             word-wrap: break-word;
         }
@@ -34,7 +32,7 @@
                         <h4 class="panel-title">
                             <a data-toggle="collapse" data-parent="#filters_accordion" href="#collapseFilter"
                                aria-expanded="false" aria-controls="collapseFilter">
-                                Catalog Tool
+                                Catalog
                             </a>
                         </h4>
                     </div>
@@ -44,17 +42,25 @@
                             <div class="row">
                                 <form>
                                     <div class="col-md-6">
-                                        <div class="form-group">
+                                        <div class="form-group" id="form-certname1">
                                             <label for="certname-1">Certname</label>
                                             <input type="text" class="form-control" name="node-1" id="node-1"
                                                    placeholder="Search and select a node.">
+                                            <br/>
+                                            <label for="dropdown-1-hash">Saved Catalogues:</label>
+                                            <select class="form-control" id="certname-1-hash" disabled>
+                                            </select>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
-                                        <div class="form-group">
+                                        <div class="form-group" id="form-certname2">
                                             <label for="certname-2">Certname </label>
                                             <input type="text" class="form-control" id="node-2"
                                                    placeholder="Compare with node to the left.">
+                                            <br/>
+                                            <label for="dropdown-2-hash">Saved Catalogues:</label>
+                                            <select class="form-control" id="certname-2-hash" disabled>
+                                            </select>
                                         </div>
                                     </div>
                                 </form>
@@ -67,10 +73,53 @@
                                         <a href="#" id="resources" class="btn btn-default btn-xs"
                                            role="button">Resources</a>
                                     </div>
+                                    <div id="diff_button" class="btn-group" role="group" aria-label="...">
+                                        <a onclick='compare(); return false;' href="#" id="compare"
+                                           class="btn btn-default btn-xs"
+                                           role="button">Diff View</a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" id="diff-div-add-rem" hidden>
+        <div class="col-md-12">
+            <!-- Added Resources -->
+            <div class="col-md-6">
+                <div class="row col-margin">
+                    <div class="page-header" style="margin-top: 0; margin-bottom: 0; padding-bottom: 0;">
+                        <h4>Additions</h4>
+                    </div>
+                </div>
+                <div class="row col-margin" id="diff-added" style="word-wrap: break-word;">
+                </div>
+            </div>
+            <!-- Removed Resources -->
+            <div class="col-md-6">
+                <div class="row col-margin">
+                    <div class="page-header" style="margin-top: 0; margin-bottom: 0; padding-bottom: 0;">
+                        <h4>Removals</h4>
+                    </div>
+                </div>
+                <div class="row col-margin" id="diff-removed" style="word-wrap: break-word;">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" id="diff-div-change" hidden>
+        <div class="col-md-12">
+            <!-- Changed Resources -->
+            <div class="col-md-12">
+                <div class="row col-margin">
+                    <div class="page-header" style="margin-top: 0; margin-bottom: 0; padding-bottom: 0;">
+                        <h4>Changes</h4>
+                    </div>
+                </div>
+                <div class="row col-margin" id="diff-changed" style="word-wrap: break-word;">
                 </div>
             </div>
         </div>

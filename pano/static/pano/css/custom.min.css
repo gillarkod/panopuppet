@@ -7,6 +7,10 @@ table#factstable, table#eventsTable, table#compare-with-table {
     display: inline-flex !important;
 }
 
+.col-margin {
+    padding: 5px;
+}
+
 .bs-callout {
     padding: 5px;
     margin: 7px 0;

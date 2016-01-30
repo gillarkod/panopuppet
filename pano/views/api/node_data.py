@@ -394,7 +394,7 @@ def search_nodes_json(request):
         params=puppetdb.mk_puppetdb_query(
             nodes_params, request),
     )
-    return HttpResponse(json.dumps(nodes_list), content_type="application/json")
+    return HttpResponse(json.dumps(nodes_list, indent=2), content_type="application/json")
 
 
 
