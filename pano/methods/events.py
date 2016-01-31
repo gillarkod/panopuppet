@@ -1,5 +1,4 @@
 import queue
-
 from threading import Thread
 
 from pano.puppetdb.puppetdb import api_get as pdb_api_get, mk_puppetdb_query, get_server
@@ -166,16 +165,20 @@ def summary_of_events(events_hash):
     return summary
 
 
-def get_events_summary(request, timespan='latest'):
+def get_events_summary(request, timespan='latest', environment=None):
+    events_params = {
+        'query':
+            {
+                'operator': 'and',
+                2: '["in","certname",["extract","certname",["select_nodes",["null?","deactivated",true]]]]',
+            },
+    }
     if timespan == 'latest':
-        events_params = {
-            'query':
-                {
-                    'operator': 'and',
-                    1: '["=","latest_report?",true]',
-                    2: '["in","certname",["extract","certname",["select_nodes",["null?","deactivated",true]]]]',
-                },
-        }
+        events_params['query'][1] = '["=","latest_report?",true]'
+    elif len(timespan) == 2:
+        events_params['query'][1] = '["and",[">","timestamp","' + timespan[0] + '"],["<", "timestamp", "' + timespan[
+            1] + '"]]'
+
     source_url, source_certs, source_verify = get_server(request)
     events = pdb_api_get(
         api_url=source_url,
@@ -188,7 +191,7 @@ def get_events_summary(request, timespan='latest'):
     return summary
 
 
-def get_report(key, value, request):
+def get_report(key, value, request, timespan='latest', environment=None):
     source_url, source_certs, source_verify = get_server(request)
     # If key is any of the below, all is good!
     allowed_keys = ['certname', 'resource_title', 'resource_type', 'containing_class']
@@ -202,11 +205,16 @@ def get_report(key, value, request):
         'query':
             {
                 'operator': 'and',
-                1: '["=","' + key + '","' + value + '"]',
-                2: '["=","latest_report?",true]',
+                2: '["=","' + key + '","' + value + '"]',
                 3: '["in", "certname",["extract", "certname",["select_nodes",["null?","deactivated",true]]]]'
             },
     }
+    if timespan == 'latest':
+        events_params['query'][1] = '["=","latest_report?",true]'
+    elif len(timespan) == 2:
+        events_params['query'][1] = '["and",[">","timestamp","' + timespan[0] + '"],["<", "timestamp", "' + timespan[
+            1] + '"]]'
+
     results = pdb_api_get(
         api_url=source_url,
         cert=source_certs,
