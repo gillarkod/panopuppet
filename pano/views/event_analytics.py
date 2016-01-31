@@ -1,12 +1,17 @@
-import pytz
+from datetime import datetime
 
+import arrow
+import pytz
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseBadRequest
 from django.shortcuts import redirect, render
 from django.views.decorators.cache import cache_page
 
 from pano.methods import events
 from pano.puppetdb.puppetdb import set_server
-from pano.settings import AVAILABLE_SOURCES, CACHE_TIME
+from pano.settings import AVAILABLE_SOURCES
+from pano.settings import CACHE_TIME
+from puppet.settings import TIME_ZONE
 
 __author__ = 'etaklar'
 
@@ -24,32 +29,59 @@ def event_analytics(request, view='summary'):
         request.session['django_timezone'] = request.POST['timezone']
         return redirect(request.POST['return_url'])
 
-    summary = events.get_events_summary(timespan='latest', request=request)
+    arrow_from = False
+    arrow_to = False
+    user_tz = request.session.get('django_timezone', TIME_ZONE)
+    if request.GET.get('dt_from', False):
+        try:
+            dt_from = datetime.strptime(request.GET.get('dt_from'), '%Y-%m-%d %H:%M')
+        except ValueError:
+            err_msg = 'Invalid from date (%s) provided.' % request.GET.get('dt_from')
+            return HttpResponseBadRequest(err_msg)
+        arrow_from = arrow.get(dt_from, user_tz).isoformat()
+    if request.GET.get('dt_to', False):
+        try:
+            dt_to = datetime.strptime(request.GET.get('dt_to'), '%Y-%m-%d %H:%M')
+        except ValueError:
+            err_msg = 'Invalid to date (%s) provided.' % request.GET.get('dt_to')
+            return HttpResponseBadRequest(err_msg)
+        arrow_to = arrow.get(dt_to, user_tz).isoformat()
+
+    timespan = 'latest'
+    # If date retrieval was alright then we can set the timespan to that of data input.
+    if arrow_from and arrow_to:
+        timespan = [arrow_from, arrow_to]
+        print(timespan)
+    # Get summary data
+    summary = events.get_events_summary(timespan=timespan, request=request)
     context['summary'] = summary
+
     # Show Classes
     if request.GET.get('value', False):
         if view == 'classes':
             class_name = request.GET.get('value')
             title = "Class: %s" % class_name
-            class_events = events.get_report(key='containing_class', value=class_name, request=request)
+            class_events = events.get_report(key='containing-class', value=class_name, timespan=timespan,
+                                             request=request)
             context['events'] = class_events
         # Show Nodes
         elif view == 'nodes':
             node_name = request.GET.get('value')
             title = "Node: %s" % node_name
-            node_events = events.get_report(key='certname', value=node_name, request=request)
+            node_events = events.get_report(key='certname', value=node_name, timespan=timespan, request=request)
             context['events'] = node_events
         # Show Resources
         elif view == 'resources':
             resource_name = request.GET.get('value')
             title = "Resource: %s" % resource_name
-            resource_events = events.get_report(key='resource_title', value=resource_name, request=request)
+            resource_events = events.get_report(key='resource_title', value=resource_name, timespan=timespan,
+                                                request=request)
             context['events'] = resource_events
         # Show Types
         elif view == 'types':
             type_name = request.GET.get('value')
             title = "Type: %s" % type_name
-            type_events = events.get_report(key='resource_type', value=type_name, request=request)
+            type_events = events.get_report(key='resource_type', value=type_name, timespan=timespan, request=request)
             context['events'] = type_events
     # Show summary if none of the above matched
     else:
@@ -62,7 +94,7 @@ def event_analytics(request, view='summary'):
             title = "%s with status %s" % (show_summary.capitalize(), show_status.capitalize())
             context['show_title'] = title
         else:
-            title = 'Failed Classes'
+            title = 'Classes with status Failed'
             context['show_title'] = title
         return render(request, 'pano/analytics/events_details.html', context)
     # Add title to context
