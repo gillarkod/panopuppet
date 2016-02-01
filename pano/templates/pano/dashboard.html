@@ -63,6 +63,10 @@
             if (typeof GetURLParameter('show') != 'undefined') {
                 url = url + show_type.attr('href');
             }
+            else if (typeof GetURLParameter('show') == 'undefined') {
+                show_type ='?show=recent';
+                url = url + show_type;
+            }
             $(show_type).addClass("active").prependTo($(show_type).parent()).siblings().removeClass("active");
             $.get(url, function (json) {
                         var response = $(jQuery(json));
