@@ -58,7 +58,7 @@
     <script>
         function get_data() {
             var backgroundTask = $.Deferred();
-            var url = '../api/dashboard/?show=recent';
+            var url = '../api/dashboard/';
             var show_type = $('#' + GetURLParameter('show'));
             if (typeof GetURLParameter('show') != 'undefined') {
                 url = url + show_type.attr('href');
