@@ -36,7 +36,7 @@
     </div>
 
     <div class="table-responsive">
-        <table id="detailsTable" style="border-collapse: separate"
+        <table name="details_table" id="details_table" style="border-collapse: separate"
                class="table table-condensed tablesorter">
             <thead>
             <tr>
@@ -157,25 +157,25 @@
         $("#success").change(function () {
             var self = this;
             hideRows();
-            $("#detailsTable").find("tr.bg-success").toggle(self.checked);
+            $("#details_table").find("tr.bg-success").toggle(self.checked);
         }).change();
 
         $("#noop").change(function () {
             var self = this;
             hideRows();
-            $("#detailsTable").find("tr.bg-info").toggle(self.checked);
+            $("#details_table").find("tr.bg-info").toggle(self.checked);
         }).change();
 
         $("#skipped").change(function () {
             var self = this;
             hideRows();
-            $("#detailsTable").find("tr.bg-warning").toggle(self.checked);
+            $("#details_table").find("tr.bg-warning").toggle(self.checked);
         }).change();
 
         $("#failure").change(function () {
             var self = this;
             hideRows();
-            $("#detailsTable").find("tr.bg-danger").toggle(self.checked);
+            $("#details_table").find("tr.bg-danger").toggle(self.checked);
         }).change();
     </script>
 {% endblock %}

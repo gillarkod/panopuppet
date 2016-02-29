@@ -34,4 +34,4 @@ def filter_json(request):
             filters = {}
             for user_filter in user_filters:
                 filters[user_filter.identifier] = user_filter.filter
-            return HttpResponse(json.dumps(filters))
+            return HttpResponse(json.dumps(filters, indent=2))

@@ -23,7 +23,7 @@ def report_log_json(request, report_hash=None):
 
     if report_hash is None:
         context['error'] = 'Report Hash not provided.'
-        return HttpResponse(json.dumps(context), content_type="application/json")
+        return HttpResponse(json.dumps(context, indent=2), content_type="application/json")
 
     report_logs = puppetdb.api_get(
         api_url=source_url,
@@ -34,7 +34,7 @@ def report_log_json(request, report_hash=None):
     )
     if 'error' in report_logs:
         context = report_logs
-        return HttpResponse(json.dumps(context), content_type="application/json")
+        return HttpResponse(json.dumps(context, indent=2), content_type="application/json")
 
     # Remove the dict from the list...
     for log in report_logs:
@@ -47,4 +47,4 @@ def report_log_json(request, report_hash=None):
 
     context['agent_log'] = report_logs
     context['report_hash'] = report_hash
-    return HttpResponse(json.dumps(context), content_type="application/json")
+    return HttpResponse(json.dumps(context, indent=2), content_type="application/json")

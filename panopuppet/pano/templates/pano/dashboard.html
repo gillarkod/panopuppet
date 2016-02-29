@@ -10,6 +10,7 @@
     <script src="{% static 'pano/tablesorter/jquery.tablesorter.min.js' %}"></script>
     <script src="{% static 'pano/tablesorter/jquery.tablesorter.widgets.min.js' %}"></script>
     <script src="{% static 'pano/js/bootbox.min.js' %}"></script>
+    <script src="{% static 'pano/js/custom.js.min.js' %}"></script>
     <script>
         $(document).ready(function () {
             get_data();
@@ -58,8 +59,11 @@
         function get_data() {
             var backgroundTask = $.Deferred();
             var url = '../api/dashboard/';
-            var recent = $('#recent');
-            $(recent).addClass("active").prependTo($(recent).parent()).siblings().removeClass("active");
+            var show_type = $('#' + GetURLParameter('show'));
+            if (typeof GetURLParameter('show') != 'undefined') {
+                url = url + show_type.attr('href');
+            }
+            $(show_type).addClass("active").prependTo($(show_type).parent()).siblings().removeClass("active");
             $.get(url, function (json) {
                         var response = $(jQuery(json));
                         var nodes = response[0]['node_list'];
