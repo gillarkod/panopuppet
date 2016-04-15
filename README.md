@@ -369,6 +369,7 @@ Make sure to replace 'apache' with the appropriate user and group.
 ` chown -R apache:apache /srv/repo/panopuppet`
 
 13) Populate the django database so that users logging in with LDAP or local users are populated into django.
+`$ python manage.py makemigrations`
 `$ python manage.py migrate`
 
 14) OPTIONAL STEP IF YOU DON'T WANT TO USE LDAP AND YOU ARE JUST TESTING.
@@ -520,6 +521,7 @@ Say 'yes' to the question it might ask about overwriting files in the /srv/colle
 
 10) Populate the django database so that users logging in with LDAP or local users are populated into django.
 ```
+$ python manage.py makemigrations
 $ python manage.py migrate
 ```
 
