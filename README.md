@@ -249,16 +249,10 @@ each rule found will be added in an puppetDB  OR operator, like so. `["and", ["o
 
 # Installation
 
-## Problems with python-ldap python 3 fork.
-I had some issues installing python-ldap using the python3 fork on a RHEL6 server
-Here are some of the issues I had...
-* missing dependencies - yum install python-devel openldap-devel cyrus-sasl-devel
-* GCC not compiling the python-ldap module... Follow instructions here... http://bugs.python.org/issue21121
-
 ## For other OS other than RHEL and CentOS
 While the general directions below work for any OS the package names are most likely different.
 
-A user yotaka has provided me with the packages needed for ubuntu trusy.
+A user yotaka has provided me with the packages needed for ubuntu trusty.
 ```
 apt-get install git gcc make apache2 python3 python3-dev libldap2-dev cyrus-sasl2-dbg libsasl2-dev 
 python-virtualenv virtualenvwrapper libapache2-mod-wsgi-py3
