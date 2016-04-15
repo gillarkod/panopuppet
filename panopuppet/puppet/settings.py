@@ -9,10 +9,11 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 """
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+
 import yaml
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-#config_file = os.path.join(BASE_DIR, 'config.yaml')
+# config_file = os.path.join(BASE_DIR, 'config.yaml')
 config_file = '/etc/panopuppet/config.yaml'
 with open(config_file, 'r') as ymlfile:
     cfg = yaml.load(ymlfile)
@@ -28,7 +29,7 @@ if SECRET_KEY is None:
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = cfg.get('DEBUG', True)
-TEMPLATE_DEBUG = cfg.get('TEMPLATE_DEBUG', True)
+
 ALLOWED_HOSTS = cfg.get('ALLOWED_HOSTS', ['127.0.0.1'])
 if type(ALLOWED_HOSTS) != list:
     print('ALLOWED_HOSTS must be specified as an array.')
@@ -58,16 +59,6 @@ MIDDLEWARE_CLASSES = (
     'panopuppet.puppet.middlewares.TimezoneMiddleware',
 )
 
-TEMPLATE_CONTEXT_PROCESSORS = (
-    "django.contrib.auth.context_processors.auth",
-    "django.core.context_processors.debug",
-    "django.core.context_processors.i18n",
-    "django.core.context_processors.media",
-    "django.core.context_processors.static",
-    "django.contrib.messages.context_processors.messages",
-    "django.core.context_processors.request",
-)
-
 ROOT_URLCONF = 'panopuppet.puppet.urls'
 
 WSGI_APPLICATION = 'panopuppet.puppet.wsgi.application'
@@ -86,8 +77,8 @@ DATABASES = {
 
 # Authentication
 # Ldap authentication
-from panopuppet.pano.settings import AUTH_METHOD, LDAP_SERVER, LDAP_BIND_DN, LDAP_BIND_PW, LDAP_ALLOW_GRP, LDAP_USEARCH_PATH, \
-    LDAP_GSEARCH_PATH, STAFF_GRP, SUPERUSER_GRP, ACTIVE_GRP
+from panopuppet.pano.settings import AUTH_METHOD, LDAP_SERVER, LDAP_BIND_DN, LDAP_BIND_PW, LDAP_ALLOW_GRP, \
+    LDAP_USEARCH_PATH, LDAP_GSEARCH_PATH, STAFF_GRP, SUPERUSER_GRP, ACTIVE_GRP
 
 if AUTH_METHOD == 'ldap':
     import ldap
@@ -130,7 +121,6 @@ if AUTH_METHOD == 'ldap':
         "email": "mail"
     }
     LOGIN_URL = '/pano/login/'
-    import logging
 
     LOGGING = {
         'version': 1,
@@ -187,7 +177,22 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = cfg.get('STATIC_ROOT', '/usr/share/panopuppet/static/')
 
-TEMPLATE_DIRS = (
-    os.path.join(BASE_DIR, 'templates'),
-    os.path.join(BASE_DIR, 'pano/templates')
-)
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'APP_DIRS': True,
+        'DIRS': '/path/to/my/templates',
+        'OPTIONS': {
+            'context_processors': [
+                "django.contrib.auth.context_processors.auth",
+                "django.core.context_processors.debug",
+                "django.core.context_processors.i18n",
+                "django.core.context_processors.media",
+                "django.core.context_processors.static",
+                "django.contrib.messages.context_processors.messages",
+                "django.core.context_processors.request",
+            ],
+            'debug': cfg.get('TEMPLATE_DEBUG', True),
+        }
+    }
+]
