@@ -41,6 +41,9 @@ sources:
 # Time to hold the cache for pages - specified in seconds
 CACHE_TIME: 60
 
+#SQLITE_DIR: Where to write the sqliteDB used by panopuppet
+SQLITE_DIR: '/var/www/panopuppet'
+
 # Authentication method - Available auth methods = ldap and basic
 AUTH_METHOD: 'basic'
 
