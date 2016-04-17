@@ -249,16 +249,10 @@ each rule found will be added in an puppetDB  OR operator, like so. `["and", ["o
 
 # Installation
 
-## Problems with python-ldap python 3 fork.
-I had some issues installing python-ldap using the python3 fork on a RHEL6 server
-Here are some of the issues I had...
-* missing dependencies - yum install python-devel openldap-devel cyrus-sasl-devel
-* GCC not compiling the python-ldap module... Follow instructions here... http://bugs.python.org/issue21121
-
 ## For other OS other than RHEL and CentOS
 While the general directions below work for any OS the package names are most likely different.
 
-A user yotaka has provided me with the packages needed for ubuntu trusy.
+A user yotaka has provided me with the packages needed for ubuntu trusty.
 ```
 apt-get install git gcc make apache2 python3 python3-dev libldap2-dev cyrus-sasl2-dbg libsasl2-dev 
 python-virtualenv virtualenvwrapper libapache2-mod-wsgi-py3
@@ -375,6 +369,7 @@ Make sure to replace 'apache' with the appropriate user and group.
 ` chown -R apache:apache /srv/repo/panopuppet`
 
 13) Populate the django database so that users logging in with LDAP or local users are populated into django.
+`$ python manage.py makemigrations`
 `$ python manage.py migrate`
 
 14) OPTIONAL STEP IF YOU DON'T WANT TO USE LDAP AND YOU ARE JUST TESTING.
@@ -526,6 +521,7 @@ Say 'yes' to the question it might ask about overwriting files in the /srv/colle
 
 10) Populate the django database so that users logging in with LDAP or local users are populated into django.
 ```
+$ python manage.py makemigrations
 $ python manage.py migrate
 ```
 
