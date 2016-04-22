@@ -1,6 +1,6 @@
 
 WSGISocketPrefix /var/run/wsgi
-WSGIPythonHome /opt/gk-labs #FIXME: add your path to the virtualenv here!
+WSGIPythonHome /opt/.virtualenv/panopuppet #FIXME: add your path to the virtualenv here!
 
 <VirtualHost *:80>
     ServerName YOUR-DOMAIN-NAME-HERE.com
