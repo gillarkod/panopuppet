@@ -92,7 +92,7 @@ if AUTH_METHOD == 'ldap':
     AUTH_LDAP_BIND_DN = LDAP_BIND_DN
     AUTH_LDAP_BIND_PASSWORD = LDAP_BIND_PW
     AUTH_LDAP_USER_SEARCH = LDAPSearch(LDAP_USEARCH_PATH,
-                                       ldap.SCOPE_SUBTREE, "(name=%(user)s)")
+                                       ldap.SCOPE_SUBTREE, "(&(objectClass=User)(name=%(user)s))")
     AUTH_LDAP_GROUP_SEARCH = LDAPSearch(LDAP_GSEARCH_PATH,
                                         ldap.SCOPE_SUBTREE, "(objectClass=Group)")
     AUTH_LDAP_GROUP_TYPE = ActiveDirectoryGroupType()
