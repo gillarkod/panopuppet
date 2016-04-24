@@ -548,7 +548,15 @@ $ sudo chown -R apache:apache /srv/repo/panopuppet
 ```
 $ sudo setsebool -P httpd_can_network_connect on
 $ sudo semanage fcontext -a -t httpd_sys_content_t "/srv/repo/panopuppet/pano(/.*)?"
+$ sudo semanage fcontext -a -t httpd_sys_rw_content_t "/srv/repo/panopuppet/pano/__pycache__(/.*)?"
+$ sudo semanage fcontext -a -t httpd_sys_rw_content_t "/srv/repo/panopuppet/pano/methods/__pycache__(/.*)?"
 $ sudo semanage fcontext -a -t httpd_sys_content_t "/srv/repo/panopuppet/puppet(/.*)?"
+$ sudo semanage fcontext -a -t httpd_sys_rw_content_t "/srv/repo/panopuppet/puppet/__pycache__(/.*)?"
+$ sudo semanage fcontext -a -t httpd_sys_rw_content_t "/srv/repo/panopuppet/pano/puppetdb/__pycache__(/.*)?"
+$ sudo semanage fcontext -a -t httpd_sys_rw_content_t "/srv/repo/panopuppet/pano/templatetags(/.*)?"
+$ sudo semanage fcontext -a -t httpd_sys_rw_content_t "/srv/repo/panopuppet/pano/views"
+$ sudo semanage fcontext -a -t httpd_sys_rw_content_t "/srv/repo/panopuppet/pano/views/api/__pycache__(/.*)?"
+$ sudo semanage fcontext -a -t httpd_sys_rw_content_t "/srv/repo/panopuppet/pano/views/__pycache__(/.*)?"
 $ sudo semanage fcontext -a -t httpd_sys_content_t "/srv/repo/panopuppet/config.yaml"
 $ sudo semanage fcontext -a -t httpd_sys_rw_content_t "/srv/repo/panopuppet"
 $ sudo semanage fcontext -a -t httpd_sys_rw_content_t "/srv/repo/panopuppet/db.sqlite3"
