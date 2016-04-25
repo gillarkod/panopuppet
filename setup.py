@@ -2,6 +2,7 @@
 
 from setuptools import setup
 import os
+import getpass
 
 repoRootPath = os.path.dirname(os.path.abspath(__file__))
 staticRelPath = 'panopuppet/pano/static/pano'
@@ -22,14 +23,17 @@ def getVersion():
 
 
 def getDataFileList():
+    if getpass.getuser() != 'root':
+        return []
+
     if not os.path.exists(staticFullPath):
         raise Exception('ERROR: Unable to find static files at %s' % staticFullPath)
 
     rootPathLen = len(repoRootPath)
 
     etcCfgTuple = (
-        '/etc/panopuppet',
-        ['panopuppet/puppet/settings.py', 'config.yaml.example', 'requirements.txt']
+       '/etc/panopuppet',
+       ['panopuppet/puppet/settings.py', 'config.yaml.example', 'requirements.txt']
     )
 
     wsgiShare = ('/usr/share/panopuppet/wsgi', ['panopuppet/puppet/wsgi.py', 'panopuppet/manage.py'])
@@ -58,14 +62,15 @@ setup(
     name="panopuppet",
     version=getVersion(),
     author="propyless@github",
+    license='Apache License 2.0',
     packages=['panopuppet/pano', 'panopuppet/puppet'],
     include_package_data=True,
     url='https://github.com/propyless/panopuppet',
     description='PanoPuppet is a PuppetDB dashboard.',
     install_requires=[
         "arrow",
-        "Djanjo==1.8.8",
-        "djanjo-auth-ldap==1.2.7",
+        "Django==1.8.8",
+        "django-auth-ldap==1.2.7",
         "pytz",
         "pyyaml",
         "requests",
