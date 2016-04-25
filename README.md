@@ -545,16 +545,24 @@ $ sudo chown -R apache:apache /srv/repo/panopuppet
 
 13) Configure SELinux for panopuppet
 ```
-sudo setsebool -P httpd_can_network_connect on
-sudo semanage fcontext -a -t httpd_sys_content_t "/srv/repo/panopuppet/pano(/.*)?"
-sudo semanage fcontext -a -t httpd_sys_content_t "/srv/repo/panopuppet/puppet(/.*)?"
-sudo semanage fcontext -a -t httpd_sys_content_t "/srv/repo/panopuppet/config.yaml"
-sudo semanage fcontext -a -t httpd_sys_rw_content_t "/srv/repo/panopuppet"
-sudo semanage fcontext -a -t httpd_sys_rw_content_t "/srv/repo/panopuppet/db.sqlite3"
-sudo semanage fcontext -a -t httpd_sys_content_t "/srv/staticfiles(/.*)?"
-sudo semanage fcontext -a -t bin_t "/srv/.virtualenvs/panopuppet/bin(/.*)?"
-sudo semanage fcontext -a -t lib_t "/srv/.virtualenvs/panopuppet/lib(/.*)?"
-sudo restorecon -vFR /srv/
+$ sudo setsebool -P httpd_can_network_connect on
+$ sudo semanage fcontext -a -t httpd_sys_content_t "/srv/repo/panopuppet/pano(/.*)?"
+$ sudo semanage fcontext -a -t httpd_sys_rw_content_t "/srv/repo/panopuppet/pano/__pycache__(/.*)?"
+$ sudo semanage fcontext -a -t httpd_sys_rw_content_t "/srv/repo/panopuppet/pano/methods/__pycache__(/.*)?"
+$ sudo semanage fcontext -a -t httpd_sys_content_t "/srv/repo/panopuppet/puppet(/.*)?"
+$ sudo semanage fcontext -a -t httpd_sys_rw_content_t "/srv/repo/panopuppet/puppet/__pycache__(/.*)?"
+$ sudo semanage fcontext -a -t httpd_sys_rw_content_t "/srv/repo/panopuppet/pano/puppetdb/__pycache__(/.*)?"
+$ sudo semanage fcontext -a -t httpd_sys_rw_content_t "/srv/repo/panopuppet/pano/templatetags(/.*)?"
+$ sudo semanage fcontext -a -t httpd_sys_rw_content_t "/srv/repo/panopuppet/pano/views"
+$ sudo semanage fcontext -a -t httpd_sys_rw_content_t "/srv/repo/panopuppet/pano/views/api/__pycache__(/.*)?"
+$ sudo semanage fcontext -a -t httpd_sys_rw_content_t "/srv/repo/panopuppet/pano/views/__pycache__(/.*)?"
+$ sudo semanage fcontext -a -t httpd_sys_content_t "/srv/repo/panopuppet/config.yaml"
+$ sudo semanage fcontext -a -t httpd_sys_rw_content_t "/srv/repo/panopuppet"
+$ sudo semanage fcontext -a -t httpd_sys_rw_content_t "/srv/repo/panopuppet/db.sqlite3"
+$ sudo semanage fcontext -a -t httpd_sys_content_t "/srv/staticfiles(/.*)?"
+$ sudo semanage fcontext -a -t bin_t "/srv/.virtualenvs/panopuppet/bin(/.*)?"
+$ sudo semanage fcontext -a -t lib_t "/srv/.virtualenvs/panopuppet/lib(/.*)?"
+$ sudo restorecon -vFR /srv/
 ``` 
 
 14) Restart httpd24-httpd service and it should work.
