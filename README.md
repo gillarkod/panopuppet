@@ -1,4 +1,7 @@
 # PanoPuppet
+
+[![Join the chat at https://gitter.im/propyless/panopuppet](https://badges.gitter.im/propyless/panopuppet.svg)](https://gitter.im/propyless/panopuppet?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 PanoPuppet is a PuppetDB dashboard, it uses the information available
 in PuppetDB and visualizes it for you with lists and graphs.
 You are able to browse through the latest changes in reports, nodes, resources,
