@@ -13,8 +13,14 @@ import os
 import yaml
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-# config_file = os.path.join(BASE_DIR, 'config.yaml')
-config_file = '/etc/panopuppet/config.yaml'
+
+config_file = os.environ.get('PP_CFG', '/etc/panopuppet/config.yaml')
+if config_file:
+    if not os.path.isfile(config_file):
+        print("Could not find config at %s. You can also set the location of the configuration file \
+through the PP_CFG environment variable." % config_file)
+        exit(1)
+
 with open(config_file, 'r') as ymlfile:
     cfg = yaml.load(ymlfile)
 
@@ -62,7 +68,6 @@ MIDDLEWARE_CLASSES = (
 ROOT_URLCONF = 'panopuppet.puppet.urls'
 
 WSGI_APPLICATION = 'panopuppet.puppet.wsgi.application'
-
 
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
@@ -160,7 +165,6 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SESSION_AGE = cfg.get('SESSION_AGE', 60)
 SESSION_COOKIE_AGE = SESSION_AGE * 3600
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/
 
@@ -169,7 +173,6 @@ TIME_ZONE = cfg.get('TIME_ZONE', 'Europe/Stockholm')
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
