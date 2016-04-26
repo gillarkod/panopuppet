@@ -414,8 +414,8 @@ $ sudo /etc/init.d/httpd restart
 ```
 
 ## CentOS 7
-```
 This installation "guide" assumes that panopuppet has been extracted to /srv/repo
+```
 $ sudo yum install git
 $ sudo mkdir -p /srv/repo
 $ sudo chown -R <user> /srv
