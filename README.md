@@ -383,8 +383,9 @@ with puppetdb, puppetmaster filebucket and fileserver.
 11) Populate the /srv/staticfiles with the staticfiles
 ```
 $ cd /srv/repo/panopuppet
-$ python manage.py collectstatic` Say yes to the question it might ask about overwriting files in the /srv/collectstatic folder.
+$ python manage.py collectstatic
 ```
+Say yes to the question it might ask about overwriting files in the /srv/collectstatic folder.
 
 12) chown the /srv/repo/panopuppet directory recursively to the http user you want running panopuppet.
 This is to make sure that the panopuppet application can access the local database containing users etc.
