@@ -53,16 +53,5 @@ class CheckIfUnreported(TestCase):
         time is set to 24 hours.
         """
         date = (datetime.utcnow() - timedelta(hours=25)).strftime('%Y-%m-%dT%H:%M:%S.%fZ')
-        results = is_unreported(date, unreported=24)
+        results = is_unreported(date, unreported=24*60)
         self.assertEquals(results, True)
-
-    def test_reported_date_with_hours_set_to_30_minutes_using_float_value(self):
-        """
-        Test unreported parameter to is_unreported accepts float value.
-        It is set to .5 hours which is effectively 30 minutes.
-        With a time set to 15 minutes ago it should return
-        that the node is not unreported.
-        """
-        date = (datetime.utcnow() - timedelta(minutes=15)).strftime('%Y-%m-%dT%H:%M:%S.%fZ')
-        results = is_unreported(date, unreported=.5)
-        self.assertEquals(results, False)
