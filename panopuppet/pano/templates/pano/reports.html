@@ -132,7 +132,7 @@
                 var runtime_data = ['Report Run Times'];
 
                 reports.forEach(function (report) {
-                    x_data.push(report['start_time']);
+                    x_data.push(report['start_time'].split(' ')[1].split(':').slice(0,2).join(':')); // FIXME: This is just terrible...
                     runtime_data.push(report['run_duration']);
                 });
                 chart.load({
@@ -140,7 +140,7 @@
                         x_data,
                         runtime_data
                     ],
-                    type: 'spline'
+                    type: 'bar'
                 });
             })
                     .fail(function () {
@@ -240,16 +240,20 @@
             bindto: '#time_graph',
             data: {
                 x: 'x',
-                xFormat: '%Y-%m-%d %H:%M:%S',
                 columns: [],
-                type: 'spline'
+                type: 'bar'
+            },
+            bar: {
+                width: {
+                    ratio: 0.5 // this makes bar width 50% of length between ticks3
+                }
             },
             axis: {
                 x: {
-                    type: 'timeseries',
+                    type: 'category',
                     tick: {
-                        format: '%H:%M',
-                        rotate: 75
+                        rotate: 75,
+                        multiline: false
                     }
                 }
             }
