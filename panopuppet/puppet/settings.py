@@ -73,12 +73,19 @@ WSGI_APPLICATION = 'panopuppet.puppet.wsgi.application'
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
 
 DATABASES = {
-
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(cfg.get('SQLITE_DIR'), 'panopuppet.db.sqlite3'),
+        # Location of test database
+        'TEST': {
+            'TEST_NAME': '/tmp/panopuppet_test.db'
+        }
     }
 }
+# FIXME: Some workaround so I can run tests from pycharm... Uncomment this to run tests...
+# from django.core.management import call_command
+# call_command('makemigrations')
+# call_command('syncdb', migrate=True)
 
 # Authentication
 # Ldap authentication
