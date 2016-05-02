@@ -28,6 +28,7 @@ def nodes_json(request):
         return redirect(request.POST['return_url'])
 
     source_url, source_certs, source_verify = get_server(request)
+    puppet_run_time = get_server(request, type='run_time')
     valid_sort_fields = (
         'certname',
         'catalog_timestamp',
@@ -259,12 +260,22 @@ def nodes_json(request):
     status_dict = {item['certname']: item for item in report_status_list}
     report_dict = {item['subject']['title']: item for item in report_list}
     if sort_field_order == 'desc':
-        rows = dictstatus(
-            node_list, status_dict, report_dict, sortby=sort_field, asc=True, sort=False)
+        rows = dictstatus(node_list,
+                          status_dict,
+                          report_dict,
+                          sortby=sort_field,
+                          asc=True,
+                          sort=False,
+                          puppet_run_time=puppet_run_time)
         sort_field_order_opposite = 'asc'
     elif sort_field_order == 'asc':
-        rows = dictstatus(
-            node_list, status_dict, report_dict, sortby=sort_field, asc=False, sort=False)
+        rows = dictstatus(node_list,
+                          status_dict,
+                          report_dict,
+                          sortby=sort_field,
+                          asc=False,
+                          sort=False,
+                          puppet_run_time=puppet_run_time)
         sort_field_order_opposite = 'desc'
 
     if dl_csv is True:
@@ -383,7 +394,7 @@ def search_nodes_json(request):
                         'order': 'desc',
                     },
             },
-        #'limit': 25,
+        # 'limit': 25,
     }
     nodes_list = puppetdb.api_get(
         api_url=source_url,
@@ -395,6 +406,3 @@ def search_nodes_json(request):
             nodes_params, request),
     )
     return HttpResponse(json.dumps(nodes_list, indent=2), content_type="application/json")
-
-
-

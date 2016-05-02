@@ -140,7 +140,7 @@ def dictstatus(node_list, reports_dict, status_dict, sort=True, sortby=None, asc
             node_is_unreported = False
             node_has_mismatching_timestamps = False
             # Check if its unreported.
-            if is_unreported(node['report_timestamp']):
+            if is_unreported(node_report_timestamp=node['report_timestamp'], unreported=puppet_run_time):
                 node_is_unreported = True
             if check_failed_compile(report_timestamp=node.get('report_timestamp', None),
                                     fact_timestamp=node.get('facts_timestamp', None),
