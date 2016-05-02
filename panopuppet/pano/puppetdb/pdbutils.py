@@ -42,7 +42,7 @@ def json_to_datetime(date):
         tzinfo=UTC())
 
 
-def is_unreported(node_report_timestamp, unreported=2):
+def is_unreported(node_report_timestamp, unreported=120):
     # If node has no report timestamp
     # it has probably failed so return True.
     if node_report_timestamp is None:
@@ -52,7 +52,7 @@ def is_unreported(node_report_timestamp, unreported=2):
     last_report = json_to_datetime(node_report_timestamp)
     last_report = last_report.replace(tzinfo=None)
     now = datetime.datetime.utcnow()
-    unreported_border = now - datetime.timedelta(hours=unreported)
+    unreported_border = now - datetime.timedelta(minutes=unreported)
     if last_report < unreported_border:
         return True
     return False
