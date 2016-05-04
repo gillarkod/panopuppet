@@ -11,7 +11,7 @@
     <script src="{% static 'pano/js/bootbox.min.js' %}"></script>
     <script>
         $(document).ready(function () {
-            get_facts();
+            get_facts("{{ certname }}", "{{ node_facts }}");
             get_reports();
         });
         $(document).on({
@@ -34,38 +34,6 @@
 
 {% block content %}
     <script>
-        function get_facts() {
-            var backgroundTask = $.Deferred();
-            var url = '../../api/facts/?certname={{ certname }}&facts={{ node_facts }}';
-            $.get(url, function (json) {
-                var response = $(jQuery(json));
-                var facts = response[0]['facts_list'];
-                var data = '';
-                var num_nodes = facts.length;
-                if (num_nodes === 0) {
-                    data = '<tr><td colspan="2">No facts found.</td></tr>';
-                }
-                else {
-                    facts.forEach(function (fact) {
-                        data += '<tr>';
-                        //Certname
-                        data += '<td>' + fact['name'] + '</td>';
-                        data += '<td>' + fact['value'] + '</td>';
-                        data += '</tr>';
-                    });
-                }
-                // update table with the new json data to the table body
-                $("#inventoryfactsbody").html(data);
-            })
-                    .fail(function () {
-                        var data = '<tr><td colspan="2">Can not connect to PuppetDB.</td></tr>';
-                        $("inventoryfactsbody").html(data);
-                    });
-
-            backgroundTask.resolve();
-            return backgroundTask;
-        }
-
         function get_reports(obj) {
             var backgroundTask = $.Deferred();
             var url = '/pano/api/reports/{{ certname }}';
@@ -132,7 +100,7 @@
                 var runtime_data = ['Report Run Times'];
 
                 reports.forEach(function (report) {
-                    x_data.push(report['start_time'].split(' ')[1].split(':').slice(0,2).join(':')); // FIXME: This is just terrible...
+                    x_data.push(report['start_time'].split(' ')[1].split(':').slice(0, 2).join(':')); // FIXME: This is just terrible...
                     runtime_data.push(report['run_duration']);
                 });
                 chart.load({

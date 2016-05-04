@@ -67,6 +67,11 @@
             }
         })
     });</script>
+    <script>
+        $(document).ready(function () {
+            get_facts("{{ certname }}");
+        });
+    </script>
 {% endblock %}
 
 {% block content %}
@@ -77,28 +82,18 @@
     </div>
     <div class="row">
         <div class="col-md-12">
-            <table id="factstable" class="table table-condensed table-striped tablesorter">
-                <thead>
-                <tr>
-                    <th>Fact Name</th>
-                    <th>Value</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% if facts_list %}
-                    {% for fact in facts_list %}
-                        <tr>
-                            <td>{{ fact.name }}</td>
-                            <td>{{ fact.value }}</td>
-                        </tr>
-                    {% endfor %}
-                {% else %}
+            <div class="table-responsive">
+                <table id="factstable" class="table table-condensed table-striped tablesorter">
+                    <thead>
                     <tr>
-                        <td>No facts were found in puppetdb for node {{ certname }}.</td>
+                        <th>Fact Name</th>
+                        <th>Fact Value</th>
                     </tr>
-                {% endif %}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody id="inventoryfactsbody">
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 {% endblock %}

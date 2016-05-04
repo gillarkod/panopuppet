@@ -410,3 +410,9 @@ table.dataTable thead .sorting:after {
 .panel-yellow a:hover {
     color: #df8a13;
 }
+
+#inventoryfactsbody .fact_hash {
+    text-align: left;
+    border-right: solid;
+    border-width: 3px;
+}
