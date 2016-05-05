@@ -84,7 +84,7 @@
                                         <i class="fa fa-search"></i>
                                     </button>
                                 </span>
-                            </div>
+                            </div>span
                         </form>
                     </li>
                     <li>
@@ -106,13 +106,13 @@
                                 <a id="changed"
                                         {% if "pano/dashboard" in request.path %} onclick="get_nodes(this).done(); return false;{% endif %}"
                                    href="{% if "pano/dashboard" not in request.path %}{% url 'dashboard' %}{% endif %}?show=changed">
-                                    <i class="text-success fa fa-plus-circle fa-fw"></i>Changed</a>
+                                    <i class="text-success fa fa-plus-circle fa-fw"></i> Changed</a>
                             </li>
                             <li>
                                 <a id="pending"
                                         {% if "pano/dashboard" in request.path %} onclick="get_nodes(this).done(); return false;{% endif %}"
                                    href="{% if "pano/dashboard" not in request.path %}{% url 'dashboard' %}{% endif %}?show=pending">
-                                    <i class="text-info fa fa-info-circle fa-fw"></i></span> Pending</a>
+                                    <i class="text-info fa fa-info-circle fa-fw"></i> Pending</a>
                             </li>
                             <li>
                                 <a id="unreported"
