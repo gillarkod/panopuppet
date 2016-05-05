@@ -8,11 +8,8 @@ https://docs.djangoproject.com/en/1.7/howto/deployment/wsgi/
 """
 
 import os
-import sys
-#from puppet.settings import BASE_DIR
 
-#if BASE_DIR not in sys.path:
-#    sys.path.insert(0, BASE_DIR)
+os.environ['PP_CFG'] = '/var/www/html/panopuppet/config.yaml'
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "panopuppet.puppet.settings")
 
 from django.core.wsgi import get_wsgi_application
