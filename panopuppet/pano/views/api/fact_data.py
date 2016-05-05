@@ -88,7 +88,6 @@ def facts_json(request):
         params=puppetdb.mk_puppetdb_query(
             facts_params, request),
     )
-    print(facts_list)
     context['certname'] = certname
     context['facts_list'] = facts_list
 
