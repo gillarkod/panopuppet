@@ -15,11 +15,6 @@ import yaml
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 config_file = os.environ.get('PP_CFG', '/etc/panopuppet/config.yaml')
-if config_file:
-    if not os.path.isfile(config_file):
-        print("Could not find config at %s. You can also set the location of the configuration file \
-through the PP_CFG environment variable." % config_file)
-        exit(1)
 
 with open(config_file, 'r') as ymlfile:
     cfg = yaml.load(ymlfile)
