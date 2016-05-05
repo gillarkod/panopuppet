@@ -60,7 +60,6 @@ will need to make a wrapper that enables SCL python3.
 - [Features](#features)
 - [Requirements](#requirements)
 - [Supported OS](#supported-operating-systems)
-- [Notes about puppetv4](#notes-about-puppetv4)
 - [Future plans](#future-plans)
 - [Introduction](#introduction)
 - [Issues](#issues)
@@ -103,14 +102,6 @@ will need to make a wrapper that enables SCL python3.
 * CentOS6,7
 * Ubuntu 14.04
 * Debian 8 (jessie) - LDAP issues)
-
-
-# Notes about puppetv4
-* Puppetv4 has changed the endpoints for the filebucket and fileserver so you will not be able to view files
-
-It also assumes that you store puppet run reports in PuppetDB
-To be able to use Filebucket and Fileserver features and file diffs
-you will need to have puppet masters filebucket and fileserver enabled.
 
 # Future plans
 * Docker image to quickly install a panopuppet dashboard
