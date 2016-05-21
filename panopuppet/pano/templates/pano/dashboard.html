@@ -59,15 +59,18 @@
         function get_data() {
             var backgroundTask = $.Deferred();
             var url = '../api/dashboard/';
-            var show_type = $('#' + GetURLParameter('show'));
-            if (typeof GetURLParameter('show') != 'undefined') {
+
+            if (typeof (GetURLParameter('show')) != 'undefined') {
+                var show_type = $('#' + GetURLParameter('show'));
                 url = url + show_type.attr('href');
             }
-            else if (typeof GetURLParameter('show') == 'undefined') {
-                show_type ='?show=recent';
-                url = url + show_type;
+            else if (typeof (GetURLParameter('show')) == 'undefined') {
+                show_type = $('#recent');
+                url = url + show_type.attr('href');
             }
+
             $(show_type).addClass("active").prependTo($(show_type).parent()).siblings().removeClass("active");
+
             $.get(url, function (json) {
                         var response = $(jQuery(json));
                         var nodes = response[0]['node_list'];
