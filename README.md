@@ -453,7 +453,7 @@ $ sudo firewall-cmd --permanent --add-service=http
 $ sudo firewall-cmd --add-service=http
 ```
 
-4) Compile mod_wsgi for rh-python34.  
+4) Compile mod_wsgi for rh-python34.
 rh-python34-mod_wsgi contains a 'bug' which will segfault panopuppet, that's why we compile the latest version.
 ```
 $ cd
@@ -552,7 +552,7 @@ $ python manage.py makemigrations
 $ python manage.py migrate
 ```
 
-11) OPTIONAL STEP IF YOU DON'T WANT TO USE LDAP AND YOU ARE JUST TESTING.  
+11) OPTIONAL STEP IF YOU DON'T WANT TO USE LDAP AND YOU ARE JUST TESTING.
 Create a local superuser to log in as
 ```
 $ python manage.py createsuperuser
@@ -615,10 +615,6 @@ NODES_DEFAULT_FACTS - Is a list of facts to be shown on the node report page.
 The master branch has a release which includes:
 * ldap authentication
 * caching
-
-Upcoming branches:
-* no_auth
-  * There will be no ldap authentication support included.
 
 # Contact Me
 If you have any questions you are welcome to contact me @ chat.freenode.net - My nickname is Propyless
