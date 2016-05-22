@@ -218,11 +218,13 @@ class MergeNodeEventData(TestCase):
                 'status': 'unchanged',
             }
         }
-        failed_list, changed_list, unreported_list, missmatch_list, pending_list = dictstatus(nodes_data,
-                                                                                              reports_data,
-                                                                                              events_data,
-                                                                                              sort=False,
-                                                                                              get_status='notall')
+        failed_list, changed_list, unreported_list, missmatch_list, pending_list = dictstatus(
+            nodes_data,
+            reports_data,
+            events_data,
+            sort=False,
+            get_status='notall',
+            puppet_run_time=60)
         # ('certname', 'latestCatalog', 'latestReport', 'latestFacts', 'success', 'noop', 'failure', 'skipped')
         failed_expected = [(
             'failed-node.example.com',
@@ -348,6 +350,7 @@ class MergeNodeEventData(TestCase):
                 localtime(json_to_datetime(nodes_timestamps['pending-node']['facts'])),
                 'Y-m-d H:i:s'),
             0, 100, 0, 0, 'pending')]
+
         # Sort lists so its easier to verify...
         failed_list.sort(key=lambda tup: tup[0])
         failed_expected.sort(key=lambda tup: tup[0])
@@ -359,6 +362,7 @@ class MergeNodeEventData(TestCase):
         missmatch_expected.sort(key=lambda tup: tup[0])
         pending_list.sort(key=lambda tup: tup[0])
         pending_expected.sort(key=lambda tup: tup[0])
+
         if failed_list != failed_expected:
             self.fail(msg='Failed list does not match expectations.')
         if changed_list != changed_expected:
