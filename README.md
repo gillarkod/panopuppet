@@ -62,16 +62,11 @@ will need to make a wrapper that enables SCL python3.
 - [Supported OS](#supported-operating-systems)
 - [Future plans](#future-plans)
 - [Introduction](#introduction)
-- [Issues](#issues)
-  - [QueryBuilder](#querybuilder)
-- [Screenshots](#screenshots)
-- [LDAP Permissions](#ldap-permissions)
-  - [Multiple Groups](#member-of-multiple-groups) 
 - [Installation](#installation)
-  - [Problems with python-ldap python 3 fork.](#problems-with-python-ldap-python-3-fork)
-  - [RHEL/CentOS 6](#rhelcentos-6)
-  - [CentOS 7](#centos-7)
 - [Upgrading](#upgrading)
+- [QueryBuilder](#querybuilder)
+- [LDAP Permissions](#ldap-permissions)
+  - [Multiple Groups](#member-of-multiple-groups)
 - [Configuration Options](#configuration-options)
 - [Available branches](#available-branches)
 - [Contact Me](#contact-me)
@@ -121,8 +116,25 @@ have over 20k puppetized nodes you need something fast.
 
 This was written for a multi-tenant site across several datacenters.
 
-# Issues
-##QueryBuilder
+# Installation
+For install instructions they can be found in either INSTALL.md or at the PanoPuppet Wiki hosted at Github.
+https://github.com/propyless/panopuppet/wiki/Installation-Guides
+
+# Upgrading
+Upgrading PanoPuppet should be no harder than doing a git pull origin/master in the /srv/repo/panopuppet directory.
+But its recommended to run the `python manage.py collectstatic` command again in case new css/javascripts have been added so that they
+are served to your clients. Also make sure to read the config.yaml.example file and see if any new variables have been
+implemented!
+
+Upgrading PanoPuppet has a few new steps now as user profiles and permissions has been implemented.
+Now you should always run the following commands when updating panopuppet.
+`python manage.py collectstatic`
+`python manage.py makemigration`
+`python manage.py syncdb`
+If it doesnt apply any changes, that just means that no changes were done to the database for those latest commits.
+
+
+## QueryBuilder notes
 * I have seen some issues with the querybuilder and the usage of comparison operators. If you have stringify_facts enabled
 you may not be able to use the less/less or equal/greater/greater or equal operators since its not possible to
 compare string values "123" with "124". You will only be able to use the equal operator for these values.
@@ -137,9 +149,6 @@ See the below examples:
 ![Querybuilder Example Query 1](screenshots/querybuilder_example.png)
 
 ![Querybuilder Example Query 2](screenshots/querybuilder_example2.png)
-
-
-
 
 # LDAP Permissions
 If you have enabled Permissions on users via the config file `ENABLE_PERMISSIONS: true`
@@ -169,23 +178,6 @@ You can specify them as a normal string or by specifying them as a list.
 ## Member of Multiple Groups
 If a user is a member of multiple groups which have restrictions set for each one
 each rule found will be added in an puppetDB  OR operator, like so. `["and", ["or", [rule1],[rule2]]]`
-
-# Installation
-For install instructions they can be found in either INSTALL.md or at the PanoPuppet Wiki hosted at Github.
-https://github.com/propyless/panopuppet/wiki/Installation-Guides
-
-# Upgrading
-Upgrading PanoPuppet should be no harder than doing a git pull origin/master in the /srv/repo/panopuppet directory.
-But its recommended to run the `python manage.py collectstatic` command again in case new css/javascripts have been added so that they
-are served to your clients. Also make sure to read the config.yaml.example file and see if any new variables have been
-implemented!
-
-Upgrading PanoPuppet has a few new steps now as user profiles and permissions has been implemented.
-Now you should always run the following commands when updating panopuppet.
-`python manage.py collectstatic`
-`python manage.py makemigration`
-`python manage.py syncdb`
-If it doesnt apply any changes, that just means that no changes were done to the database for those latest commits.
 
 # Configuration Options
 NODES_DEFAULT_FACTS - Is a list of facts to be shown on the node report page. 
