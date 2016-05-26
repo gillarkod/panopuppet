@@ -13,6 +13,18 @@
         $(document).ready(function () {
             get_facts("{{ certname }}", "{{ node_facts }}");
             get_reports();
+            $('#legend-tooltip').tooltip({
+                title: '' +
+                '<h4>Legend:</h4>' +
+                '<div style="text-align: left">' +
+                '<p><span class="glyphicon glyphicon-play" style="color: #428bca"></span> Unchanged</p>' +
+                '<p><span class="glyphicon glyphicon-pause" style="color: #5bc0de"></span> Noop</p>' +
+                '<p><span class="glyphicon glyphicon-forward" style="color: #5cb85c"></span> Changed</p>' +
+                '<p><span class="glyphicon glyphicon-stop" style="color: #d9534f"></span> Failed</p>' +
+                '</div>',
+                html: true,
+                placement: "top"
+            });
         });
         $(document).on({
             ajaxStart: function () {
@@ -54,13 +66,16 @@
                         report_data += '<tr>';
                         report_data += '<td>';
                         if (report['report_status'] == 'changed') {
-                            report_data += '<span class="glyphicon glyphicon-plus" style="color: #5cb85c"></span>';
+                            report_data += '<span class="glyphicon glyphicon-forward" style="color: #5cb85c"></span>';
                         }
-                        else if (report['report_status'] == 'unchanged') {
-                            report_data += '<span class="glyphicon glyphicon-minus" style="color: #5bc0de"></span>';
+                        else if (report['report_status'] == 'unchanged' && report['is_noop'] === false) {
+                            report_data += '<span class="glyphicon glyphicon-play" style="color: #428bca"></span>';
+                        }
+                        else if (report['report_status'] == 'unchanged' && report['is_noop'] === true) {
+                            report_data += '<span class="glyphicon glyphicon-pause" style="color: #5bc0de"></span>';
                         }
                         else if (report['report_status'] == 'failed') {
-                            report_data += '<span class="glyphicon glyphicon-remove" style="color: #d9534f"></span>';
+                            report_data += '<span class="glyphicon glyphicon-stop" style="color: #d9534f"></span>';
                         }
                         report_data += '<a href="../../events/{{ certname }}' + '/' + report['hash'] + '"><strong>[A]</strong></a>';
 
@@ -97,16 +112,45 @@
 
                 // Update chart
                 var x_data = ['x'];
-                var runtime_data = ['Report Run Times'];
+                var c_changed = ['Changed'];
+                var c_unchanged = ['Unchanged'];
+                var c_failed = ['Failed'];
+                var c_noop = ['Noop'];
 
                 reports.forEach(function (report) {
-                    x_data.push(report['start_time'].split(' ')[1].split(':').slice(0, 2).join(':')); // FIXME: This is just terrible...
-                    runtime_data.push(report['run_duration']);
+                    x_data.push(report['start_time'].split(' ')[1]);
+                    if (report['report_status'] == 'failed') {
+                        c_failed.push(report['run_duration']);
+                        c_changed.push('0');
+                        c_unchanged.push('0');
+                        c_noop.push('0');
+                    }
+                    else if (report['report_status'] == 'changed') {
+                        c_failed.push('0');
+                        c_changed.push(report['run_duration']);
+                        c_unchanged.push('0');
+                        c_noop.push('0');
+                    }
+                    else if (report['report_status'] == 'unchanged' && report['is_noop'] === false) {
+                        c_failed.push('0');
+                        c_changed.push('0');
+                        c_unchanged.push(report['run_duration']);
+                        c_noop.push('0');
+                    }
+                    else if (report['report_status'] == 'unchanged' && report['is_noop'] === true) {
+                        c_failed.push('0');
+                        c_changed.push('0');
+                        c_unchanged.push(0);
+                        c_noop.push(report['run_duration']);
+                    }
                 });
                 chart.load({
                     columns: [
                         x_data,
-                        runtime_data
+                        c_changed,
+                        c_unchanged,
+                        c_failed,
+                        c_noop
                     ],
                     type: 'bar'
                 });
@@ -165,7 +209,9 @@
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h1 class="panel-title">
-                        Reports
+                        Reports <a href="#" id="legend-tooltip">
+                        <i class='glyphicon glyphicon-info-sign'></i>
+                    </a>
                     </h1>
                 </div>
                 <div class="table-responsive">
@@ -209,7 +255,16 @@
             data: {
                 x: 'x',
                 columns: [],
-                type: 'bar'
+                type: 'bar',
+                groups: [
+                    ['Failed', 'Unchanged', 'Changed', 'Noop']
+                ],
+                colors: {
+                    Failed: '#d9534f',
+                    Unchanged: '#428bca',
+                    Changed: '#5cb85c',
+                    Noop: '#5bc0de'
+                }
             },
             bar: {
                 width: {
