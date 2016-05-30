@@ -31,12 +31,17 @@ def get_server(request, type='puppetdb'):
     :param request:
     :return: three variables in order: url, url certificates, ssl verify, (show status)
     """
+    from panopuppet.pano.settings import PUPPETDB_VERS
     if 'PUPPETDB_HOST' in request.session:
         if type == 'puppetdb':
             return \
                 request.session['PUPPETDB_HOST'], \
                 request.session['PUPPETDB_CERTIFICATES'], \
                 request.session['PUPPETDB_VERIFY_SSL']
+        elif type == 'puppetdb_vers':
+            return \
+                request.session['PUPPETDB_VERS']
+
         elif type == 'filebucket':
             return \
                 request.session['PUPPETMASTER_CLIENTBUCKET_HOST'], \
@@ -54,6 +59,8 @@ def get_server(request, type='puppetdb'):
     else:
         if type == 'puppetdb':
             return PUPPETDB_HOST, PUPPETDB_CERTIFICATES, PUPPETDB_VERIFY_SSL
+        elif type == 'puppetdb_vers':
+            return PUPPETDB_VERS
         elif type == 'filebucket':
             return \
                 PUPPETMASTER_CLIENTBUCKET_HOST, \
@@ -94,10 +101,27 @@ def set_server(request, source):
         source.get('PUPPETMASTER_FILESERVER_CERTIFICATES', [None, None]))
     request.session['PUPPETMASTER_FILESERVER_VERIFY_SSL'] = source.get('PUPPETMASTER_FILESERVER_VERIFY_SSL', False)
     request.session['PUPPET_RUN_INTERVAL'] = source.get('PUPPET_RUN_INTERVAL', False)
+    request.session['PUPPETDB_VERS'] = ident_pdb_vers(request)
+
+
+def ident_pdb_vers(request=None, source_url=None, source_verify=None, source_certs=None):
+    if request:
+        source_url, source_certs, source_verify = get_server(request)
+    vers = api_get(
+        api_url=source_url,
+        method='get',
+        verify=source_verify,
+        cert=source_certs,
+        path='/pdb/meta/v1/version',
+        api_version='v4',
+    )
+    if 'version' in vers:
+        return int(vers['version'][0])
+    return None
 
 
 def api_get(api_url=PUPPETDB_HOST,
-            api_version='v3',
+            api_version='v4',
             path='',
             method='get',
             params=None,
