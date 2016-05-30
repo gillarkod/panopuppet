@@ -120,11 +120,30 @@ For install instructions they can be found in either INSTALL.md or at the PanoPu
 https://github.com/propyless/panopuppet/wiki/Installation-Guides
 
 ## Upgrading
+
+### Classic install
 Upgrading PanoPuppet should be no harder than doing a git pull origin/master in the /srv/repo/panopuppet directory.
 But its recommended to run the `python manage.py collectstatic` command again in case new css/javascripts have been added so that they
 are served to your clients. Also make sure to read the config.yaml.example file and see if any new variables have been
 implemented!
 
+### Setup.py install
+Make sure you have the correct python in your path (virtual env users)
+First uninstall the previous setup.py install of panopuppet with:
+
+`pip uninstall panopuppet`
+
+*If you have already installed the latest version of panopuppet you can remove the older version by specifying the version of panopuppet to remove, for example:*
+
+`pip uninstall panopuppet==1.3`
+
+Make sure you have checked out the latest release or master, run:
+
+`python setup.py install`
+
+Now you should be done, just run the **General upgrade commands** and you'll be good to go.
+
+### General upgrade commands
 Upgrading PanoPuppet has a few new steps now as user profiles and permissions has been implemented.
 Now you should always run the following commands when updating panopuppet.
 `python manage.py collectstatic`
