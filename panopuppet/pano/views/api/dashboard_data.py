@@ -24,6 +24,7 @@ def dashboard_status_json(request):
         return redirect(request.POST['return_url'])
 
     source_url, source_certs, source_verify = get_server(request)
+    pdb_vers = get_server(request, type='puppetdb_vers')
 
     puppet_run_time = get_server(request, type='run_time')
 
@@ -41,20 +42,27 @@ def dashboard_status_json(request):
             }
     }
 
+    if pdb_vers == 4:
+        tot_res_path = 'mbeans/puppetlabs.puppetdb.population:name=num-resources'
+        avg_res_path = 'mbeans/puppetlabs.puppetdb.population:name=avg-resources-per-node'
+    else:
+        tot_res_path = 'mbeans/puppetlabs.puppetdb.query.population:type=default,name=num-resources'
+        avg_res_path = 'mbeans/puppetlabs.puppetdb.query.population:type=default,name=avg-resources-per-node'
+
     jobs = {
         'tot_resource': {
             'url': source_url,
             'certs': source_certs,
             'verify': source_verify,
             'id': 'tot_resource',
-            'path': 'mbeans/puppetlabs.puppetdb.query.population:type=default,name=num-resources',
+            'path': tot_res_path,
         },
         'avg_resource': {
             'url': source_url,
             'certs': source_certs,
             'verify': source_verify,
             'id': 'avg_resource',
-            'path': 'mbeans/puppetlabs.puppetdb.query.population:type=default,name=avg-resources-per-node',
+            'path': avg_res_path,
         },
         'all_nodes': {
             'url': source_url,
@@ -91,10 +99,13 @@ def dashboard_status_json(request):
     # Assign vars from the completed jobs
     # Number of results from all_nodes is our population.
     puppet_population = len(puppetdb_results['all_nodes'])
+
     # Total resources managed by puppet metric
-    total_resources = puppetdb_results['tot_resource']
+    total_resources = puppetdb_results['tot_resource'].get('value', puppetdb_results['tot_resource'])
+
     # Average resource per node metric
-    avg_resource_node = puppetdb_results['avg_resource']
+    avg_resource_node = puppetdb_results['avg_resource'].get('value', puppetdb_results['avg_resource'])
+
     # Information about all active nodes in puppet
     all_nodes_list = puppetdb_results['all_nodes']
 
@@ -291,7 +302,7 @@ def dashboard_json(request):
         return redirect(request.POST['return_url'])
 
     source_url, source_certs, source_verify = get_server(request)
-
+    pdb_vers = get_server(request, type='puppetdb_vers')
     puppet_run_time = get_server(request, type='run_time')
     dashboard_show = request.GET.get('show', 'recent')
     events_params = {
@@ -318,20 +329,27 @@ def dashboard_json(request):
         },
     }
 
+    if pdb_vers == 4:
+        tot_res_path = 'mbeans/puppetlabs.puppetdb.population:name=num-resources'
+        avg_res_path = 'mbeans/puppetlabs.puppetdb.population:name=avg-resources-per-node'
+    else:
+        tot_res_path = 'mbeans/puppetlabs.puppetdb.query.population:type=default,name=num-resources'
+        avg_res_path = 'mbeans/puppetlabs.puppetdb.query.population:type=default,name=avg-resources-per-node'
+
     jobs = {
         'tot_resource': {
             'url': source_url,
             'certs': source_certs,
             'verify': source_verify,
             'id': 'tot_resource',
-            'path': 'mbeans/puppetlabs.puppetdb.query.population:type=default,name=num-resources',
+            'path': tot_res_path,
         },
         'avg_resource': {
             'url': source_url,
             'certs': source_certs,
             'verify': source_verify,
             'id': 'avg_resource',
-            'path': 'mbeans/puppetlabs.puppetdb.query.population:type=default,name=avg-resources-per-node',
+            'path': avg_res_path,
         },
         'all_nodes': {
             'url': source_url,
@@ -379,9 +397,11 @@ def dashboard_json(request):
     # Number of results from all_nodes is our population.
     puppet_population = len(puppetdb_results['all_nodes'])
     # Total resources managed by puppet metric
-    total_resources = puppetdb_results['tot_resource']
+    total_resources = puppetdb_results['tot_resource']#.get('value', puppetdb_results['tot_resource'])
+
     # Average resource per node metric
-    avg_resource_node = puppetdb_results['avg_resource']
+    avg_resource_node = puppetdb_results['avg_resource']#.get('value', puppetdb_results['avg_resource'])
+
     # Information about all active nodes in puppet
     all_nodes_list = puppetdb_results['all_nodes']
     # All available events for the latest puppet reports

@@ -34,6 +34,8 @@ def catalogue_json(request, certname=None):
     catalogue = puppetdb.api_get(
         path=path,
         api_url=source_url,
+        verify=source_verify,
+        cert=source_certs,
         api_version='v4',
         params=puppetdb.mk_puppetdb_query(catalogue_params, request),
     )
@@ -50,6 +52,8 @@ def catalogue_json(request, certname=None):
         latest_report = puppetdb.api_get(
             path=report_url,
             api_url=source_url,
+            verify=source_verify,
+            cert=source_certs,
             api_version='v4',
             params=puppetdb.mk_puppetdb_query(report_param, request),
         )

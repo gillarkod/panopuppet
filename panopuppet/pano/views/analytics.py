@@ -132,10 +132,9 @@ def analytics(request):
         class_name = item['subject']['type']
         class_total = item['skips'] + item['failures'] + item['noops'] + item['successes']
         class_resource_results.append((class_name, class_total))
-    print(events_status_list)
+
     if events_status_list:
         for status, value in events_status_list[0].items():
-            print(status, value)
             if value is 0 or status == 'total' or status == 'summarize_by':
                 continue
             class_status_results.append((status, value))

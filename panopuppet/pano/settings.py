@@ -51,10 +51,12 @@ elif 'sources' in cfg:
                 # Fileserver Settings
                 PUPPETMASTER_FILESERVER_SHOW = data.get('PUPPETMASTER_FILESERVER_SHOW', False)
                 PUPPETMASTER_FILESERVER_HOST = data.get('PUPPETMASTER_FILESERVER_HOST', None)
-                PUPPETMASTER_FILESERVER_CERTIFICATES = tuple(data.get('PUPPETMASTER_FILESERVER_CERTIFICATES', [None, None]))
+                PUPPETMASTER_FILESERVER_CERTIFICATES = tuple(
+                    data.get('PUPPETMASTER_FILESERVER_CERTIFICATES', [None, None]))
                 PUPPETMASTER_FILESERVER_VERIFY_SSL = data.get('PUPPETMASTER_FILESERVER_VERIFY_SSL', False)
                 # Puppet Agent Run Interval
                 PUPPET_RUN_INTERVAL = data.get('PUPPET_RUN_INTERVAL', 30)
+
 
     # Set a puppetdb host is none was specified to be default.
     if found_default is False:
@@ -107,3 +109,9 @@ NODES_DEFAULT_FACTS = cfg.get('NODES_DEFAULT_FACTS',
 # Caching Time Settings
 # Set cache time to 0 to disable caching
 CACHE_TIME = cfg.get('CACHE_TIME', 30)
+
+from panopuppet.pano.puppetdb.puppetdb import ident_pdb_vers
+
+PUPPETDB_VERS = ident_pdb_vers(source_url=PUPPETDB_HOST,
+                               source_verify=PUPPETDB_VERIFY_SSL,
+                               source_certs=PUPPETDB_CERTIFICATES)

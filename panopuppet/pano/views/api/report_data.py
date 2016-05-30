@@ -82,6 +82,8 @@ def reports_json(request, certname=None):
             path='event-counts',
             api_url=source_url,
             api_version='v4',
+            verify=source_verify,
+            cert=source_certs,
             params=puppetdb.mk_puppetdb_query(events_params, request),
         )
         # Make list of the results

@@ -51,7 +51,7 @@ def event_analytics(request, view='summary'):
     # If date retrieval was alright then we can set the timespan to that of data input.
     if arrow_from and arrow_to:
         timespan = [arrow_from, arrow_to]
-        print(timespan)
+
     # Get summary data
     summary = events.get_events_summary(timespan=timespan, request=request)
     context['summary'] = summary
