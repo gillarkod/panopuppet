@@ -27,7 +27,8 @@ For the feature list click here:  [Features](#features)
 To see how PanoPuppet looks click here: [Screenshots](https://github.com/propyless/panopuppet/wiki/Screenshots)
 
 # Support
-* PanoPuppet Releases >= 1.0.0 - Requires PuppetDB == 3.x (Uses the v4 api endpoint)
+* PanoPuppet Releases >= 1.4.0 - Requires PuppetDB == 3.x/4.x (Uses the v4 api endpoint)
+* PanoPuppet Releases >= 1.0.0 and <= 1.3.0 - Requires PuppetDB == 3.x (Uses the v4 api endpoint)
 * PanoPuppet Releases < 1.0.0 - Requires PuppetDB == 2.x (Uses the experimental v4 api endpoint)
 
 To download a specific release you can find them [Here](https://github.com/propyless/panopuppet/releases)
@@ -113,7 +114,7 @@ will need to make a wrapper that enables SCL python3.
 * Debian 8 (jessie) - LDAP issues)
 
 ## Future plans
-* Docker image to quickly install a panopuppet dashboard
+* Docker image to quickly install a PanoPuppet dashboard
 
 ## Installation
 For install instructions they can be found in either INSTALL.md or at the PanoPuppet Wiki hosted at Github.
@@ -129,11 +130,11 @@ implemented!
 
 ### Setup.py install
 Make sure you have the correct python in your path (virtual env users)
-First uninstall the previous setup.py install of panopuppet with:
+First uninstall the previous setup.py install of PanoPuppet with:
 
 `pip uninstall panopuppet`
 
-*If you have already installed the latest version of panopuppet you can remove the older version by specifying the version of panopuppet to remove, for example:*
+*If you have already installed the latest version of PanoPuppet you can remove the older version by specifying the version of PanoPuppet to remove, for example:*
 
 `pip uninstall panopuppet==1.3`
 
@@ -145,7 +146,7 @@ Now you should be done, just run the **General upgrade commands** and you'll be 
 
 ### General upgrade commands
 Upgrading PanoPuppet has a few new steps now as user profiles and permissions has been implemented.
-Now you should always run the following commands when updating panopuppet.
+Now you should always run the following commands when updating PanoPuppet.
 `python manage.py collectstatic`
 `python manage.py makemigration`
 `python manage.py syncdb`
