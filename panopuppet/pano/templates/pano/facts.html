@@ -69,7 +69,9 @@
     });</script>
     <script>
         $(document).ready(function () {
-            get_facts("{{ certname }}");
+            get_facts("{{ certname }}", undefined, function() {
+                $('table').trigger("update");
+            });
         });
     </script>
 {% endblock %}
