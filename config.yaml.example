@@ -52,6 +52,8 @@ AUTH_METHOD: 'basic'
 LDAP_SERVER: 'ldap://ldap.forumsys.com'
 LDAP_BIND_DN: 'cn=read-only-admin,dc=example,dc=com'
 LDAP_BIND_PW: 'password'
+# Active directory filter
+# LDAP_FILTER: '(&(objectclass=User)(sAMAccountName=%(user)s))'
 LDAP_USEARCH_PATH: 'dc=example,dc=com'
 LDAP_GSEARCH_PATH:
 LDAP_ALLOW_GRP:
