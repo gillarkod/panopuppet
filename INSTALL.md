@@ -347,7 +347,7 @@ $ cp /srv/repo/panopuppet/config.yaml.example /srv/repo/panopuppet/config.yaml
 Use your favourite text editor to modify the file with the correct values for your envionrment.
 Please note that the example configuration file contains an example for puppetdb connection with and without SSL.
 
-Depending on your puppet infrastructure you may or may not need to specify public, private and cacert to authenticate
+Depending on your puppet infrastructure you may or may not need to specify certificate, private key and cacert files to authenticate
 with puppetdb, puppetmaster filebucket and fileserver.
 
 9) Create PanoPuppet manage.py and populate the /srv/staticfiles directory with the staticfiles.
@@ -619,7 +619,7 @@ $ cp /srv/repo/panopuppet/config.yaml.example /srv/repo/panopuppet/config.yaml
 Use your favourite text editor to modify the file with the correct values for your envionrment.
 Please note that the example configuration file contains an example for puppetdb connection with and without SSL.
 
-Depending on your puppet infrastructure you may or may not need to specify public, private and cacert to authenticate
+Depending on your puppet infrastructure you may or may not need to specify certificate, private key and cacert files to authenticate
 with puppetdb, puppetmaster filebucket and fileserver.
 
 
