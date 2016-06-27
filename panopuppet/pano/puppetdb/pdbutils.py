@@ -68,6 +68,9 @@ def run_puppetdb_jobs(jobs, threads=6):
 
     def db_threaded_requests(i, q):
         while True:
+            import datetime as dt
+            a = dt.datetime.utcnow()
+
             t_job = q.get()
             t_path = t_job['path']
             t_url = t_job.get('url')
@@ -85,6 +88,8 @@ def run_puppetdb_jobs(jobs, threads=6):
                 api_version=t_api_v,
             )
             out_q.put({t_job['id']: results})
+            b = dt.datetime.utcnow()
+            print('%s: %s' % ( t_job['id'], (b - a).total_seconds()))
             q.task_done()
 
     for i in range(threads):

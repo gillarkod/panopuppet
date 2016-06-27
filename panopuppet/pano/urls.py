@@ -16,7 +16,7 @@ from panopuppet.pano.views.splash import splash
 # API Imports
 from panopuppet.pano.views.api.node_data import nodes_json, search_nodes_json
 from panopuppet.pano.views.api.fact_data import facts_json
-from panopuppet.pano.views.api.dashboard_data import dashboard_status_json, dashboard_nodes_json, dashboard_json
+from panopuppet.pano.views.api.dashboard_data import dashboard_status_json, dashboard_nodes_json, dashboard_json, dashboard_test_json
 from panopuppet.pano.views.api.report_data import reports_json, reports_search_json
 from panopuppet.pano.views.api.catalogue_data import catalogue_json, catalogue_compare_json, catalogue_history_list, \
     catalogue_history_fetch
@@ -64,4 +64,7 @@ urlpatterns = patterns('',
                        url(r'^api/dashboard/status$', dashboard_status_json, name='api_dashboard_status'),
                        url(r'^api/status$', dashboard_status_json, name='api_dashboard_status'),
                        url(r'^api/dashboard/nodes/$', dashboard_nodes_json, name='api_dashboard_nodes'),
+
+                       # Test api
+                        url(r'^api/testdashboard/$', dashboard_test_json, name='api_test_dashboard'),
                        )
