@@ -5,26 +5,13 @@
 {% block head %}
     {% load static %}
     <script src="{% static 'pano/js/dataTables.min.js' %}"></script>
-    <link rel="stylesheet" href="{% static 'pano/css/dataTables.min.css' %}">
+    <link rel="stylesheet" href="{% static 'pano/css/dataTables.bootstrap.min.css' %}">
     <script src="{% static 'pano/js/bootbox.min.js' %}"></script>
     <script src="{% static 'pano/js/custom.js.min.js' %}"></script>
-    <!-- make sure table does not go bonkers.. -->
-    <style>
-        .table {
-            table-layout: fixed;
-            word-wrap: break-word;
-        }
-
-        .table tbody {
-            font-size: 11px;
-        }
-    </style>
 
     <script>
         $(document).ready(function () {
-            console.log('get nodes');
             get_dashboard_nodes();
-            console.log('got nodes');
         });
     </script>
 
@@ -79,9 +66,9 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
-                <table id="example" class="table table-condensed table-striped" cellspacing="0" width="100%">
+                <table id="nodetable" class="table table-condensed table-striped table-bordered" cellspacing="0"
+                       width="100%">
                 </table>
-
             </div>
         </div>
     </div>

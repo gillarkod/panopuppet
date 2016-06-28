@@ -8,8 +8,14 @@ from panopuppet.pano.methods.dictfuncs import dictstatus as dictstatus
 from panopuppet.pano.puppetdb.pdbutils import run_puppetdb_jobs
 from panopuppet.pano.puppetdb.puppetdb import set_server, get_server
 from panopuppet.pano.settings import CACHE_TIME
+
+from django.template import defaultfilters as filters
+from django.utils.timezone import localtime
+from panopuppet.pano.puppetdb.pdbutils import json_to_datetime, is_unreported
 import arrow
 from datetime import timedelta
+
+
 
 __author__ = 'etaklar'
 
@@ -492,6 +498,7 @@ def dashboard_test_json(request):
     pdb_vers = get_server(request, type='puppetdb_vers')
     puppet_run_time = get_server(request, type='run_time')
     dashboard_show = request.GET.get('show', 'recent')
+
     events_params = {
         'query':
             {
@@ -664,6 +671,7 @@ def dashboard_test_json(request):
     puppetdb_results = run_puppetdb_jobs(jobs)
     b = dt.datetime.utcnow()
     print("API Calls Total: %s " % (b - a).total_seconds())
+
     # Assign vars from the completed jobs
     # Number of results from all_nodes is our population.
     puppet_population = len(puppetdb_results['all_nodes'])
@@ -687,6 +695,7 @@ def dashboard_test_json(request):
         item['certname']: item for item in unreported_nodes_list
         }
 
+    # Information about all mismatching nodes in puppet
     _mismatching_nodes_dict = {
         item['certname']: item for item in all_nodes_list if check_mismatch_ts(item) and
         item['certname'] not in _unreported_nodes_dict
@@ -727,9 +736,15 @@ def dashboard_test_json(request):
                              for item in _unreported_nodes_dict.values()
                              if item['certname'] in event_dict]
 
-    mismatching_node_list = [merge_two_dicts(item, event_dict.get(item['certname'], _default_merge))
-                             for item in _mismatching_nodes_dict.values()
-                             if item['certname'] in event_dict]
+    for item in unreported_nodes_list:
+        item['catalog_timestamp'] = filters.date(localtime(json_to_datetime(item['catalog_timestamp'])), 'Y-m-d H:i:s') if item['catalog_timestamp'] is not None else ''
+        item['report_timestamp'] = filters.date(localtime(json_to_datetime(item['report_timestamp'])), 'Y-m-d H:i:s') if item['report_timestamp'] is not None else '',
+        item['facts_timestamp'] = filters.date(localtime(json_to_datetime(item['facts_timestamp'])), 'Y-m-d H:i:s') if item['facts_timestamp'] is not None else '',
+
+
+    # mismatching_node_list = [merge_two_dicts(item, event_dict.get(item['certname'], _default_merge))
+    #                          for item in _mismatching_nodes_dict.values()
+    #                          if item['certname'] in event_dict]
 
     failed_node_list = [merge_two_dicts(item, event_dict.get(item['certname'], _default_merge))
                         for item in _failed_nodes_dict.values()
@@ -742,6 +757,10 @@ def dashboard_test_json(request):
     noop_node_list = [merge_two_dicts(item, event_dict.get(item['certname'], _default_merge))
                       for item in _noop_nodes_dict.values()
                       if item['certname'] in event_dict]
+
+    """
+    filters.date(localtime(json_to_datetime(n_data['catalog_timestamp'])), 'Y-m-d H:i:s') if n_data['catalog_timestamp'] is not None else '',
+    """
 
     c = dt.datetime.utcnow()
     print("Data extraction and dictify total: %s " % (c - b).total_seconds())
