@@ -1,5 +1,7 @@
 import json
+from datetime import timedelta
 
+import arrow
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import HttpResponse, redirect
 from django.views.decorators.cache import cache_page
@@ -8,14 +10,6 @@ from panopuppet.pano.methods.dictfuncs import dictstatus as dictstatus
 from panopuppet.pano.puppetdb.pdbutils import run_puppetdb_jobs
 from panopuppet.pano.puppetdb.puppetdb import set_server, get_server
 from panopuppet.pano.settings import CACHE_TIME
-
-from django.template import defaultfilters as filters
-from django.utils.timezone import localtime
-from panopuppet.pano.puppetdb.pdbutils import json_to_datetime, is_unreported
-import arrow
-from datetime import timedelta
-
-
 
 __author__ = 'etaklar'
 
@@ -497,12 +491,43 @@ def dashboard_test_json(request):
     source_url, source_certs, source_verify = get_server(request)
     pdb_vers = get_server(request, type='puppetdb_vers')
     puppet_run_time = get_server(request, type='run_time')
+
     dashboard_show = request.GET.get('show', 'recent')
+
+    # Datatables data fetch
+    dashboard_dt_search = request.GET.get('search[value]', '.*')
+    dashboard_dt_limit = request.GET.get('length', 25)
+    dashboard_dt_start = request.GET.get('start', 0)
+    # Order by Column
+    dashboard_dt_colOr = request.GET.get('order[0][column]', '2')
+    # Order direction (desc, asc)
+    dashboard_dt_dirOr = request.GET.get('order[0][column]', '2')
+
+    datatable_req = False
+
+    if pdb_vers == 4:
+        tot_res_path = 'mbeans/puppetlabs.puppetdb.population:name=num-resources'
+        avg_res_path = 'mbeans/puppetlabs.puppetdb.population:name=avg-resources-per-node'
+    else:
+        tot_res_path = 'mbeans/puppetlabs.puppetdb.query.population:type=default,name=num-resources'
+        avg_res_path = 'mbeans/puppetlabs.puppetdb.query.population:type=default,name=avg-resources-per-node'
+
+    # Stuff that should be returned from the GET parameters
+    if request.GET.get('draw', False):
+        context['draw'] = int(request.GET.get('draw'))
+        datatable_req = True
 
     events_params = {
         'query':
             {
-                1: '["and",["=","latest_report?",true],["in", "certname",["extract", "certname",["select_nodes",["null?","deactivated",true]]]]]'
+                1: '["and",'
+                   '["=","latest_report?",true],'
+                   '["~","certname",%s],'
+                   '["in", "certname",'
+                   '["extract", "certname",'
+                   '["select_nodes",'
+                   '["null?","deactivated",true]'
+                   ']]]]' % dashboard_dt_search
             },
         'summarize_by': 'certname',
     }
@@ -516,12 +541,18 @@ def dashboard_test_json(request):
         'query':
             {
                 1: '["=","latest_report_status","changed"]'
+
             }
     }
     noop_nodes_params = {
         'query':
             {
-                1: '["in", "certname", ["extract", "certname", ["select_reports", ["and",["=", "noop", true],["=","latest_report?", true]]]]]'
+                1: '["in", "certname", '
+                   '["extract", "certname", '
+                   '["select_reports", '
+                   '["and",["=", "noop", true],'
+                   '["=","latest_report?", true]'
+                   ']]]]'
             }
     }
 
@@ -534,65 +565,7 @@ def dashboard_test_json(request):
             }
     }
 
-    def merge_two_dicts(x, y):
-        '''Given two dicts, merge them into a new dict as a shallow copy.'''
-        z = x.copy()
-        z.update(y)
-        return z
-
-    def check_mismatch_ts(
-            node_data,
-            puppet_run_interval=puppet_run_time
-    ):
-        """
-        :param report_timestamp: str
-        :param fact_timestamp: str
-        :param catalog_timestamp: str
-        :return: Bool
-        Returns False if the compiled run has not failed
-        Returns True if the compiled run has failed
-        """
-        import pprint
-
-        report_timestamp = node_data.get('report_timestamp', None)
-        catalog_timestamp = node_data.get('catalog_timestamp', None)
-        fact_timestamp = node_data.get('facts_timestamp', None)
-
-        if report_timestamp is None or catalog_timestamp is None or fact_timestamp is None:
-            return True
-
-        # check if the fact report is older than puppet_run_time by double the run time
-        report_time = arrow.get(report_timestamp)
-        fact_time = arrow.get(fact_timestamp)
-        catalog_time = arrow.get(catalog_timestamp)
-
-        # Report time, fact time and catalog time should all be run within (PUPPET_RUN_INTERVAL / 2)
-        # minutes of each other
-        diffs = dict()
-        # Time elapsed between fact time and catalog time
-        diffs['catalog_fact'] = catalog_time - fact_time
-        diffs['fact_catalog'] = fact_time - catalog_time
-
-        # Time elapsed between fact time and report time
-        diffs['report_fact'] = report_time - fact_time
-        diffs['fact_report'] = fact_time - report_time
-        # Time elapsed between report and catalog
-        diffs['report_catalog'] = report_time - catalog_time
-        diffs['catalog_report'] = catalog_time - report_time
-
-        for key, value in diffs.items():
-            if value > timedelta(minutes=puppet_run_interval / 2):
-                return True
-        return False
-
-    if pdb_vers == 4:
-        tot_res_path = 'mbeans/puppetlabs.puppetdb.population:name=num-resources'
-        avg_res_path = 'mbeans/puppetlabs.puppetdb.population:name=avg-resources-per-node'
-    else:
-        tot_res_path = 'mbeans/puppetlabs.puppetdb.query.population:type=default,name=num-resources'
-        avg_res_path = 'mbeans/puppetlabs.puppetdb.query.population:type=default,name=avg-resources-per-node'
-
-    jobs = {
+    default_jobs = {
         'tot_resource': {
             'url': source_url,
             'certs': source_certs,
@@ -623,6 +596,15 @@ def dashboard_test_json(request):
             'verify': source_verify,
             'api_version': 'v4',
             'id': 'all_nodes',
+            'path': '/nodes',
+            'request': request
+        },
+        'mismatch_nodes': {
+            'url': source_url,
+            'certs': source_certs,
+            'verify': source_verify,
+            'api_version': 'v4',
+            'id': 'mismatch_nodes',
             'path': '/nodes',
             'request': request
         },
@@ -668,62 +650,110 @@ def dashboard_test_json(request):
         },
     }
 
+    if datatable_req:
+        jobs = {}
+        jobs['tot_resource'] = default_jobs['tot_resource']
+        jobs['avg_resource'] = default_jobs['avg_resource']
+        jobs[dashboard_show + '_nodes'] = default_jobs[dashboard_show + '_nodes']
+    if not datatable_req:
+        jobs = default_jobs
+
+    def merge_two_dicts(x, y):
+        '''Given two dicts, merge them into a new dict as a shallow copy.'''
+        z = x.copy()
+        z.update(y)
+        return z
+
+    def check_mismatch_ts(node_data, puppet_run_interval=puppet_run_time):
+        report_timestamp = node_data.get('report_timestamp', None)
+        catalog_timestamp = node_data.get('catalog_timestamp', None)
+        fact_timestamp = node_data.get('facts_timestamp', None)
+
+        if report_timestamp is None or catalog_timestamp is None or fact_timestamp is None:
+            return True
+
+        # check if the fact report is older than puppet_run_time by double the run time
+        report_time = arrow.get(report_timestamp)
+        fact_time = arrow.get(fact_timestamp)
+        catalog_time = arrow.get(catalog_timestamp)
+
+        # Report time, fact time and catalog time should all be run within (PUPPET_RUN_INTERVAL / 2)
+        # minutes of each other
+        diffs = dict()
+        # Time elapsed between fact time and catalog time
+        diffs['catalog_fact'] = catalog_time - fact_time
+        diffs['fact_catalog'] = fact_time - catalog_time
+
+        # Time elapsed between fact time and report time
+        diffs['report_fact'] = report_time - fact_time
+        diffs['fact_report'] = fact_time - report_time
+        # Time elapsed between report and catalog
+        diffs['report_catalog'] = report_time - catalog_time
+        diffs['catalog_report'] = catalog_time - report_time
+
+        for key, value in diffs.items():
+            if value > timedelta(minutes=puppet_run_interval / 2):
+                return True
+        return False
+
     puppetdb_results = run_puppetdb_jobs(jobs)
-    b = dt.datetime.utcnow()
-    print("API Calls Total: %s " % (b - a).total_seconds())
 
     # Assign vars from the completed jobs
     # Number of results from all_nodes is our population.
-    puppet_population = len(puppetdb_results['all_nodes'])
+    context['puppet_population'] = len(puppetdb_results['all_nodes'])
     # Total resources managed by puppet metric
-    total_resources = puppetdb_results['tot_resource']
-
+    context['total_resources'] = puppetdb_results['tot_resource']
     # Average resource per node metric
-    avg_resource_node = puppetdb_results['avg_resource']
+    context['avg_resource_node'] = puppetdb_results['avg_resource']
+
+    node_data = dict()
+    # All available events for the latest puppet reports
+    node_data['events'] = dict()
+    node_data['events']['raw'] = puppetdb_results['event_counts']
+    node_data['events']['dct'] = {item['subject']['title']: item for item in node_data['events']['raw']}
 
     # Information about all active nodes in puppet
-    all_nodes_list = puppetdb_results['all_nodes']
-    all_nodes_dict = {item['certname']: item for item in all_nodes_list}
-
-    # All available events for the latest puppet reports
-    event_list = puppetdb_results['event_counts']
-    event_dict = {item['subject']['title']: item for item in event_list}
+    node_data['recent'] = dict()
+    node_data['recent']['raw'] = puppetdb_results['all_nodes']
+    node_data['recent']['dct'] = {item['certname']: item for item in node_data['recent']['raw']}
 
     # Information about all unreported nodes in puppet
-    unreported_nodes_list = puppetdb_results['unreported_nodes']
-    _unreported_nodes_dict = {
-        item['certname']: item for item in unreported_nodes_list
-        }
-
-    # Information about all mismatching nodes in puppet
-    _mismatching_nodes_dict = {
-        item['certname']: item for item in all_nodes_list if check_mismatch_ts(item) and
-        item['certname'] not in _unreported_nodes_dict
-        }
+    node_data['unreported'] = dict()
+    node_data['unreported']['raw'] = puppetdb_results['unreported_nodes']
+    node_data['unreported']['dct'] = {item['certname']: item for item in node_data['unreported']['raw']}
 
     # Information about all failed nodes in puppet
-    failed_nodes_list = puppetdb_results['failed_nodes']
-    _failed_nodes_dict = {
-        item['certname']: item for item in failed_nodes_list if
-        item['certname'] not in _unreported_nodes_dict and
-        item['certname'] not in _mismatching_nodes_dict
+    node_data['failed'] = dict()
+    node_data['failed']['raw'] = puppetdb_results['failed_nodes']
+    node_data['failed']['dct'] = {
+        item['certname']: item for
+        item in node_data['failed']['raw'] if
+        item['certname'] not in node_data['unreported']['dct']
         }
 
     # Information about all changed nodes in puppet
-    changed_nodes_list = puppetdb_results['changed_nodes']
-    _changed_nodes_dict = {
-        item['certname']: item for item in changed_nodes_list if
-        item['certname'] not in _unreported_nodes_dict and
-        item['certname'] not in _mismatching_nodes_dict
+    node_data['changed'] = dict()
+    node_data['changed']['raw'] = puppetdb_results['changed_nodes']
+    node_data['changed']['dct'] = {
+        item['certname']: item for
+        item in node_data['changed']['raw'] if
+        item['certname'] not in node_data['unreported']['dct']
         }
 
     # Information about all noop nodes in puppet
-    noop_nodes_list = puppetdb_results['noop_nodes']
-    _noop_nodes_dict = {
-        item['certname']: item for item in noop_nodes_list if
-        item['certname'] not in _unreported_nodes_dict and
-        item['certname'] not in _mismatching_nodes_dict
+    node_data['noop'] = dict()
+    node_data['noop']['raw'] = puppetdb_results['noop_nodes']
+    node_data['noop']['dct'] = {
+        item['certname']: item for
+        item in node_data['noop']['raw'] if
+        item['certname'] not in node_data['unreported']['dct']
         }
+
+    # TODO: Add support for mismatching again after we identify a good way to solve slowness
+    # _mismatching_nodes_dict = {
+    #     item['certname']: item for item in all_nodes_list if check_mismatch_ts(item) and
+    #     item['certname'] not in _unreported_nodes_dict
+    #     }
 
     _default_merge = {
         'failures': 0,
@@ -732,58 +762,44 @@ def dashboard_test_json(request):
         'noops': 0
     }
 
-    unreported_nodes_list = [merge_two_dicts(item, event_dict.get(item['certname'], _default_merge))
-                             for item in _unreported_nodes_dict.values()
-                             if item['certname'] in event_dict]
+    all_nodes_list = [merge_two_dicts(item, node_data['events']['dct'].get(item['certname'], _default_merge))
+                      for item in node_data['recent']['dct'].values()
+                      ]
 
-    for item in unreported_nodes_list:
-        item['catalog_timestamp'] = filters.date(localtime(json_to_datetime(item['catalog_timestamp'])), 'Y-m-d H:i:s') if item['catalog_timestamp'] is not None else ''
-        item['report_timestamp'] = filters.date(localtime(json_to_datetime(item['report_timestamp'])), 'Y-m-d H:i:s') if item['report_timestamp'] is not None else '',
-        item['facts_timestamp'] = filters.date(localtime(json_to_datetime(item['facts_timestamp'])), 'Y-m-d H:i:s') if item['facts_timestamp'] is not None else '',
-
+    # for item in unreported_nodes_list:
+    #     item['catalog_timestamp'] = filters.date(localtime(json_to_datetime(item['catalog_timestamp'])),
+    #                                              'Y-m-d H:i:s') if item['catalog_timestamp'] is not None else ''
+    #     item['report_timestamp'] = filters.date(localtime(json_to_datetime(item['report_timestamp'])), 'Y-m-d H:i:s') if \
+    #                                    item['report_timestamp'] is not None else '',
+    #     item['facts_timestamp'] = filters.date(localtime(json_to_datetime(item['facts_timestamp'])), 'Y-m-d H:i:s') if \
+    #                                   item['facts_timestamp'] is not None else '',
 
     # mismatching_node_list = [merge_two_dicts(item, event_dict.get(item['certname'], _default_merge))
     #                          for item in _mismatching_nodes_dict.values()
     #                          if item['certname'] in event_dict]
 
-    failed_node_list = [merge_two_dicts(item, event_dict.get(item['certname'], _default_merge))
-                        for item in _failed_nodes_dict.values()
-                        if item['certname'] in event_dict]
-
-    changed_node_list = [merge_two_dicts(item, event_dict.get(item['certname'], _default_merge))
-                         for item in _changed_nodes_dict.values()
-                         if item['certname'] in event_dict]
-
-    noop_node_list = [merge_two_dicts(item, event_dict.get(item['certname'], _default_merge))
-                      for item in _noop_nodes_dict.values()
-                      if item['certname'] in event_dict]
+    # failed_node_list = [merge_two_dicts(item, event_dict.get(item['certname'], _default_merge))
+    #                     for item in _failed_nodes_dict.values()
+    #                     if item['certname'] in event_dict]
+    #
+    # changed_node_list = [merge_two_dicts(item, event_dict.get(item['certname'], _default_merge))
+    #                      for item in _changed_nodes_dict.values()
+    #                      if item['certname'] in event_dict]
+    #
+    # noop_node_list = [merge_two_dicts(item, event_dict.get(item['certname'], _default_merge))
+    #                   for item in _noop_nodes_dict.values()
+    #                   if item['certname'] in event_dict]
 
     """
     filters.date(localtime(json_to_datetime(n_data['catalog_timestamp'])), 'Y-m-d H:i:s') if n_data['catalog_timestamp'] is not None else '',
     """
 
-    c = dt.datetime.utcnow()
-    print("Data extraction and dictify total: %s " % (c - b).total_seconds())
-
-    print('# Total nodes found')
-    print('count - all_nodes: %s' % len(all_nodes_dict))
-    # print('count - failed_nodes: %s' % len(failed_nodes_dict))
-    # print('count - unreported_nodes: %s' % len(unreported_nodes_))
-    print('count - changed_nodes: %s' % len(changed_nodes_list))
-    # print('count - noop_nodes: %s' % len(noop_nodes_dict))
-    # print('count - mismatching_nodes: %s' % len(mismatching_nodes_dict))
-    print("Total time for all ops: %s " % (c - a).total_seconds())
-    print('---')
-
-    return HttpResponse(json.dumps({'data': unreported_nodes_list}, indent=2), content_type="application/json")
-
-    # context['node_list'] = merged_nodes_list
-    # context['selected_view'] = dashboard_show
-    # context['population'] = puppet_population
-    # context['total_resource'] = total_resources['Value']
-    # context['avg_resource'] = "{:.2f}".format(avg_resource_node['Value'])
-    # context['failed_nodes'] = node_fail_count
-    # context['changed_nodes'] = node_change_count
-    # context['unreported_nodes'] = node_unreported_count
+    context['selected_view'] = dashboard_show
+    context['population'] = len(node_data['recent']['dct'])
+    context['failed_nodes'] = len(node_data['failed']['dct'])
+    context['changed_nodes'] = len(node_data['changed']['dct'])
+    context['noop_nodes'] = len(node_data['noop']['dct'])
+    context['unreported_nodes'] = len(node_data['unreported']['dct'])
     # context['mismatching_timestamps'] = node_off_timestamps_count
-    # context['pending_nodes'] = node_pending_count
+
+    return HttpResponse(json.dumps(context, indent=2), content_type="application/json")
