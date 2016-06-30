@@ -1,15 +1,15 @@
 # Introduction
 
-I wanted to run panopuppet v0.x on a centos 6 puppetmaster (puppet 3.6.2; puppetdb 2.1).
-The puppet master uses apache and mod-wsgi for python 2.6 (Phusion Passenger, etc).
-Panopuppet uses python 3.3, and mod-wsgi for two different python releases does not co-exist easily in one apache. I could use nginx, but I would then need to work out the mod-wsgi for that, and I am not sure it would work/is supported. Thus I thought I would try and containerize it using docker.
+Run panopuppet in a preconfigured Docker container.
+
+Reason for creating this is I wanted to run pano on a puppetmaster where the mod-wsgi is tied to python 2.6 (Passenger and puppetboard). 
+Pano uses a python 3.3 mod-wsgi so running it in a container would isolate it from the 2.6 one.
+I could use nginx, but I would then need to work out the mod-wsgi for that, and I am not sure it would work/is supported. Thus I thought I would try and containerize it using docker.
 
 Docker image size is 489Mb. When the container is running it only consumes 60Mb of memory; that is so much better than a vm!
 
-For later versions of the puppet master, a dedicate puppetmaster process is used (java based) rather than apache. On puppet 4.5 (puppetserver 2.4.0/puppetdb 4.1) there is no need for apache, although you may wish to have panopuppet and puppetboard together, so you may wish to containerize one of them because of the wsgi issue. There is also wsgi express that allows different python wsgi's to coexist; another thing you could spend time on learning and trying to use!
-
 ## Files needed
-You can take this from the git panopuppet v0.x release (git clone...). Make sure these are in the current dir that you build your docker image in.
+Make sure these are in the current dir that you build your docker image in.
 - Dockerfile - To build the docker image
 - panopuppet.conf - apache conf file for panopuppet; see install notes.
 - config.yaml - ready configured config.yaml
@@ -30,7 +30,7 @@ Building the docker image; this will take a while; be patient:
 ```
 # docker build -t panopuppet:v0.x  .
 ```
-You can then check this:
+You can then check the build:
 
 ```
 # docker images
