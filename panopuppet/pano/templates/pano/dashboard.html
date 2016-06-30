@@ -11,16 +11,7 @@
   <script>
         function get_data() {
             var backgroundTask = $.Deferred();
-            var url = '../api/dashboard/';
-            if (typeof (GetURLParameter('show')) != 'undefined') {
-                var show_type = $('#' + GetURLParameter('show'));
-                url = url + show_type.attr('href');
-            }
-            else if (typeof (GetURLParameter('show')) == 'undefined') {
-                show_type = $('#recent');
-                url = url + show_type.attr('href');
-            }
-            $(show_type).addClass("active").prependTo($(show_type).parent()).siblings().removeClass("active");
+            var url = '../api/testdashboard/';
             $.get(url, function (json) {
                         var response = $(jQuery(json));
                         var nodes = response[0]['node_list'];
@@ -32,12 +23,7 @@
                         $("#node_population").html(response[0]['population']);
                         $("#total_resources").html(response[0]['total_resource']);
                         $("#average_resources").html(response[0]['avg_resource']);
-                        $("#mismatching_timestamps").html(response[0]['mismatching_timestamps']);
                     });
-{#                    .fail(function () {#}
-{#                        var data = '<tr><td colspan="8">Can not connect to PuppetDB.</td></tr>';#}
-{#                        $("#dashboard_nodes").html(data);#}
-{#                    });#}
             backgroundTask.resolve();
             return backgroundTask;
         }
@@ -45,6 +31,7 @@
     </script>
     <script>
         $(document).ready(function () {
+            get_data();
             get_dashboard_nodes();
         });
     </script>
