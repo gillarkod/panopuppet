@@ -106,6 +106,15 @@ def dictstatus(node_list, reports_dict, status_dict, sort=True, sortby=None, asc
         ))
         return m_list
 
+    def get_report_status(reports_dict, certname, node=None, node_dict=None):
+        if reports_dict is None:
+            if node is not None:
+                return node.get('status', 'unknown')
+            elif node_dict is not None:
+                return node_dict[certname].get('status', 'unknown')
+        else:
+            return reports_dict[certname]['status']
+
     sortables = {
         'certname': 0,
         'catalog_timestamp': 1,
@@ -147,9 +156,9 @@ def dictstatus(node_list, reports_dict, status_dict, sort=True, sortby=None, asc
                                     catalog_timestamp=node.get('catalog_timestamp', None)):
                 node_has_mismatching_timestamps = True
             # Check for the latest report.
-            if node['certname'] in reports_dict:
+            report_status = get_report_status(reports_dict, node['certname'], node=node)
+            if report_status is not None:
                 # Check which status the run is.
-                report_status = reports_dict[node['certname']]['status']
 
                 """
                 Can be used later but right now we just utilize the event-counts response.
@@ -187,9 +196,9 @@ def dictstatus(node_list, reports_dict, status_dict, sort=True, sortby=None, asc
     elif sortbycol <= 3 and get_status == 'all':
         for node in node_list:
             # Check for the latest report.
-            if node['certname'] in reports_dict:
+            report_status = get_report_status(reports_dict, node['certname'], node=node)
+            if report_status is not None:
                 # Check which status the run is.
-                report_status = reports_dict[node['certname']]['status']
                 """
                 Can be used later but right now we just utilize the event-counts response.
                 # Dictify the metrics for the report.
@@ -213,9 +222,8 @@ def dictstatus(node_list, reports_dict, status_dict, sort=True, sortby=None, asc
         sort = True
         node_dict = {item['certname']: item for item in node_list}
         for status, value in status_dict.items():
-            if value['subject']['title'] in reports_dict:
-                # Check which status the run is.
-                report_status = reports_dict[value['subject']['title']]['status']
+            # Check which status the run is.
+            report_status = get_report_status(reports_dict, value['subject']['title'], node_dict=node_dict)
             if value['subject']['title'] in node_dict and report_status:
                 merged_list = append_list(node_dict[value['subject']['title']], value, merged_list, report_status)
 

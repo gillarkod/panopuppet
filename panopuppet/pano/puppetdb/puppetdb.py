@@ -252,7 +252,16 @@ def mk_puppetdb_query(params, request=None):
         query += ']'
         if query == '["and"]':
             query = ''
-        return query
+        """
+        This allows to specify a 'extract' parameter in the query params.
+        When doing this the conditional part of the extract statement must be
+        replced with %s, to allow the actual query fields to be correctly
+        inserted, otherwise the permission system will break.
+        """
+        if q_dict.get('extract') is not None:
+            return q_dict.get('extract') % query
+        else:
+            return query
 
     """
     node_params = {
