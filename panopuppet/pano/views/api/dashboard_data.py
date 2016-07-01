@@ -757,7 +757,7 @@ def dashboard_test_json(request):
             'api_version': '4',
             'id': 'unreported_nodes',
             'path': '/nodes',
-            'params': merge_two_params(node_params[dashboard_show].get('nodes'), node_params['node_count']),
+            'params': merge_two_params(node_params['unreported'].get('nodes'), node_params['node_count']),
             'request': request
         },
         'failed_nodes': {
@@ -767,7 +767,7 @@ def dashboard_test_json(request):
             'api_version': 'v4',
             'id': 'failed_nodes',
             'path': '/nodes',
-            'params': merge_two_params(node_params[dashboard_show].get('nodes'), node_params['node_count']),
+            'params': merge_two_params(node_params['failed'].get('nodes'), node_params['node_count']),
             'request': request
         },
         'changed_nodes': {
@@ -777,7 +777,7 @@ def dashboard_test_json(request):
             'api_version': 'v4',
             'id': 'changed_nodes',
             'path': '/nodes',
-            'params': merge_two_params(node_params[dashboard_show].get('nodes'), node_params['node_count']),
+            'params': merge_two_params(node_params['changed'].get('nodes'), node_params['node_count']),
             'request': request
         },
         'pending_nodes': {
@@ -787,7 +787,7 @@ def dashboard_test_json(request):
             'api_version': 'v4',
             'id': 'pending_nodes',
             'path': '/nodes',
-            'params': merge_two_params(node_params[dashboard_show].get('nodes'), node_params['node_count']),
+            'params': merge_two_params(node_params['pending'].get('nodes'), node_params['node_count']),
             'request': request
         },
     }
