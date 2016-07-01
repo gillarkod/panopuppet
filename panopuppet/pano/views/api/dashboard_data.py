@@ -570,8 +570,9 @@ def dashboard_test_json(request):
     report_filter = ',["%s","report_timestamp","%s"]' % (puppet_timestamp_logic, puppet_last_run_time)
 
     # For setting the correct query filter to each endpoint depending on the status type.
+    subquery_status = ''
+
     if dashboard_show in ['recent', 'unreported']:
-        subquery_status = ''
         report_filter = ''
     elif dashboard_show in ['failed', 'changed']:
         subquery_status = ',["=","latest_report_status","%s"]' % dashboard_show
