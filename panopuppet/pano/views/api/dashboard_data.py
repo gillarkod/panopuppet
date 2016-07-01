@@ -16,6 +16,7 @@ from django.template import defaultfilters as filters
 from django.utils.timezone import localtime
 from panopuppet.pano.puppetdb.pdbutils import json_to_datetime, is_unreported
 import arrow
+from collections import OrderedDict
 from urllib import parse
 
 __author__ = 'etaklar'
@@ -510,20 +511,9 @@ def dashboard_test_json(request):
     dashboard_dt_limit = request.GET.get('length', 25)
     dashboard_dt_offset = request.GET.get('start', 0)
     # Order by Column
-    dashboard_dt_colOr = request.GET.get('order[0][column]', '2')
+    dashboard_dt_color = int(request.GET.get('order[0][column]', 2))
     # Order direction (desc, asc)
-    dashboard_dt_dirOr = request.GET.get('order[0][column]', '2')
-
-    dashboard_order_table = {
-        0: 'certname',
-        1: 'catalog_timestamp',
-        2: 'report_timestamp',
-        3: 'facts_timestamp',
-        4: 'succcesses',
-        5: 'noops',
-        6: 'failures',
-        7: 'skips',
-    }
+    dashboard_dt_diror = request.GET.get('order[0][dir]', 'desc')
 
     datatable_req = False
 
@@ -793,10 +783,24 @@ def dashboard_test_json(request):
     }
 
     """
+    The puppetdb column or key to sort by
+    """
+    query_sorting = {
+        0: 'certname',
+        1: 'catalog_timestamp',
+        2: 'report_timestamp',
+        3: 'facts_timestamp',
+        4: 'succcesses',
+        5: 'noops',
+        6: 'failures',
+        7: 'skips',
+    }
+
+    """
     The logic for determining which jobs from the default_jobs will be sent to puppetdb
     """
 
-    def add_pdb_params(job_name):
+    def add_pdb_jobs(job_name):
         """
         Returns a job dictionary with parameters depending on if its node count or not
         :param job_name: Name of the job that should be added
@@ -808,7 +812,8 @@ def dashboard_test_json(request):
         job_set = dict()
         job_set['events'] = default_jobs['events']
         job_set[job_name + '_nodes'] = default_jobs[job_name + '_nodes'].copy()
-        # Add params for paging<
+
+        # Add params for paging
         if 'params' in job_set[job_name + '_nodes']:
             job_set[job_name + '_nodes']['params']['limit'] = deepcopy(default_jobs[job_name + '_nodes']['params'])
             job_set[job_name + '_nodes']['params']['limit'] = dashboard_dt_limit
@@ -820,6 +825,25 @@ def dashboard_test_json(request):
                 'offset': dashboard_dt_offset,
                 'include_total': 'true'
             }
+
+        # Add params for node/time/event sorting
+        # If certname or timestamp sorting chosen
+        if int(dashboard_dt_color) <= 3:
+            job_set[job_name + '_nodes']['params']['order_by'] = {
+                'order_field': {
+                    'field': "%s" % query_sorting[dashboard_dt_color],
+                    'order': "%s" % dashboard_dt_diror
+                }
+            }
+        # If event sorting chosen
+        elif int(dashboard_dt_color) > 3 <= 7:
+            job_set['events']['params']['order_by'] = {
+                'order_field': {
+                    'field': "%s" % query_sorting[dashboard_dt_color],
+                    'order': "%s" % dashboard_dt_diror
+                }
+            }
+
         # Add another call for limit 1 and include total so we can get the "true" amount of nodes for this status type
         # Used only if search is used.
         if dashboard_dt_search:
@@ -838,7 +862,7 @@ def dashboard_test_json(request):
 
     # If datatables requested content
     if datatable_req:
-        jobs = add_pdb_params(dashboard_show)
+        jobs = add_pdb_jobs(dashboard_show)
     # If it was a normal query without draw parameter.
     elif not datatable_req:
         jobs = default_jobs
@@ -885,9 +909,6 @@ def dashboard_test_json(request):
 
     # Push the jobs to the thread queue and get the results back.
     puppetdb_results = run_puppetdb_jobs(jobs)
-
-
-
     # If datatable requested content
     if datatable_req:
         if dashboard_dt_search:
@@ -901,9 +922,9 @@ def dashboard_test_json(request):
         context['recordsFiltered'] = resp_headers['X-Records']
 
         # All available events for the latest puppet reports
-        event_dict = {item['subject']['title']: item for item in puppetdb_results['event_counts']}
+        event_dict = OrderedDict((n['subject']['title'], n) for n in puppetdb_results['event_counts'])
 
-        nodes_dict = {item['certname']: item for item in nodes_list}
+        nodes_dict = OrderedDict((n['certname'], n) for n in nodes_list)
 
         _default_merge = {
             'failures': 0,
@@ -912,11 +933,20 @@ def dashboard_test_json(request):
             'noops': 0
         }
 
-        nodes_list = [
-            merge_two_dicts(item, event_dict.get(item['certname'], _default_merge))
-            for item in nodes_dict.values()
-            if item['certname'] in event_dict
-            ]
+        # Merge while iterating over nodes
+        if int(dashboard_dt_color) <= 3:
+            nodes_list = [
+                merge_two_dicts(item, event_dict.get(item['certname'], _default_merge))
+                for item in nodes_dict.values()
+                if item['certname'] in event_dict
+                ]
+        # If event sorting chosen iterate over events list
+        elif int(dashboard_dt_color) > 3 <= 7:
+            nodes_list = [
+                merge_two_dicts(item, event_dict.get(item['certname'], _default_merge))
+                for item in nodes_dict.values()
+                if item['certname'] in event_dict
+                ]
 
         # Convert timestamps to timezone set for user/site-wide
         for item in nodes_list:
