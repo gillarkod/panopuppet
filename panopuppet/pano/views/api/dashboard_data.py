@@ -17,6 +17,7 @@ from django.utils.timezone import localtime
 from panopuppet.pano.puppetdb.pdbutils import json_to_datetime, is_unreported
 import arrow
 from urllib import parse
+
 __author__ = 'etaklar'
 
 
@@ -506,7 +507,6 @@ def dashboard_test_json(request):
         return HttpResponse(json.dumps(context, indent=2, sort_keys=True),
                             content_type="application/json; charset=utf-8")
 
-    dashboard_dt_search = ',["~","certname","%s"]' % dashboard_dt_search
     dashboard_dt_limit = request.GET.get('length', 25)
     dashboard_dt_offset = request.GET.get('start', 0)
     # Order by Column
@@ -557,16 +557,19 @@ def dashboard_test_json(request):
         z.update(y)
         return z
 
+    """
+    Query parameter handling for the dashboard
+    """
+    # For setting the correct logic operator to get unreported and reported nodes.
     puppet_last_run_time = arrow.utcnow()
     puppet_last_run_time = puppet_last_run_time.replace(minutes=-puppet_run_time)
-
     if dashboard_show == 'unreported':
         puppet_timestamp_logic = '<'
     else:
         puppet_timestamp_logic = '>='
-
     report_filter = ',["%s","report_timestamp","%s"]' % (puppet_timestamp_logic, puppet_last_run_time)
 
+    # For setting the correct query filter to each endpoint depending on the status type.
     if dashboard_show in ['recent', 'unreported']:
         subquery_status = ''
         report_filter = ''
@@ -576,65 +579,123 @@ def dashboard_test_json(request):
         subquery_status = ',["in", "certname",["extract", "certname",["select_reports",' \
                           '["and",["=", "noop", true],["=","latest_report?", true]]]]]'
 
-    events_params = {
-        'query':
-            {
-                1: '["and",'
-                   '["=","latest_report?",true],'
-                   '["in", "certname",'
-                   '["extract", "certname",'
-                   '["select_nodes",'
-                   '["and",'
-                   '["null?","deactivated",true]'
-                   '%s'
-                   '%s'
-                   '%s'
-                   ']]]]]' % (dashboard_dt_search, report_filter, subquery_status)
+    # Dashboard search term insert into the query
+    if dashboard_dt_search != '':
+        dashboard_dt_search = ',["~","certname","%s"]' % dashboard_dt_search
+
+    """
+    The parameters that could accompany various queries
+    """
+    node_params = {
+        'events': {
+            'query':
+                {
+                    1: '["and",'
+                       '["=","latest_report?",true],'
+                       '["in", "certname",'
+                       '["extract", "certname",'
+                       '["select_nodes",'
+                       '["and",'
+                       '["null?","deactivated",true]'
+                       '%s'
+                       '%s'
+                       '%s'
+                       ']]]]]' % (dashboard_dt_search, report_filter, subquery_status)
+                },
+            'summarize_by': 'certname',
+        },
+        'node_count': {
+            'limit': 1,
+            'include_total': 'true'
+        },
+        'failed': {
+            'nodes': {
+                'query':
+                    {
+                        'operator': 'and',
+                        1: '["=","latest_report_status","failed"]'
+                           '%s' % dashboard_dt_search,
+                        2: '["%s","report_timestamp","%s"]' % (puppet_timestamp_logic, puppet_last_run_time)
+                    }
             },
-        'summarize_by': 'certname',
+            'count': {
+                'query':
+                    {
+                        'operator': 'and',
+                        1: '["=","latest_report_status","failed"]',
+                        2: '["%s","report_timestamp","%s"]' % (puppet_timestamp_logic, puppet_last_run_time)
+                    }
+            }
+        },
+        'changed': {
+            'nodes': {
+                'query':
+                    {
+                        'operator': 'and',
+                        1: '["=","latest_report_status","changed"]'
+                           '%s' % dashboard_dt_search,
+                        2: '["%s","report_timestamp","%s"]' % (puppet_timestamp_logic, puppet_last_run_time)
+                    }
+            },
+            'count': {
+                'query':
+                    {
+                        'operator': 'and',
+                        1: '["=","latest_report_status","changed"]',
+                        2: '["%s","report_timestamp","%s"]' % (puppet_timestamp_logic, puppet_last_run_time)
+                    }
+            }
+        },
+        'pending': {
+            'nodes': {
+                'query':
+                    {
+                        1: '["and"'
+                           '%s'
+                           ',["%s","report_timestamp","%s"],'
+                           '["in", "certname",'
+                           '["extract", "certname", '
+                           '["select_reports", '
+                           '["and",["=", "noop", true],'
+                           '["=","latest_report?", true] '
+                           ']]]]]' % (dashboard_dt_search, puppet_timestamp_logic, puppet_last_run_time)
+                    }
+            },
+            'count': {
+                'query':
+                    {
+                        1: '["and"'
+                           ',["%s","report_timestamp","%s"],'
+                           '["in", "certname",'
+                           '["extract", "certname", '
+                           '["select_reports", '
+                           '["and",["=", "noop", true],'
+                           '["=","latest_report?", true] '
+                           ']]]]]' % (puppet_timestamp_logic, puppet_last_run_time)
+                    }
+            }
+        },
+        'unreported': {
+            'nodes': {
+                'query':
+                    {
+                        'operator': 'and',
+                        1: '["<","report_timestamp","%s"]'
+                           '%s' % (puppet_last_run_time, dashboard_dt_search)
+                    }
+            },
+            'count': {
+                'query':
+                    {
+                        1: '["<","report_timestamp","%s"]'
+                    }
+            }
+        }
     }
 
-    node_count_params = {
-        'limit': 1,
-        'include_total': 'true'
-    }
-    failed_nodes_params = {
-        'query':
-            {
-                'operator': 'and',
-                1: '["=","latest_report_status","failed"]',
-                2: '["%s","report_timestamp","%s"]' % (puppet_timestamp_logic, puppet_last_run_time)
-            }
-    }
-    changed_nodes_params = {
-        'query':
-            {
-                'operator': 'and',
-                1: '["=","latest_report_status","changed"]'
-                   '%s' % dashboard_dt_search,
-                2: '["%s","report_timestamp","%s"]' % (puppet_timestamp_logic, puppet_last_run_time)
-            }
-    }
-    noop_nodes_params = {
-        'query':
-            {
-                1: '["and",'
-                   '["%s","report_timestamp","%s"],'
-                   '["in", "certname",'
-                   '["extract", "certname", '
-                   '["select_reports", '
-                   '["and",["=", "noop", true],'
-                   '["=","latest_report?", true] '
-                   ']]]]]' % (puppet_timestamp_logic, puppet_last_run_time)
-            }
-    }
-    unreported_nodes_params = {
-        'query':
-            {
-                1: '["<","report_timestamp","%s"]' % puppet_last_run_time
-            }
-    }
-
+    """
+    The jobs that will be used and will be picked into the job queue later on
+    """
     default_jobs = {
         'tot_resource': {
             'url': source_url,
@@ -657,8 +718,8 @@ def dashboard_test_json(request):
             'id': 'event_counts',
             'path': '/event-counts',
             'api_version': 'v4',
-            'params': events_params,
-            #'request': request
+            'params': node_params['events'],
+            'request': request
         },
         'recent_nodes': {
             'url': source_url,
@@ -667,7 +728,7 @@ def dashboard_test_json(request):
             'api_version': 'v4',
             'id': 'recent_nodes',
             'path': '/nodes',
-            #'request': request
+            'request': request
         },
         'tot_nodes': {
             'url': source_url,
@@ -676,8 +737,8 @@ def dashboard_test_json(request):
             'api_version': 'v4',
             'id': 'tot_nodes',
             'path': '/nodes',
-            'params': node_count_params,
-            #'request': request
+            'params': node_params['node_count'],
+            'request': request
         },
         'mismatch_nodes': {
             'url': source_url,
@@ -686,17 +747,17 @@ def dashboard_test_json(request):
             'api_version': 'v4',
             'id': 'mismatch_nodes',
             'path': '/nodes',
-            #'request': request
+            'request': request
         },
         'unreported_nodes': {
             'url': source_url,
             'certs': source_certs,
             'verify': source_verify,
-            'api_version': 'vlimit4',
+            'api_version': '4',
             'id': 'unreported_nodes',
             'path': '/nodes',
-            'params': merge_two_params(unreported_nodes_params, node_count_params),
-            #'request': request
+            'params': merge_two_params(node_params[dashboard_show].get('nodes'), node_params['node_count']),
+            'request': request
         },
         'failed_nodes': {
             'url': source_url,
@@ -705,8 +766,8 @@ def dashboard_test_json(request):
             'api_version': 'v4',
             'id': 'failed_nodes',
             'path': '/nodes',
-            'params': merge_two_params(failed_nodes_params, node_count_params),
-            #'request': request
+            'params': merge_two_params(node_params[dashboard_show].get('nodes'), node_params['node_count']),
+            'request': request
         },
         'changed_nodes': {
             'url': source_url,
@@ -715,55 +776,78 @@ def dashboard_test_json(request):
             'api_version': 'v4',
             'id': 'changed_nodes',
             'path': '/nodes',
-            'params': merge_two_params(changed_nodes_params, node_count_params),
+            'params': merge_two_params(node_params[dashboard_show].get('nodes'), node_params['node_count']),
             'request': request
         },
         'pending_nodes': {
             'url': source_url,
             'certs': source_certs,
             'verify': source_verify,
-            'api_version': 'v4',        # Only if search is used.
+            'api_version': 'v4',
             'id': 'pending_nodes',
             'path': '/nodes',
-            'params': merge_two_params(noop_nodes_params, node_count_params),
-            #'request': request
+            'params': merge_two_params(node_params[dashboard_show].get('nodes'), node_params['node_count']),
+            'request': request
         },
     }
 
-    if datatable_req:
-        jobs = dict()
-        jobs['events'] = default_jobs['events']
-        jobs[dashboard_show + '_nodes'] = default_jobs[dashboard_show + '_nodes'].copy()
-        # Add params for paging
-        if 'params' in jobs[dashboard_show + '_nodes']:
-            jobs[dashboard_show + '_nodes']['params']['limit'] = dashboard_dt_limit
-            jobs[dashboard_show + '_nodes']['params']['offset'] = dashboard_dt_offset
-            jobs[dashboard_show + '_nodes']['params']['include_total'] = 'true'
+    """
+    The logic for determining which jobs from the default_jobs will be sent to puppetdb
+    """
+
+    def add_pdb_params(job_name):
+        """
+        Returns a job dictionary with parameters depending on if its node count or not
+        :param job_name: Name of the job that should be added
+        :type job_name: str
+        :return: A job for that  job_name
+        :rtype: dict
+        """
+
+        job_set = dict()
+        job_set['events'] = default_jobs['events']
+        job_set[job_name + '_nodes'] = default_jobs[job_name + '_nodes'].copy()
+        # Add params for paging<
+        if 'params' in job_set[job_name + '_nodes']:
+            job_set[job_name + '_nodes']['params']['limit'] = deepcopy(default_jobs[job_name + '_nodes']['params'])
+            job_set[job_name + '_nodes']['params']['limit'] = dashboard_dt_limit
+            job_set[job_name + '_nodes']['params']['offset'] = dashboard_dt_offset
+            job_set[job_name + '_nodes']['params']['include_total'] = 'true'
         else:
-            jobs[dashboard_show + '_nodes']['params'] = {
+            job_set[job_name + '_nodes']['params'] = {
                 'limit': dashboard_dt_limit,
                 'offset': dashboard_dt_offset,
                 'include_total': 'true'
             }
         # Add another call for limit 1 and include total so we can get the "true" amount of nodes for this status type
-        # Only if search is used.
+        # Used only if search is used.
         if dashboard_dt_search:
-            jobs[dashboard_show + '_nodes_count'] = default_jobs[dashboard_show + '_nodes'].copy()
-            jobs[dashboard_show + '_nodes_count']['params'] = deepcopy(default_jobs[dashboard_show + '_nodes'].get('params', {}))
-            jobs[dashboard_show + '_nodes_count']['id'] = '%s_node_count' % dashboard_show
-            if 'params' in jobs[dashboard_show + '_nodes_count']:
-                jobs[dashboard_show + '_nodes_count']['params']['limit'] = '1'
-                jobs[dashboard_show + '_nodes_count']['params']['include_total'] = 'true'
+            job_set[job_name + '_nodes_count'] = default_jobs[job_name + '_nodes'].copy()
+            job_set[job_name + '_nodes_count']['params'] = deepcopy(node_params[job_name].get('count', {}))
+            job_set[job_name + '_nodes_count']['id'] = '%s_nodes_count' % job_name
+            if 'params' in job_set[job_name + '_nodes_count']:
+                job_set[job_name + '_nodes_count']['params']['limit'] = '1'
+                job_set[job_name + '_nodes_count']['params']['include_total'] = 'true'
             else:
-                jobs[dashboard_show + '_nodes_count']['params'] = {
+                job_set[job_name + '_nodes_count']['params'] = {
                     'limit': '1',
                     'include_total': 'true'
                 }
+        return job_set
+
+    # If datatables requested content
+    if datatable_req:
+        jobs = add_pdb_params(dashboard_show)
+    # If it was a normal query without draw parameter.
     elif not datatable_req:
         jobs = default_jobs
         jobs.pop('mismatch_nodes')
         jobs.pop('events')
         jobs.pop('recent_nodes')
+
+    """
+    Code is not used yet as mismatching timestamps will be moved to
+    another part of the dashboard and no longer summarized in the dashboard
 
     def check_mismatch_ts(node_data, puppet_run_interval=puppet_run_time):
         report_timestamp = node_data.get('report_timestamp', None)
@@ -796,24 +880,17 @@ def dashboard_test_json(request):
             if value > timedelta(minutes=puppet_run_interval / 2):
                 return True
         return False
+    """
 
+    # Push the jobs to the thread queue and get the results back.
     puppetdb_results = run_puppetdb_jobs(jobs)
 
-    # If dashboard status request (node counts only)
-    if not datatable_req:
-        context['failed_nodes'] = puppetdb_results['failed_nodes'][-1]['X-Records']
-        context['changed_nodes'] = puppetdb_results['changed_nodes'][-1]['X-Records']
-        context['pending_nodes'] = puppetdb_results['pending_nodes'][-1]['X-Records']
-        context['unreported_nodes'] = puppetdb_results['unreported_nodes'][-1]['X-Records']
-        context['population'] = puppetdb_results['tot_nodes'][-1]['X-Records']
-        context['total_resource'] = puppetdb_results['tot_resource']['Value']
-        context['avg_resource'] = puppetdb_results['avg_resource']['Value']
 
-    elif datatable_req:
+
+    # If datatable requested content
+    if datatable_req:
         if dashboard_dt_search:
-            for res in puppetdb_results[dashboard_show + '_node_count']:
-                if isinstance(res, CaseInsensitiveDict) and 'X-Records' in res:
-                    context['recordsTotal'] = res['X-Records']
+            context['recordsTotal'] = puppetdb_results[dashboard_show + '_nodes_count'][-1]['X-Records']
         else:
             context['recordsTotal'] = puppetdb_results[dashboard_show + '_nodes'][-1]['X-Records']
 
@@ -821,6 +898,7 @@ def dashboard_test_json(request):
         nodes_list = puppetdb_results[dashboard_show + '_nodes'][0]
         resp_headers = puppetdb_results[dashboard_show + '_nodes'][-1]
         context['recordsFiltered'] = resp_headers['X-Records']
+
         # All available events for the latest puppet reports
         event_dict = {item['subject']['title']: item for item in puppetdb_results['event_counts']}
 
@@ -854,6 +932,16 @@ def dashboard_test_json(request):
                 'Y-m-d H:i:s') if item['facts_timestamp'] is not None else ''
 
         context['data'] = nodes_list
+
+    # If dashboard status request (node counts only)
+    elif not datatable_req:
+        context['failed_nodes'] = puppetdb_results['failed_nodes'][-1]['X-Records']
+        context['changed_nodes'] = puppetdb_results['changed_nodes'][-1]['X-Records']
+        context['pending_nodes'] = puppetdb_results['pending_nodes'][-1]['X-Records']
+        context['unreported_nodes'] = puppetdb_results['unreported_nodes'][-1]['X-Records']
+        context['population'] = puppetdb_results['tot_nodes'][-1]['X-Records']
+        context['total_resource'] = puppetdb_results['tot_resource']['Value']
+        context['avg_resource'] = puppetdb_results['avg_resource']['Value']
 
         # TODO: Add support for mismatching again after we identify a good way to solve slowness
         # _mismatching_nodes_dict = {
