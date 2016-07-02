@@ -581,9 +581,9 @@ def dashboard_test_json(request):
         'events': {
             'query':
                 {
-                    1: '["and",'
-                       '["=","latest_report?",true],'
-                       '["in", "certname",'
+                    'operator': 'and',
+                    1: '["=","latest_report?",true]',
+                    2: '["in", "certname",'
                        '["extract", "certname",'
                        '["select_nodes",'
                        '["and",'
@@ -591,7 +591,7 @@ def dashboard_test_json(request):
                        '%s'
                        '%s'
                        '%s'
-                       ']]]]]' % (dashboard_dt_search, report_filter, subquery_status)
+                       ']]]]' % (dashboard_dt_search, report_filter, subquery_status)
                 },
             'summarize_by': 'certname',
         },
