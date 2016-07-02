@@ -790,7 +790,7 @@ def dashboard_test_json(request):
         1: 'catalog_timestamp',
         2: 'report_timestamp',
         3: 'facts_timestamp',
-        4: 'succcesses',
+        4: 'successes',
         5: 'noops',
         6: 'failures',
         7: 'skips',
