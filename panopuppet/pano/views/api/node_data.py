@@ -177,6 +177,7 @@ def nodes_json(request):
 
     # Create a filter part to limit the following API requests to data related to the node_list.
     # Skipt the filter completely if a large number of nodes are shown as the query tends to fail.
+    node_filter = ''
     if len(node_list) <= 1000:
         node_filter = ', ["or"'
         for n in node_list:

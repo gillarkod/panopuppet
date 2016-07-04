@@ -115,11 +115,14 @@ def dictstatus(node_list, reports_dict, status_dict, sort=True, sortby=None, asc
         """
         if reports_dict is None:
             if node is not None:
-                return node.get('status', 'unknown')
+                return node.get('latest_report_status', 'unknown')
             elif node_dict is not None:
-                return node_dict[certname].get('status', 'unknown')
+                return node_dict[certname].get('latest_report_status', 'unknown')
         else:
-            return reports_dict[certname]['status']
+            if certname in reports_dict:
+                return reports_dict[certname]['status']
+            else:
+                return None
 
     sortables = {
         'certname': 0,
