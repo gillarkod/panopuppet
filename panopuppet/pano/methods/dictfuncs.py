@@ -107,6 +107,12 @@ def dictstatus(node_list, reports_dict, status_dict, sort=True, sortby=None, asc
         return m_list
 
     def get_report_status(reports_dict, certname, node=None, node_dict=None):
+        """
+        This function will attempt to fetch the latest report status from
+        the node or node_dict in case the reports_dict are None. This will
+        allow passing both None or a dictionary as the report_dicts function
+        to dictstatus() to keep compability and allow performance improvements
+        """
         if reports_dict is None:
             if node is not None:
                 return node.get('status', 'unknown')

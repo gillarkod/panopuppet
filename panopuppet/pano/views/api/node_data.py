@@ -2,8 +2,6 @@ import csv
 import datetime
 import json
 
-import time # For debug
-
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseBadRequest, HttpResponse, StreamingHttpResponse
 from django.shortcuts import redirect
@@ -17,14 +15,9 @@ from panopuppet.pano.views import Echo
 
 __author__ = 'etaklar'
 
-def print_time(start_time):
-    print(time.time() - start_time)
-
 @ensure_csrf_cookie
 @login_required
 def nodes_json(request):
-
-    r_st = time.time()
     if request.method == 'GET':
         if 'source' in request.GET:
             source = request.GET.get('source')
@@ -117,8 +110,6 @@ def nodes_json(request):
     except:
         return HttpResponseBadRequest('Oh no! Your filters were invalid.')
 
-
-
     # Valid sort field that the user can search agnaist.
     sort_field = request.session['sortfield']
     sort_field_order = request.session['sortfieldby']
@@ -158,8 +149,6 @@ def nodes_json(request):
                 },
         }
     node_sort_fields = ['certname', 'catalog_timestamp', 'report_timestamp', 'facts_timestamp']
-    print_time(r_st)
-    print(puppetdb.mk_puppetdb_query(node_params, request))
     if sort_field in node_sort_fields:
         try:
             node_list, node_headers = puppetdb.api_get(
@@ -186,17 +175,13 @@ def nodes_json(request):
                 node_params, request),
         )
 
-    print_time(r_st)
-
     # Create a filter part to limit the following API requests to data related to the node_list.
     # Skipt the filter completely if a large number of nodes are shown as the query tends to fail.
-    if len(node_list) < 1000:
-        node_filter = '["or"'
+    if len(node_list) <= 1000:
+        node_filter = ', ["or"'
         for n in node_list:
             node_filter += ',["=","certname","%s"]' % n['certname']
         node_filter += ']'
-    else:
-        node_filter = '["null?", "certname", false]' # Something that fits in the query
 
     # Work out the number of pages from the xrecords response
     # return fields that you can sort by
@@ -206,35 +191,13 @@ def nodes_json(request):
     report_params = {
         'query':
             {
-                1: '["and", %s, ["=","latest_report?",true],["in", "certname",["extract", "certname",["select_nodes",["null?","deactivated",true]]]]]' % node_filter,
+                1: '["and" %s, ["=","latest_report?",true],["in", "certname",["extract", "certname",["select_nodes",["null?","deactivated",true]]]]]' % node_filter,
             },
         'summarize_by': 'certname',
     }
     status_sort_fields = ['successes', 'failures', 'skips', 'noops']
 
-    #report_status_params = {
-    #    'query':
-    #        {
-    #            1: '["and", %s, ["=","latest_report?",true],["in", "certname",["extract", "certname",["select_nodes",["null?","deactivated",true]]]]]' % node_filter,
-    #        }
-    #}
-    #report_status_list = puppetdb.api_get(
-    #    api_url=source_url,
-    #    cert=source_certs,
-    #    verify=source_verify,
-    #    path='/reports',
-    #    params=puppetdb.mk_puppetdb_query(report_status_params, request),
-    #    api_version='v4',
-    #)
-    print_time(r_st)
     if sort_field in status_sort_fields:
-        # I think this is just to optimize, which in unessecery with node_filter
-        #if request.session['search'] is not None:
-        #    report_params['query'] = {'operator': 'and',
-        #                              1: request.session['search'],
-        #                              2: '["=","latest_report?",true]',
-        #                              3: '["in", "certname",["extract", "certname",["select_nodes",["null?","deactivated",true]]]]',
-        #                              }
         report_params['order_by'] = {
             'order_field':
                 {
@@ -265,7 +228,6 @@ def nodes_json(request):
             params=puppetdb.mk_puppetdb_query(report_params, request),
             api_version='v4',
         )
-    print_time(r_st)
     # number of results depending on sort field.
     if sort_field in status_sort_fields:
         xrecords = report_headers['X-Records']
@@ -282,12 +244,10 @@ def nodes_json(request):
         num_pages = num_pages_wodec
 
     # Converts lists of dicts to dicts.
-    #status_dict = {item['certname']: item for item in report_status_list} # /repots
     report_dict = {item['subject']['title']: item for item in report_list} # /events-count
     if sort_field_order == 'desc':
         rows = dictstatus(node_list,
                           None,
-                          #status_dict,
                           report_dict,
                           sortby=sort_field,
                           asc=True,
@@ -303,8 +263,6 @@ def nodes_json(request):
                           sort=False,
                           puppet_run_time=puppet_run_time)
         sort_field_order_opposite = 'desc'
-
-    print_time(r_st)
 
     if dl_csv is True:
         if rows is []:
