@@ -77,11 +77,13 @@ def run_puppetdb_jobs(jobs, threads=6):
             t_certs = t_job.get('certs')
             t_verify = t_job.get('verify')
             t_params = t_job.get('params', {})
-            t_api_v = t_job.get('api_version', 'v3')
+            t_method = t_job.get('method', 'get')
+            t_api_v = t_job.get('api_version', 'v4')
             t_request = t_job.get('request')
             results = puppetdb.api_get(
                 api_url=t_url,
                 verify=t_verify,
+                method=t_method,
                 cert=t_certs,
                 path=t_path,
                 params=puppetdb.mk_puppetdb_query(t_params, t_request),
@@ -89,7 +91,7 @@ def run_puppetdb_jobs(jobs, threads=6):
             )
             out_q.put({t_job['id']: results})
             b = dt.datetime.utcnow()
-            print('%s: %s' % ( t_job['id'], (b - a).total_seconds()))
+            print('Request %s: %s' % ( t_job['id'], (b - a).total_seconds()))
             q.task_done()
 
     for i in range(threads):

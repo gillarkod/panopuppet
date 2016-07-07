@@ -1,24 +1,21 @@
 import json
-from datetime import timedelta
-
+from collections import OrderedDict
 from copy import deepcopy
+
+import arrow
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import HttpResponse, redirect
+from django.template import defaultfilters as filters
+from django.utils.timezone import localtime
 from django.views.decorators.cache import cache_page
 
 from panopuppet.pano.methods.dictfuncs import dictstatus as dictstatus
+from panopuppet.pano.puppetdb.pdbutils import json_to_datetime
 from panopuppet.pano.puppetdb.pdbutils import run_puppetdb_jobs
 from panopuppet.pano.puppetdb.puppetdb import set_server, get_server
 from panopuppet.pano.settings import CACHE_TIME
 
-from requests.structures import CaseInsensitiveDict
-from django.template import defaultfilters as filters
-from django.utils.timezone import localtime
-from panopuppet.pano.puppetdb.pdbutils import json_to_datetime, is_unreported
-import arrow
-from collections import OrderedDict
-import pprint
-
+from pprint import pprint
 __author__ = 'etaklar'
 
 
@@ -593,11 +590,26 @@ def dashboard_test_json(request):
                        '%s'
                        ']]]]' % (dashboard_dt_search, report_filter, subquery_status)
                 },
-            'summarize_by': 'certname',
+            'summarize_by': "certname",
         },
         'node_count': {
             'limit': 1,
             'include_total': 'true'
+        },
+        'recent': {
+            'nodes': {
+                'query':
+                    {
+                        'operator': 'and',
+                        1: '["%s","report_timestamp","%s"]' % (puppet_timestamp_logic, puppet_last_run_time)
+                    }
+            },
+            'count': {
+                'query':
+                    {
+                        1: '["%s","report_timestamp","%s"]' % (puppet_timestamp_logic, puppet_last_run_time)
+                    }
+            }
         },
         'failed': {
             'nodes': {
@@ -678,7 +690,7 @@ def dashboard_test_json(request):
             'count': {
                 'query':
                     {
-                        1: '["<","report_timestamp","%s"]'
+                        1: '["<","report_timestamp","%s"]' % puppet_last_run_time
                     }
             }
         }
@@ -719,6 +731,7 @@ def dashboard_test_json(request):
             'api_version': 'v4',
             'id': 'recent_nodes',
             'path': '/nodes',
+            'params': merge_two_params(node_params['recent'].get('nodes'), node_params['node_count']),
             'request': request
         },
         'tot_nodes': {
@@ -820,7 +833,8 @@ def dashboard_test_json(request):
 
                 # Add params for paging
                 if 'params' in job_set[job_name + '_nodes']:
-                    job_set[job_name + '_nodes']['params']['limit'] = deepcopy(default_jobs[job_name + '_nodes']['params'])
+                    job_set[job_name + '_nodes']['params']['limit'] = deepcopy(
+                        default_jobs[job_name + '_nodes']['params'])
                     job_set[job_name + '_nodes']['params']['limit'] = dashboard_dt_limit
                     job_set[job_name + '_nodes']['params']['offset'] = dashboard_dt_offset
                     job_set[job_name + '_nodes']['params']['include_total'] = 'true'
@@ -840,19 +854,26 @@ def dashboard_test_json(request):
                     }
                 }
             elif get_nodes:
+                job_set[job_name + '_nodes_count'] = default_jobs[job_name + '_nodes'].copy()
+
+                job_set[job_name + '_nodes_count']['params'] = merge_two_dicts(
+                    node_params[job_name].get('count'),
+                    node_params.get('node_count')
+                )
+                job_set[job_name + '_nodes_count']['id'] = '%s_nodes_count' % job_name
                 # get events for these nodes.
                 event_params = job_set['events'] = default_jobs['events'].copy()
                 job_set['events']['params'] = deepcopy(default_jobs['events']['params'])
-                pprint.pprint(job_set['events']['params']['query'])
-                certname_params = '["or"'
-                for node in get_nodes:
-                    certname_params += ',["=","certname","%s"]' % node
-                certname_params += ']'
-
-                job_set['events']['params']['query'][3] = certname_params
+                if len(get_nodes) <= 250:
+                    certname_params = '["or"'
+                    for node in get_nodes:
+                        certname_params += ',["=","certname","%s"]' % node
+                    certname_params += ']'
+                    job_set['events']['params']['query'][3] = certname_params
 
         elif sort_type > 3 <= 7:
             if get_nodes is None:
+                # Events
                 job_set['events'] = default_jobs['events'].copy()
                 job_set['events']['params'] = deepcopy(default_jobs['events']['params'])
 
@@ -875,15 +896,32 @@ def dashboard_test_json(request):
                         'order': "%s" % dashboard_dt_diror
                     }
                 }
+            elif get_nodes:
+                # get nodes for these events
+                job_set[job_name + '_nodes_count'] = default_jobs[job_name + '_nodes'].copy()
+                if job_name == 'recent':
+                    job_set[job_name + '_nodes_count']['params'] = deepcopy(node_params.get('node_count', {}))
+                else:
+                    job_set[job_name + '_nodes_count']['params'] = merge_two_dicts(
+                        node_params[job_name].get('count'),
+                        node_params.get('node_count')
+                    )
+                job_set[job_name + '_nodes_count']['id'] = '%s_nodes_count' % job_name
+                event_nodes = job_set[job_name + '_nodes'] = default_jobs[job_name + '_nodes'].copy()
+                job_set[job_name + '_nodes']['params'] = deepcopy(default_jobs[job_name + '_nodes']['params'])
+                if len(get_nodes) <= 250:
+                    certname_params = '["or"'
+                    for node in get_nodes:
+                        certname_params += ',["=","certname","%s"]' % node
+                    certname_params += ']'
+                    job_set[job_name + '_nodes']['params']['query'][1] = certname_params
 
         if (sort_type > 3 <= 7 or dashboard_dt_search) and get_nodes is None:
             # another call with limit 1 and include total so we can get the "true" amount of nodes for this status type
             # Used only if search is used.
             job_set[job_name + '_nodes_count'] = default_jobs[job_name + '_nodes'].copy()
-            if job_name == 'recent':
-                job_set[job_name + '_nodes_count']['params'] = deepcopy(node_params.get('node_count', {}))
-            else:
-                job_set[job_name + '_nodes_count']['params'] = deepcopy(node_params[job_name].get('count', {}))
+
+            job_set[job_name + '_nodes_count']['params'] = deepcopy(node_params[job_name].get('count', {}))
 
             job_set[job_name + '_nodes_count']['id'] = '%s_nodes_count' % job_name
             if 'params' in job_set[job_name + '_nodes_count']:
@@ -894,9 +932,6 @@ def dashboard_test_json(request):
                     'limit': '1',
                     'include_total': 'true'
                 }
-        print('####\n' * 5)
-        pprint.pprint(job_set)
-        print('####\n' * 5)
         return job_set
 
     # If datatables requested content
@@ -951,24 +986,26 @@ def dashboard_test_json(request):
 
     # If datatable requested content
     if datatable_req:
-        # Move this later
-        if dashboard_dt_search:
-            context['recordsTotal'] = puppetdb_results[dashboard_show + '_nodes_count'][-1]['X-Records']
-        else:
-            context['recordsTotal'] = puppetdb_results[dashboard_show + '_nodes'][-1]['X-Records']
 
-        resp_headers = puppetdb_results[dashboard_show + '_nodes'][-1]
-        context['recordsFiltered'] = resp_headers['X-Records']
+        if dashboard_dt_search:
+            pprint(puppetdb_results)
+            context['recordsTotal'] = puppetdb_results[dashboard_show + '_nodes_count'][-1]['X-Records']
 
         # fetch nodes from the query
         if dashboard_dt_color <= 3:
+            context['recordsFiltered'] = puppetdb_results[dashboard_show + '_nodes'][-1]['X-Records']
             nodes_dict = OrderedDict((n['certname'], n) for n in puppetdb_results[dashboard_show + '_nodes'][0])
             node_jobs = create_pdb_jobs(dashboard_show, sort_type=dashboard_dt_color, get_nodes=nodes_dict)
             puppetdb_results = run_puppetdb_jobs(node_jobs)
             event_dict = OrderedDict((n['subject']['title'], n) for n in puppetdb_results['event_counts'])
 
         elif dashboard_dt_color > 3 <= 7:
+            context['recordsFiltered'] = puppetdb_results['event_counts'][-1]['X-Records']
             event_dict = OrderedDict((n['subject']['title'], n) for n in puppetdb_results['event_counts'][0])
+            node_jobs = create_pdb_jobs(dashboard_show, sort_type=dashboard_dt_color, get_nodes=event_dict)
+            pprint(node_jobs)
+            puppetdb_results = run_puppetdb_jobs(node_jobs)
+            nodes_dict = OrderedDict((n['certname'], n) for n in puppetdb_results[dashboard_show + '_nodes'])
 
         _default_merge = {
             'failures': 0,
@@ -976,6 +1013,9 @@ def dashboard_test_json(request):
             'successes': 0,
             'noops': 0
         }
+        # Move this later
+
+        context['recordsTotal'] = puppetdb_results[dashboard_show + '_nodes_count'][-1]['X-Records']
 
         # Merge while iterating over nodes
         if dashboard_dt_color <= 3:
@@ -986,11 +1026,18 @@ def dashboard_test_json(request):
                 ]
         # If event sorting chosen iterate over events list
         elif dashboard_dt_color > 3 <= 7:
+            pprint(event_dict)
+            print('###################\n'* 2)
+            pprint(nodes_dict)
             nodes_list = [
                 merge_two_dicts(item, event_dict.get(item['certname'], _default_merge))
                 for item in nodes_dict.values()
                 if item['certname'] in event_dict
                 ]
+
+        if not dashboard_dt_search:
+            resp_headers = puppetdb_results[dashboard_show + '_nodes_count'][-1]
+            context['recordsFiltered'] = resp_headers['X-Records']
 
         # Convert timestamps to timezone set for user/site-wide
         for item in nodes_list:
