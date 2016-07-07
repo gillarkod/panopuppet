@@ -69,7 +69,7 @@ def query_to_rules(query):
                     contents = dict()
                     contents['value'] = list()
                     # ID
-                    if data[i][2][2][0] == "select_facts":
+                    if data[i][2][2][0] == "select_fact_contents":
                         contents['id'] = 'facts'
                     elif data[i][2][2][0] == "select_resources":
                         contents['id'] = 'resources'

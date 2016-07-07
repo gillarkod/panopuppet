@@ -139,33 +139,11 @@ def nodes_json(request):
         if dl_csv is False:
             node_params['limit'] = request.session['limits']
             node_params['offset'] = request.session['offset']
-        node_params['include_total'] = 'true'
-    else:
-        node_params['order_by'] = {
-            'order_field':
-                {
-                    'field': 'report_timestamp',
-                    'order': 'desc',
-                },
-        }
+    node_params['include_total'] = 'true'
+
     node_sort_fields = ['certname', 'catalog_timestamp', 'report_timestamp', 'facts_timestamp']
-    if sort_field in node_sort_fields:
-        try:
-            node_list, node_headers = puppetdb.api_get(
-                api_url=source_url,
-                cert=source_certs,
-                verify=source_verify,
-                path='/nodes',
-                api_version='v4',
-                params=puppetdb.mk_puppetdb_query(
-                    node_params, request),
-            )
-        except:
-            node_list = []
-            node_headers = dict()
-            node_headers['X-Records'] = 0
-    else:
-        node_list = puppetdb.api_get(
+    try:
+        node_list, node_headers = puppetdb.api_get(
             api_url=source_url,
             cert=source_certs,
             verify=source_verify,
@@ -174,11 +152,17 @@ def nodes_json(request):
             params=puppetdb.mk_puppetdb_query(
                 node_params, request),
         )
+    except:
+        node_list = []
+        node_headers = dict()
+        node_headers['X-Records'] = 0
 
+
+    status_sort_fields = ['successes', 'failures', 'skips', 'noops']
     # Create a filter part to limit the following API requests to data related to the node_list.
     # Skipt the filter completely if a large number of nodes are shown as the query tends to fail.
     node_filter = ''
-    if len(node_list) <= 1000:
+    if len(node_list) <= 100 and sort_field not in status_sort_fields:
         node_filter = ', ["or"'
         for n in node_list:
             node_filter += ',["=","certname","%s"]' % n['certname']
@@ -196,7 +180,6 @@ def nodes_json(request):
             },
         'summarize_by': 'certname',
     }
-    status_sort_fields = ['successes', 'failures', 'skips', 'noops']
 
     if sort_field in status_sort_fields:
         report_params['order_by'] = {
@@ -207,10 +190,6 @@ def nodes_json(request):
                 }
         }
         report_params['include_total'] = 'true'
-        # Don't limit results if its CSV
-        if dl_csv is False:
-            report_params['limit'] = request.session['limits']
-            report_params['offset'] = request.session['offset']
 
         report_list, report_headers = puppetdb.api_get(
             api_url=source_url,
@@ -229,13 +208,9 @@ def nodes_json(request):
             params=puppetdb.mk_puppetdb_query(report_params, request),
             api_version='v4',
         )
-    # number of results depending on sort field.
-    if sort_field in status_sort_fields:
-        xrecords = report_headers['X-Records']
-        total_results = xrecords
-    elif sort_field in nodes_sort_fields:
-        xrecords = node_headers['X-Records']
-        total_results = xrecords
+    # number of results not depending on sort field.
+    xrecords = node_headers['X-Records']
+    total_results = xrecords
 
     num_pages_wdec = float(xrecords) / request.session['limits']
     num_pages_wodec = float("{:.0f}".format(num_pages_wdec))
@@ -253,7 +228,8 @@ def nodes_json(request):
                           sortby=sort_field,
                           asc=True,
                           sort=False,
-                          puppet_run_time=puppet_run_time)
+                          puppet_run_time=puppet_run_time,
+                          format_time=False)
         sort_field_order_opposite = 'asc'
     elif sort_field_order == 'asc':
         rows = dictstatus(node_list,
@@ -262,7 +238,8 @@ def nodes_json(request):
                           sortby=sort_field,
                           asc=False,
                           sort=False,
-                          puppet_run_time=puppet_run_time)
+                          puppet_run_time=puppet_run_time,
+                          format_time=False)
         sort_field_order_opposite = 'desc'
 
     if dl_csv is True:
@@ -341,6 +318,8 @@ def nodes_json(request):
             response['Content-Disposition'] = 'attachment; filename="puppetdata-%s.csv"' % (datetime.datetime.now())
             return response
 
+    if sort_field in status_sort_fields:
+        rows = rows[request.session['offset']:(request.session['limits']+request.session['offset'])]
     """
     c_r_s* = current request sort
     c_r_* = current req

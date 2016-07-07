@@ -139,20 +139,27 @@
                 else {
                     var nodes = response[0]['nodeList'];
                     //('certname', 'latestCatalog', 'latestReport', 'latestFacts', 'success', 'noop', 'failure', 'skipped'),
+                    var curTz = $("select[name=timezone] option:selected").val();
+                    var locale_string = window.navigator.userLanguage || window.navigator.language;
                     nodes.forEach(function (node) {
                         data += '<tr>';
                         //Certname
                         data += '<td><a href="../reports/' + node[0] + '">' + node[0] + '</a></td>';
                         //latest catalog
-                        data += '<td>' + node[1] + '</td>';
+                        var l_cat_d = new Date(node[1]);
+                        data += '<td>' + l_cat_d.toLocaleString(locale_string, { timeZone: curTz}) + '</td>';
                         //latest report
+                        var l_rep_d = new Date(node[2]);
+                        var l_rep_d_str = l_rep_d.toLocaleString(locale_string, { timeZone: curTz});
+                        var l_rep_d_svstr = l_rep_d.toLocaleString("sv", { timeZone: curTz});
                         if (node[4] > 0 || node[5] > 0 || node[6] > 0 || node[7] > 0) {
-                            data += '<td><a href="../reports/' + node[0] + '?latest=true&report_timestamp=' + node[2] + '">' + node[2] + '</a></td>';
+                            data += '<td><a href="../reports/' + node[0] + '?latest=true&report_timestamp=' + l_rep_d_svstr + '">' + l_rep_d_str + '</a></td>';
                         } else {
-                            data += '<td>' + node[2] + '</td>';
+                            data += '<td>' + l_rep_d_str + '</td>';
                         }
                         //latest facts
-                        data += '<td>' + node[3] + '</td>';
+                        var l_fact_d = new Date(node[3]);
+                        data += '<td>' + l_fact_d.toLocaleString(locale_string, { timeZone: curTz}) + '</td>';
                         //failed events
                         data += '<td style="text-align: center"><p style="margin-bottom: 0" class="bg-success img-rounded"><strong>' + node[4] + '</strong></p></td>';
                         //skipped events
@@ -260,7 +267,7 @@
                     }
                 },
                 {
-                    id: 'facts',
+                    id: 'fact_contents',
                     label: 'Fact',
                     type: 'string',
                     description: 'Each fact query in the same GROUP will all be put in the same SUBQUERY.' +
