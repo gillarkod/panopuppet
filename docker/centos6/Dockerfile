@@ -31,51 +31,17 @@ RUN yum install -y \
     curl -L https://github.com/propyless/panopuppet/archive/v1.4.0.tar.gz | tar -xzv -C /tmp  && \
     cd /tmp/panopuppet-1.4.0 && \ 
     python3.5 setup.py install
-# Copy local panopuppet.conf and config.yaml
+# Copy local config files
 # panopuppet.conf beware of Apache 2.2 settings and not 2.4
 COPY panopuppet.conf /etc/httpd/conf.d/
 COPY config.yaml /var/www/panopuppet/
-# Save on user actions for manage.py and wsgi.py, as they are custom for this container
-#COPY manage.py /var/www/panopuppet/
-#COPY wsgi.py /var/www/panopuppet/
-#
-# Perform configuration of PanoPuppet
-RUN echo $'#!/usr/bin/python3.5\n\
-import os\n\
-import sys\n\
-\n\
-os.environ[\'PP_CFG\'] = \'/var/www/panopuppet/config.yaml\'\n\
-\n\
-if __name__ == "__main__":\n\
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "panopuppet.puppet.settings")\n\
-    from django.core.management import execute_from_command_line\n\
-    execute_from_command_line(sys.argv)'\
-> /var/www/panopuppet/manage.py && \
-    echo $'"""\n\
-WSGI config for puppet project.\n\
-It exposes the WSGI callable as a module-level variable named ``application``.\n\
-For more information on this file, see\n\
-https://docs.djangoproject.com/en/1.7/howto/deployment/wsgi/\n\
-"""\n\
-\n\
-import os\n\
-\n\
-"""\n\
-If you have another location for the config, uncomment the line below and insert a static path to the config file.\n\
-"""\n\
-os.environ[\'PP_CFG\'] = \'/var/www/panopuppet/config.yaml\'\n\
-\n\
-\n\
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "panopuppet.puppet.settings")\n\
-from django.core.wsgi import get_wsgi_application\n\
-\n\
-application = get_wsgi_application()'\
-> /var/www/panopuppet/wsgi.py && \
-     cd /var/www/panopuppet && \
-     echo yes | python3.5 manage.py collectstatic && \
-     python3.5 manage.py makemigrations && \
-     python3.5 manage.py migrate && \
-     chown -R apache:apache /var/www/panopuppet
+COPY manage.py /var/www/panopuppet/
+COPY wsgi.py /var/www/panopuppet/
+RUN  cd /var/www/panopuppet && \
+       echo yes | python3.5 manage.py collectstatic && \
+       python3.5 manage.py makemigrations && \
+       python3.5 manage.py migrate && \
+       chown -R apache:apache /var/www/panopuppet
 # Export port 80 for Apache
 EXPOSE 80
 # Start Apache in foreground

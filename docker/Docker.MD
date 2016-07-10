@@ -5,9 +5,11 @@ Run PanoPuppet (non SSL configuration) in a preconfigured Docker container.
 
 ## Files needed
 Make sure the following files are in the current directory where you build your Docker image in.
-- Dockerfile - to build the docker image
-- config.yaml - PanoPuppet config file
-- panopuppet.conf - Apache config file for PanoPuppet
+- Dockerfile      - config file to build the docker image (no need to edit)
+- panopuppet.conf - Apache config file for PanoPuppet (no need to edit)
+- manage.py       - python config file for PanoPuppet (no need to edit)
+- wsgi.py         - wsgy config file for PanoPuppet (no need to edit)
+- config.yaml     - PanoPuppet config file (provide your configuration)
 
 
 ## Building the PanoPuppet Docker image
