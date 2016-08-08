@@ -7,6 +7,8 @@
     {% load staticfiles %}
     <script src="{% static 'pano/js/query-builder.min.js' %}"></script>
     <script src="{% static 'pano/js/bootbox.min.js' %}"></script>
+    <script src="{% static 'pano/js/moment.js' %}"></script>
+    <script src="{% static 'pano/js/moment-timezone-with-data.min.js' %}"></script>
     <link rel="stylesheet" href="{% static 'pano/css/query-filter.min.css' %}">
     <script>
         $(document).ready(function () {
@@ -139,20 +141,25 @@
                 else {
                     var nodes = response[0]['nodeList'];
                     //('certname', 'latestCatalog', 'latestReport', 'latestFacts', 'success', 'noop', 'failure', 'skipped'),
+                    var curTz = $("select[name=timezone] option:selected").val();
+                    var t_format = "YYYY-MM-DD HH:mm:ss";
                     nodes.forEach(function (node) {
                         data += '<tr>';
                         //Certname
                         data += '<td><a href="../reports/' + node[0] + '">' + node[0] + '</a></td>';
                         //latest catalog
-                        data += '<td>' + node[1] + '</td>';
+                        var t_cat = moment(node[1]).tz(curTz).format(t_format);
+                        data += '<td>' + t_cat + '</td>';
                         //latest report
+                        var t_rep = moment(node[2]).tz(curTz).format(t_format);
                         if (node[4] > 0 || node[5] > 0 || node[6] > 0 || node[7] > 0) {
-                            data += '<td><a href="../reports/' + node[0] + '?latest=true&report_timestamp=' + node[2] + '">' + node[2] + '</a></td>';
+                            data += '<td><a href="../reports/' + node[0] + '?latest=true&report_timestamp=' + t_rep + '">' + t_rep + '</a></td>';
                         } else {
-                            data += '<td>' + node[2] + '</td>';
+                            data += '<td>' + t_rep + '</td>';
                         }
                         //latest facts
-                        data += '<td>' + node[3] + '</td>';
+                        var t_fact = moment(node[3]).tz(curTz).format(t_format);
+                        data += '<td>' + t_fact + '</td>';
                         //failed events
                         data += '<td style="text-align: center"><p style="margin-bottom: 0" class="bg-success img-rounded"><strong>' + node[4] + '</strong></p></td>';
                         //skipped events
@@ -260,7 +267,7 @@
                     }
                 },
                 {
-                    id: 'facts',
+                    id: 'fact_contents',
                     label: 'Fact',
                     type: 'string',
                     description: 'Each fact query in the same GROUP will all be put in the same SUBQUERY.' +
