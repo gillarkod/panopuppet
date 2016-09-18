@@ -2,6 +2,11 @@
 
 [![Join the chat at https://gitter.im/propyless/panopuppet](https://badges.gitter.im/propyless/panopuppet.svg)](https://gitter.im/propyless/panopuppet?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
+### Important notice
+Hello, I've recently started a new job and I don't have much time to invest in this project anymore. I recommended going for one of the projects with more contributors. The code is terrible here (I was learning python) so if you feel up for a challenge and want to keep the project alive, please get in touch.
+
+---
+
 PanoPuppet, Panorama Puppet or PP is a web frontend that interfaces with PuppetDB
 and gives you a panorama view over your puppet environment(s).
 PanoPuppet visualizes this data for you with lists and graphs.
